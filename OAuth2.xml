@@ -88,10 +88,10 @@
                 <t>The updated OAuth 1.0 spec could also be useful for more complete language around the Web App Profile though we should also draw from Luke Shepard's JavaScript profile (which needs updating).  I believe the main difference is the security characteristics.</t>
             </section>
 
-            <section title="JavaScript Profile">
-                <t>The JavaScript Profile is similar to the <xref target="web_profile">Web App Profile</xref> though has differing security characteristics as the authorization server includes an access token in its response via the resource owner's user-agent. Because the entire source code for the client is downloaded to resource owner's user-agent, it is not possible to protect the client secret. This profile allows for authorization while taking those security considerations into account.</t>
+            <section title="Pure Client Profile">
+                <t>The Pure Client Profile is similar to the <xref target="web_profile">Web App Profile</xref>, but it has different security characteristics. Pure client apps are applications that live entirely in JavaScript, on the desktop, a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This profile allows for authorization while taking those security considerations into account.</t>
 
-                <t>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this profile. Specifically, it should only be used when the risk of exposing the access token in a JavaScript environment is acceptable. To help mitigate this risk, the access token SHOULD have an expiration time on the order of a few hours or less.</t>
+                <t>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this profile. Specifically, as the access token flows directly to the user-agent, it should only be used when it is acceptable for the user to have direct access to the access token. Additionally, care should be taken to choose a good callback URL, as described below.</t>
 
                 <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and secret from the authorization server. The authorization server MAY require the client to pre-register their callback URI.</t>
 
@@ -100,11 +100,11 @@
                 <t><list style="hanging">
                     <t hangText="oauth_client_only">Specifies that the authorization server should return an access token. The parameter value MUST be set to "true" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
-                    <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the Resource Owner Authorization step is completed.  If the client is unable to receive callbacks or a callback URI has been established via other means, the parameter value MUST be set to "oob" (case sensitive), to indicate an out-of-band configuration. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URL or (TODO: reference) include a hash "#" in the URL to prevent transmission of plain text credentials.</t>
                 </list></t>
 
                 <t>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:</t>
                 <t><list style="hanging">
+                    <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the Resource Owner Authorization step is completed.  If the client is unable to receive callbacks or a callback URI has been established via other means, the parameter value MUST be set to "oob" (case sensitive), to indicate an out-of-band configuration. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URL or (TODO: reference) include a hash "#" in the URL to prevent transmission of plain text credentials.</t>
                     <t hangText="oauth_client_state">An opaque value that Clients can use to maintain state associated with this request.</t>
                     <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
                 </list></t>
@@ -136,13 +136,13 @@
 
                 <t>If the callback URI already includes a query component, the server MUST append the OAuth parameters to the end of the existing query.</t>
 
-                <t>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS/HTTP requests:</t>
+                <t>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS/HTTP "GET" requests:</t>
                 <figure><artwork><![CDATA[
-    GET /cb?oauth_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
+    GET /cb?oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
     Host: client.example.com
                 ]]></artwork></figure>
                 <figure><artwork><![CDATA[
-    GET /cb#?oauth_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
+    GET /cb#?oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
     Host: client.example.com
                 ]]></artwork></figure>
 
