@@ -158,7 +158,103 @@
             </section>
 
             <section title="Device Profile">
-                <t>For devices which cannot open or embed a web browser. Netflix and Apple have very nice flows here where the device presents a code that you type in on your computer's web browser.</t>
+                <t>The Device Profile is suitable when the client is a device which does not have an easy data-entry method (e.g. game consoles or entertainment centers), but where the end-user has access to a separate computer with simple data-entry methods (e.g. their home computer, a laptop or a smartphone).</t>
+
+                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier from the authorization server.</t>
+
+                <t>The client constructs an HTTP "POST" request to the device authorization endpoint and includes the following REQUIRED parameters:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_client_identifier">The client identifier.</t>
+                </list></t>
+
+                <t>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
+                </list></t>
+
+                <t>Since the request results in the transmission of temporary plain text credentials in the HTTP response, the authorization server MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).</t>
+
+                <t>For example, the client makes the following HTTPS request:</t>
+                <figure><artwork><![CDATA[
+   POST /request_token HTTP/1.1
+   Host: server.example.com
+   oauth_client_identifier=s6BhdRkqt3
+                ]]></artwork></figure>
+
+                <t>Upon receiving an authorization request by the client, the authorization server generates a device verification code and a user verification code. These are included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK). The response contains the following REQUIRED parameters:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_device_code">The device verification code.</t>
+                    <t hangText="oauth_user_code">The user verification code.</t>
+                    <t hangText="oauth_verification_url">The user verification URL on the authorization server.</t>
+                </list></t>
+
+                <t>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_verification_token_expires_in">The lifetime of the two verification codes in seconds.</t>
+                    <t hangText="oauth_verification_rate_limit">The minimum amount of time in seconds that the client SHOULD wait between polling requests to the device authorization URL.</t>
+                </list></t>
+
+                <t>For example:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_device_code=74tq5miHKB&oauth_user_code=94248&oauth_verification_url=http%3A%2F%2Fwww%2Eexample%2Ecom%2Fdevice&oauth_verification_rate_limit=3
+                ]]></artwork></figure>
+
+                <t>The client MUST display the user verification URL and the user verification code to the end-user, instruct them to visit the user verification URL in a web browser, and to enter the user verification token upon doing so.</t>
+
+                <t>The way in which the authorization server handles the authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner. After doing so, the server MUST prompt the end-user to enter the user verification code.</t>
+
+                <t>The authorization server MUST verify that the user verification code is valid and MAY verify that the client is authorized to use this profile.  If the request is authorized, the authorization server directs the end-user to go back to the client device and follow its instructions.</t>
+
+                <t>The client MAY have an interface element (such as a button) that the end-user interacts with to communicate that they have finished the authorization process. The client MAY initiate the following request at an arbitrary but reasonable interval in order to create a more responsive user experience though MUST NOT exceed the verification rate limit if one is specified. The Client MAY both poll and have an interface element, but MUST NOT have neither.</t>
+
+                <t>The client constructs an HTTP "POST" request to the device authorization endpoint and includes the following REQUIRED parameters:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_client_identifier">The client identifier.</t>
+                    <t hangText="oauth_device_verification_code">The device verification code.</t>
+                </list></t>
+
+                <t>Since the request results in the transmission of plain text credentials in the HTTP response, the authorization server MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).</t>
+
+                <t>For example, the client makes the following HTTPS request:</t>
+                <figure><artwork><![CDATA[
+    POST /device_authorize HTTP/1.1
+    Host: server.example.com
+    oauth_client_identifier=s6BhdRkqt3&oauth_device_verification_code=J2vC42OifV
+                ]]></artwork></figure>
+
+                <t>If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK). The response contains the following REQUIRED parameter:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_access_token">The access token.</t>
+                </list></t>
+
+                <t>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                </list></t>
+
+                <t>For example:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=600
+                ]]></artwork></figure>
+
+                <t>If the authorization server is unable to issue an access token to the client, the HTTP response body uses the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 401 status code (Unauthorized). The response contains the following REQUIRED parameter:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_error_reason">Value must be one of "authorization_declined", "authorization_pending", "slow_down", or "verification_code_expired" (case sensitive).</t>
+                </list></t>
+
+                <t>For example:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+
+    oauth_error_reason=authorization_pending
+                ]]></artwork></figure>
             </section>
 
             <section title="Username and Password Profile">
