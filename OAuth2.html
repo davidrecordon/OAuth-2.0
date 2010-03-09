@@ -444,7 +444,80 @@ Device Profile</h3>
 <a name="rfc.section.2.5"></a><h3>2.5.&nbsp;
 Username and Password Profile</h3>
 
-<p>Generally for trusted Clients.
+<p>This profile is used when the authorization server generally trusts the client to temporarily collect the end-user's username and password and it is impossible to use one of the other authorization profiles. This profile enables a client to act on behalf of the resource owner without having to permanently store their username and password.
+</p>
+<p>Prior to making a request using this profile, the client MUST have obtained a client identifier and secret from the authorization server. How the client prompts the resource owner for their username and password is beyond the scope of this specification. The client MUST discard the resource owner's username and password once an access token has been obtained.
+</p>
+<p>The client constructs an HTTP "POST" request to the token request endpoint and includes the following REQUIRED parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_client_identifier</dt>
+<dd>The client identifier.
+</dd>
+<dt>oauth_client_secret</dt>
+<dd>The client secret.
+</dd>
+<dt>oauth_username</dt>
+<dd>The resource owner's username.
+</dd>
+<dt>oauth_password</dt>
+<dd>The resource owner's password.
+</dd>
+</dl></blockquote>
+
+<p>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_scope</dt>
+<dd>If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.
+</dd>
+</dl></blockquote>
+
+<p>Since the request results in the transmission of plain text credentials in both the HTTP request and response, the authorization server MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).
+</p>
+<p>For example, the client makes the following HTTPS request:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    POST /request_token HTTP/1.1
+    Host: server.example.com
+    oauth_client_identifier=s6BhdRkqt3&amp;oauth_client_secret=8eSEIpnqmM&amp;oauth_username=daveman692&amp;oauth_password=1password
+</pre></div>
+<p>The authorization server MUST verify that the resource owner's credentials are accurate and MAY verify that the client is authorized to use this profile. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <a class='info' href='#W3C.REC-html40-19980424'>[W3C.REC&#8209;html40&#8209;19980424]<span> (</span><span class='info'>Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;HTML 4.0 Specification,&rdquo; .</span><span>)</span></a> with a 200 status code (OK).
+</p>
+<p>The response contains the following REQUIRED parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token</dt>
+<dd>The access token.
+</dd>
+<dt>oauth_refresh_token</dt>
+<dd>The refresh token.
+</dd>
+</dl></blockquote>
+
+<p>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token_expires_in</dt>
+<dd>The lifetime of the access token in seconds.
+</dd>
+</dl></blockquote>
+
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_access_token=FJQbwq9OD8&amp;oauth_refresh_token=gO3CHNqpH8
+</pre></div>
+<p>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
+</p>
+<p>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>) using the access token received.
+</p>
+<p>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.
 </p>
 <a name="anchor10"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
