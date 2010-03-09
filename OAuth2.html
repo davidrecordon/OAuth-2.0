@@ -203,7 +203,7 @@ Getting an Access Token<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#web_profile">2.1.</a>&nbsp;
 Web App Profile<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor6">2.2.</a>&nbsp;
-JavaScript Profile<br />
+Pure Client Profile<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor7">2.3.</a>&nbsp;
 Rich App Profile<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor8">2.4.</a>&nbsp;
@@ -341,11 +341,11 @@ Web App Profile</h3>
 <a name="anchor6"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.2"></a><h3>2.2.&nbsp;
-JavaScript Profile</h3>
+Pure Client Profile</h3>
 
-<p>The JavaScript Profile is similar to the <a class='info' href='#web_profile'>Web App Profile<span> (</span><span class='info'>Web App Profile</span><span>)</span></a> though has differing security characteristics as the authorization server includes an access token in its response via the resource owner's user-agent. Because the entire source code for the client is downloaded to resource owner's user-agent, it is not possible to protect the client secret. This profile allows for authorization while taking those security considerations into account.
+<p>The Pure Client Profile is similar to the <a class='info' href='#web_profile'>Web App Profile<span> (</span><span class='info'>Web App Profile</span><span>)</span></a>, but it has different security characteristics. Pure client apps are applications that live entirely in JavaScript, on the desktop, a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This profile allows for authorization while taking those security considerations into account.
 </p>
-<p>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this profile. Specifically, it should only be used when the risk of exposing the access token in a JavaScript environment is acceptable. To help mitigate this risk, the access token SHOULD have an expiration time on the order of a few hours or less.
+<p>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this profile. Specifically, as the access token flows directly to the user-agent, it should only be used when it is acceptable for the user to have direct access to the access token. Additionally, care should be taken to choose a good callback URL, as described below.
 </p>
 <p>Prior to making a request using this profile, the client MUST have obtained a client identifier and secret from the authorization server. The authorization server MAY require the client to pre-register their callback URI.
 </p>
@@ -359,15 +359,15 @@ JavaScript Profile</h3>
 <dt>oauth_client_identifier</dt>
 <dd>The client identifier.
 </dd>
-<dt>oauth_callback_url</dt>
-<dd>An absolute URI to which the authorization server will redirect the resource owner back when the Resource Owner Authorization step is completed.  If the client is unable to receive callbacks or a callback URI has been established via other means, the parameter value MUST be set to "oob" (case sensitive), to indicate an out-of-band configuration. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URL or (TODO: reference) include a hash "#" in the URL to prevent transmission of plain text credentials.
-</dd>
 </dl></blockquote>
 
 <p>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:
 </p>
 <p></p>
 <blockquote class="text"><dl>
+<dt>oauth_callback_url</dt>
+<dd>An absolute URI to which the authorization server will redirect the resource owner back when the Resource Owner Authorization step is completed.  If the client is unable to receive callbacks or a callback URI has been established via other means, the parameter value MUST be set to "oob" (case sensitive), to indicate an out-of-band configuration. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URL or (TODO: reference) include a hash "#" in the URL to prevent transmission of plain text credentials.
+</dd>
 <dt>oauth_client_state</dt>
 <dd>An opaque value that Clients can use to maintain state associated with this request.
 </dd>
@@ -411,12 +411,12 @@ JavaScript Profile</h3>
 
 <p>If the callback URI already includes a query component, the server MUST append the OAuth parameters to the end of the existing query.
 </p>
-<p>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS/HTTP requests:
+<p>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS/HTTP "GET" requests:
 </p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
-    GET /cb?oauth_token=FJQbwq9OD8&amp;oauth_access_token_expires_in=10800 HTTP/1.1
+    GET /cb?oauth_access_token=FJQbwq9OD8&amp;oauth_access_token_expires_in=10800 HTTP/1.1
     Host: client.example.com
 </pre></div><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
-    GET /cb#?oauth_token=FJQbwq9OD8&amp;oauth_access_token_expires_in=10800 HTTP/1.1
+    GET /cb#?oauth_access_token=FJQbwq9OD8&amp;oauth_access_token_expires_in=10800 HTTP/1.1
     Host: client.example.com
 </pre></div>
 <p>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
