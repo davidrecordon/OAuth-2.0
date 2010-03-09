@@ -200,15 +200,17 @@ URLs<br />
 Notational Conventions<br />
 <a href="#get_token">2.</a>&nbsp;
 Getting an Access Token<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor6">2.1.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#web_profile">2.1.</a>&nbsp;
 Web App Profile<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor7">2.2.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor6">2.2.</a>&nbsp;
+JavaScript Profile<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor7">2.3.</a>&nbsp;
 Rich App Profile<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor8">2.3.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor8">2.4.</a>&nbsp;
 Device Profile<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor9">2.4.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor9">2.5.</a>&nbsp;
 Username and Password Profile<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor10">2.5.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor10">2.6.</a>&nbsp;
 Client Identifier and Secret Profile<br />
 <a href="#anchor11">3.</a>&nbsp;
 Refreshing an Access Token<br />
@@ -329,37 +331,124 @@ Getting an Access Token</h3>
 
 <p>TODO: This section really comes from WRAP.  I believe that a server MUST implement at least one of the profiles to be considered OAuth compatible. While the SAML assertion profile has been in WRAP, I haven't seen strong advocates on the mailing list or in the survey for it.  Let's draft it as a separate profile from the core spec.
 </p>
-<a name="anchor6"></a><br /><hr />
+<a name="web_profile"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.1"></a><h3>2.1.&nbsp;
 Web App Profile</h3>
 
 <p>The updated OAuth 1.0 spec could also be useful for more complete language around the Web App Profile though we should also draw from Luke Shepard's JavaScript profile (which needs updating).  I believe the main difference is the security characteristics.
 </p>
-<a name="anchor7"></a><br /><hr />
+<a name="anchor6"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.2"></a><h3>2.2.&nbsp;
+JavaScript Profile</h3>
+
+<p>The JavaScript Profile is similar to the <a class='info' href='#web_profile'>Web App Profile<span> (</span><span class='info'>Web App Profile</span><span>)</span></a> though has differing security characteristics as the authorization server includes an access token in its response via the resource owner's user-agent. Because the entire source code for the client is downloaded to resource owner's user-agent, it is not possible to protect the client secret. This profile allows for authorization while taking those security considerations into account.
+</p>
+<p>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this profile. Specifically, it should only be used when the risk of exposing the access token in a JavaScript environment is acceptable. To help mitigate this risk, the access token SHOULD have an expiration time on the order of a few hours or less.
+</p>
+<p>Prior to making a request using this profile, the client MUST have obtained a client identifier and secret from the authorization server. The authorization server MAY require the client to pre-register their callback URI.
+</p>
+<p>The client MUST send the end-user to the authorization server to authorize the request. The client constructs request URI by adding the following REQUIRED query parameters to the user authorization URL:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_client_only</dt>
+<dd>Specifies that the authorization server should return an access token. The parameter value MUST be set to "true" (case sensitive).
+</dd>
+<dt>oauth_client_identifier</dt>
+<dd>The client identifier.
+</dd>
+<dt>oauth_callback_url</dt>
+<dd>An absolute URI to which the authorization server will redirect the resource owner back when the Resource Owner Authorization step is completed.  If the client is unable to receive callbacks or a callback URI has been established via other means, the parameter value MUST be set to "oob" (case sensitive), to indicate an out-of-band configuration. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URL or (TODO: reference) include a hash "#" in the URL to prevent transmission of plain text credentials.
+</dd>
+</dl></blockquote>
+
+<p>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_client_state</dt>
+<dd>An opaque value that Clients can use to maintain state associated with this request.
+</dd>
+<dt>oauth_scope</dt>
+<dd>If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.
+</dd>
+</dl></blockquote>
+
+<p>The client directs the resource owner to the constructed URI using an HTTP redirection response, or by other means available to it via the resource owner's user-agent.  The request MUST use the HTTP "GET" method.
+</p>
+<p>For example, the client directs the resource owner's user-agent make one of the following HTTPS requests:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    GET /user_authorization?oauth_client_only=true&amp;oauth_client_identifier=s6BhdRkqt3&amp;oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    Host: server.example.com
+</pre></div><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    GET /user_authorization?oauth_client_only=true&amp;oauth_client_identifier=s6BhdRkqt3&amp;oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
+    Host: server.example.com
+</pre></div>
+<p>The way in which the server handles the authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner.
+</p>
+<p>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding the following REQUIRED parameters to the callback URI query component
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token</dt>
+<dd>The access token.
+</dd>
+</dl></blockquote>
+
+<p>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token_expires_in</dt>
+<dd>The lifetime of the access token in seconds.
+</dd>
+<dt>oauth_refresh_token</dt>
+<dd>The refresh token.
+</dd>
+</dl></blockquote>
+
+<p>If the callback URI already includes a query component, the server MUST append the OAuth parameters to the end of the existing query.
+</p>
+<p>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS/HTTP requests:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    GET /cb?oauth_token=FJQbwq9OD8&amp;oauth_access_token_expires_in=10800 HTTP/1.1
+    Host: client.example.com
+</pre></div><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    GET /cb#?oauth_token=FJQbwq9OD8&amp;oauth_access_token_expires_in=10800 HTTP/1.1
+    Host: client.example.com
+</pre></div>
+<p>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
+</p>
+<p>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>) using the access token received.
+</p>
+<p>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.
+</p>
+<a name="anchor7"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.2.3"></a><h3>2.3.&nbsp;
 Rich App Profile</h3>
 
 <p>For desktop applications which can open or embed a web browser.
 </p>
 <a name="anchor8"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
-<a name="rfc.section.2.3"></a><h3>2.3.&nbsp;
+<a name="rfc.section.2.4"></a><h3>2.4.&nbsp;
 Device Profile</h3>
 
 <p>For devices which cannot open or embed a web browser. Netflix and Apple have very nice flows here where the device presents a code that you type in on your computer's web browser.
 </p>
 <a name="anchor9"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
-<a name="rfc.section.2.4"></a><h3>2.4.&nbsp;
+<a name="rfc.section.2.5"></a><h3>2.5.&nbsp;
 Username and Password Profile</h3>
 
 <p>Generally for trusted Clients.
 </p>
 <a name="anchor10"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
-<a name="rfc.section.2.5"></a><h3>2.5.&nbsp;
+<a name="rfc.section.2.6"></a><h3>2.6.&nbsp;
 Client Identifier and Secret Profile</h3>
 
 <p>This profile is suitable when the client is also the resource owner and thus not accessing protected resources within the context of a given end-user. For example, when a client is accessing non-private data or modifying data about itself. This profile SHOULD NOT be used when the client is acting on behalf of an end-user.
@@ -429,7 +518,7 @@ Client Identifier and Secret Profile</h3>
 </p>
 <p>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>) using the access token received.
 </p>
-<p>Id the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.
+<p>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.
 </p>
 <a name="anchor11"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>

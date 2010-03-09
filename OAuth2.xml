@@ -84,8 +84,73 @@
         <section title="Getting an Access Token" anchor="get_token">
             <t>TODO: This section really comes from WRAP.  I believe that a server MUST implement at least one of the profiles to be considered OAuth compatible. While the SAML assertion profile has been in WRAP, I haven't seen strong advocates on the mailing list or in the survey for it.  Let's draft it as a separate profile from the core spec.</t>
 
-            <section title="Web App Profile">
+            <section title="Web App Profile" anchor="web_profile">
                 <t>The updated OAuth 1.0 spec could also be useful for more complete language around the Web App Profile though we should also draw from Luke Shepard's JavaScript profile (which needs updating).  I believe the main difference is the security characteristics.</t>
+            </section>
+
+            <section title="JavaScript Profile">
+                <t>The JavaScript Profile is similar to the <xref target="web_profile">Web App Profile</xref> though has differing security characteristics as the authorization server includes an access token in its response via the resource owner's user-agent. Because the entire source code for the client is downloaded to resource owner's user-agent, it is not possible to protect the client secret. This profile allows for authorization while taking those security considerations into account.</t>
+
+                <t>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this profile. Specifically, it should only be used when the risk of exposing the access token in a JavaScript environment is acceptable. To help mitigate this risk, the access token SHOULD have an expiration time on the order of a few hours or less.</t>
+
+                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and secret from the authorization server. The authorization server MAY require the client to pre-register their callback URI.</t>
+
+                <t>The client MUST send the end-user to the authorization server to authorize the request. The client constructs request URI by adding the following REQUIRED query parameters to the user authorization URL:</t>
+
+                <t><list style="hanging">
+                    <t hangText="oauth_client_only">Specifies that the authorization server should return an access token. The parameter value MUST be set to "true" (case sensitive).</t>
+                    <t hangText="oauth_client_identifier">The client identifier.</t>
+                    <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the Resource Owner Authorization step is completed.  If the client is unable to receive callbacks or a callback URI has been established via other means, the parameter value MUST be set to "oob" (case sensitive), to indicate an out-of-band configuration. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URL or (TODO: reference) include a hash "#" in the URL to prevent transmission of plain text credentials.</t>
+                </list></t>
+
+                <t>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_client_state">An opaque value that Clients can use to maintain state associated with this request.</t>
+                    <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
+                </list></t>
+
+                <t>The client directs the resource owner to the constructed URI using an HTTP redirection response, or by other means available to it via the resource owner's user-agent.  The request MUST use the HTTP "GET" method.</t>
+
+                <t>For example, the client directs the resource owner's user-agent make one of the following HTTPS requests:</t>
+                <figure><artwork><![CDATA[
+    GET /user_authorization?oauth_client_only=true&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    Host: server.example.com
+                ]]></artwork></figure>
+                <figure><artwork><![CDATA[
+    GET /user_authorization?oauth_client_only=true&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
+    Host: server.example.com
+                ]]></artwork></figure>
+
+                <t>The way in which the server handles the authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner.</t>
+
+                <t>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding the following REQUIRED parameters to the callback URI query component</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_access_token">The access token.</t>
+                </list></t>
+
+                <t>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                    <t hangText="oauth_refresh_token">The refresh token.</t>
+                </list></t>
+
+                <t>If the callback URI already includes a query component, the server MUST append the OAuth parameters to the end of the existing query.</t>
+
+                <t>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS/HTTP requests:</t>
+                <figure><artwork><![CDATA[
+    GET /cb?oauth_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
+    Host: client.example.com
+                ]]></artwork></figure>
+                <figure><artwork><![CDATA[
+    GET /cb#?oauth_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
+    Host: client.example.com
+                ]]></artwork></figure>
+
+                <t>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.</t>
+
+                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
+
+                <t>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.</t>
             </section>
 
             <section title="Rich App Profile">
