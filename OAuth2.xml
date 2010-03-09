@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rfc SYSTEM "http://xml.resource.org/authoring/rfc2629.dtd" [
+    <!ENTITY RFC2119 PUBLIC '' "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+    <!ENTITY RFC2119 PUBLIC '' "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2616.xml">
+]>
+<?rfc toc="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="info" docName="draft-recordon-oauth2-01" ipr="trust200902">
+    <front>
+        <title>OAuth 2.0 DRAFT</title>
+        <author fullname='David Recordon' surname='Recordon' initials='D.' role='editor'>
+            <organization>Facebook, Inc</organization>
+            <address>
+                <email>davidrecordon@facebook.com</email>
+            </address>
+        </author>
+        <date year="2010" month="Mar"/>
+
+        <abstract>
+            <t>OAuth 2.0 provides a method for an application (client) to access the Protected Resource hosted on a server on behalf of a resource owner (such as a different client or an end-user).  It provides a process for users to authorize third-party access to their protected resources via a variety of authorization profiles. These profiles generally do not include having to share their credentials (typically, a username and password pair).  A server can additionally delegate authorization to one or more authorities (authorization server) which issue access tokens to clients.</t>
+        </abstract>
+    </front>
+
+    <middle>
+        <section title="Introduction">
+            <t>This specification consists of two major parts: <xref target='get_token'>Getting an Access Token</xref> and <xref target='access_resource'>Accessing a Protected Resource</xref>.  The first part defines multiple authorization profiles describing how a client may obtain an access token when acting autonomously or on behalf of an end-user.  They involve resource owners authorizing client access to their resources, by authenticating directly with the server and provisioning tokens to the client for use with the authentication method.  The second part defines a method for making authenticated HTTP requests using access tokens either protected via TLS/SSL or by using an access token combined with an access token secret. The access token both identifies the client making the request as well as the resource owner on whose behalf the request is being made.</t>
+
+            <t>The use of OAuth with any other transport protocol than <xref target='RFC2616'>HTTP</xref> is undefined.</t>
+
+            <t>TODO: This section should provide a longer description of the protocol flows and the evolution from OAuth 1.0. Both OAuth 1.0 and WRAP contain fairly complete introductory sections.  I think that the WRAP one is a bit too long and we should shoot for this section being a little over two pages (including terminology).</t>
+
+            <section title="Acknowledgements">
+                <t>This (early) draft was written pretty quickly and is heavily based on <xref target="draft-hammer-oauth-10">The OAuth 1.0 Protocol</xref>, <xref target="draft-hardt-oauth-01">OAuth WRAP</xref> and further discussion on the <eref target="https://www.ietf.org/mailman/listinfo/oauth">IETF OAuth Working Group mailing list</eref>.  Those authors and editors include Allen Tom (Yahoo!), Brian Eaton (Google), Dick Hardt, Eran Hammer-Lahav (Yahoo!) and Yaron Goland (Microsoft).</t>
+                <t>To provide feedback on this draft join the OAuth Working Group: <eref target="http://www.ietf.org/dyn/wg/charter/oauth-charter.html">http://www.ietf.org/dyn/wg/charter/oauth-charter.html</eref>.</t>
+            </section>
+
+            <section title="Terminology">
+                <t>TODO: The terminology should be based on updated OAuth 1.0 terminology which is already close to the WRAP terminology as well.  We should err on the side of more generally understood terms.</t>
+
+                <t><list style="hanging">
+                    <t hangText="access token">An unique identifier issued by the authorization server and used by the client to make authenticated requests on behalf of the user whose authorization has been obtained by the client.  TODO (rephrase): When using SSL it is a short lived bearer token and when using signatures it is accompanied by an additional secret.</t>
+
+                    <t hangText="authorization server">A server that issues access tokens to clients after successful authorization. May be the same entity as the server hosting protected resources.</t>
+
+                    <t hangText="client">An HTTP client (per <xref target='RFC2616' />) capable of making OAuth-authenticed requests for protected resources.</t>
+
+                    <t hangText="client identifier">An unique identifier issued by the authorization server and used used by the client to identify itself to the authorization server.</t>
+
+                    <t hangText="client secret:">An unique identifier issued by the authorization server and used by the client to establish ownership of the client identifier.</t>
+
+                    <t hangText="protected resource">An access-restricted resource which can be obtained from the server using an OAuth-authenticated request. May be the same entity as the authorization server.</t>
+
+                    <t hangText="refresh token">An unique long lived bearer token used by a client to acquire access tokens from an authorization server.</t>
+
+                    <t hangText="resource owner">An entity (generally an end-user) who can authenticate to the authorization server such that it issues the client an access token.</t>
+
+                    <t hangText="server">An HTTP server (per <xref target='RFC2616' />) capable of accepting OAuth-authenticated requests.</t>
+
+
+                    <t hangText="Verification Code:">a code used by a Client to verify the User has authorized the Client to have specific access to a Protected Resource.</t>
+                  </list></t>
+
+                <section title="URLs">
+                    <t>TODO: remove this section? move them into context.</t>
+                    <t><list style="hanging">
+                        <t hangText="Access Token URL:">the Authorization Server URL at which an Access Token is requested by the Client. The URL may accept a variety of parameters depending on the Profile. A Refresh Token may also be returned to the Client. This URL MUST be an HTTPS URL and MUST always be called with POST.</t>
+
+                        <t hangText="Refresh Token URL:">the Authorization Server URL at which a Refresh Token is presented in exchange for a new Access Token is requested. This URL MUST be an HTTPS URL and MUST always be called with POST.</t>
+
+                        <t hangText="Callback URL:">the Client URL where the User will be redirected after an authorization request to the Authorization Server.</t>
+
+                        <t hangText="User Authorization URL:">the Authorization Server URL where the Client redirects the User to make an authorization request.</t>
+                    </list></t>
+                </section>
+            </section>
+
+            <section title="Notational Conventions">
+                <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119" />.</t>
+            </section>
+        </section>
+
+        <section title="Getting an Access Token" anchor="get_token">
+            <t>TODO: This section really comes from WRAP.  I believe that a server MUST implement at least one of the profiles to be considered OAuth compatible. While the SAML assertion profile has been in WRAP, I haven't seen strong advocates on the mailing list or in the survey for it.  Let's draft it as a separate profile from the core spec.</t>
+
+            <section title="Web App Profile">
+                <t>The updated OAuth 1.0 spec could also be useful for more complete language around the Web App Profile though we should also draw from Luke Shepard's JavaScript profile (which needs updating).  I believe the main difference is the security characteristics.</t>
+            </section>
+
+            <section title="Rich App Profile">
+                <t>For desktop applications which can open or embed a web browser.</t>
+            </section>
+
+            <section title="Device Profile">
+                <t>For devices which cannot open or embed a web browser. Netflix and Apple have very nice flows here where the device presents a code that you type in on your computer's web browser.</t>
+            </section>
+
+            <section title="Username and Password Profile">
+                <t>Generally for trusted Clients.</t>
+            </section>
+
+            <section title="Client Identifier and Secret Profile">
+                <t>This profile is suitable when the client is also the resource owner and thus not accessing protected resources within the context of a given end-user. For example, when a client is accessing non-private data or modifying data about itself. This profile SHOULD NOT be used when the client is acting on behalf of an end-user.</t>
+
+                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and secret from the authorization server.</t>
+
+                <t>The client constructs an HTTP "POST" request to the token request endpoint and includes the following REQUIRED parameters:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_client_identifier">The client identifier.</t>
+                    <t hangText="oauth_client_secret">The client secret.</t>
+                </list></t>
+
+                <t>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
+                </list></t>
+
+                <t>Since the request results in the transmission of plain text credentials in both the HTTP request and response, the authorization server MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).</t>
+
+                <t>For example, the client makes the following HTTPS request:</t>
+                <figure><artwork><![CDATA[
+    POST /request_token HTTP/1.1
+    Host: server.example.com
+    oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM
+                ]]></artwork></figure>
+
+                <t>The authorization server MUST verify that the resource owner has authorized the provisioning of an access token to the client. If the request is authorized, the access token are included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
+
+                <t>The response contains the following REQUIRED parameters:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_access_token">The access token.</t>
+                    <t hangText="oauth_refresh_token">The refresh token.</t>
+                </list></t>
+
+                <t>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                </list></t>
+
+                <t>For example:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_access_token=FJQbwq9OD8&oauth_refresh_token=gO3CHNqpH8
+                ]]></artwork></figure>
+
+                <t>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.</t>
+
+                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
+
+                <t>Id the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.</t>
+            </section>
+        </section>
+
+        <section title="Refreshing an Access Token">
+            <t>TODO: In WRAP this functionality is described along with each individual authorization profile.  Some profiles require the client id and secret though not all of them.  In terms of writing more reusable code I imagine that implementors will write a single refresh_token(client_id, client_secret) function so breaking this out into its own section will be easier to implement. We could either require the client id and secret for all profiles or keep them as optional for some profiles.  Personally I lean toward consistency.</t>
+        </section>
+
+        <section title="Accessing a Protected Resource" anchor="access_resource">
+            <t>TODO: This section is really a combination of WRAP and OAuth 1.0.  SSL support will be a MUST and signatures will be optional.</t>
+
+            <section title="Using TLS/SSL">
+                <t>TODO: The SSL section basically copies directly from WRAP section #4.  It's about a page and a half and really easy to implement.</t>
+            </section>
+
+            <section title="Using Signatures">
+                <t>TODO: We need to agree on the signature method though there is a lot of normative text in the OAuth 1.0 spec to draw from.   OAuth 1.0 is about three pages of text assuming people are happy with the mechanism; it would be good to simplify as much as possible. We could modify WRAP's refresh token request to let the client specify that they'd also like an access token secret for that request. This seems like the right way of doing it.</t>
+            </section>
+        </section>
+
+        <section title="Security Considerations">
+            <t>TODO: I'm the wrong person to write this section.</t>
+        </section>
+    </middle>
+
+    <back>
+        <references title="Normative References">
+            <reference anchor="RFC2119">
+                <front> 
+                    <title abbrev='RFC Key Words'>Key words for use in RFCs to Indicate Requirement Levels</title> 
+                    <author initials='B.' surname='Bradner' fullname='Scott Bradner'></author>
+                </front>
+                <seriesInfo name='BCP' value='14' />
+                <seriesInfo name='RFC' value='2119' /> 
+                <format type='TXT' target='ftp://ftp.isi.edu/in-notes/rfc2119.txt' /> 
+                <format type='HTML' target='http://xml.resource.org/public/rfc/html/rfc2119.html' /> 
+            </reference>
+
+            <reference anchor="RFC2616">
+                <front> 
+                    <title abbrev='HTTP/1.1'>Hypertext Transfer Protocol -- HTTP/1.1</title>
+                    <author initials='R.' surname='Fielding' fullname='Roy T. Fielding'></author>
+                    <author initials='J.' surname='Gettys' fullname='James Gettys'></author>
+                    <author initials='J.' surname='Mogul' fullname='Jeffrey C. Mogul'></author>
+                    <author initials='H.' surname='Frystyk' fullname='Henrik Frystyk Nielsen'></author>
+                    <author initials='L.' surname='Masinter' fullname='Larry Masinter'></author>
+                    <author initials='P.' surname='Leach' fullname='Paul J. Leach'></author>
+                    <author initials='T.' surname='Berners-Lee' fullname='Tim Berners-Lee'></author>
+                </front>
+                <seriesInfo name='RFC' value='2616' /> 
+                <format type='TXT' target='http://www.rfc-editor.org/rfc/rfc2616.txt' />
+                <format type='HTML' target='http://xml.resource.org/public/rfc/html/rfc2616.html' /> 
+            </reference>
+
+            <reference anchor="W3C.REC-html40-19980424">
+                <front> 
+                    <title abbrev='HTML 4.0'>HTML 4.0 Specification</title> 
+                    <author initials='D.' surname='Ragget' fullname='Dave Ragget' role="editor"></author>
+                    <author initials='A.' surname='Le Hors' fullname='Arnaud Le Hors' role="editor"></author>
+                    <author initials='I.' surname='Jacobs' fullname='Ian Jacobs' role="editor"></author>
+                </front>
+                <seriesInfo name='W3C' value='REC-html40-19980424' /> 
+                <format type='HTML' target='http://www.w3.org/TR/1998/REC-html40-19980424' /> 
+            </reference>
+        </references>
+
+        <references title="Informative References">
+            <reference anchor="draft-hammer-oauth-10">
+                <front>
+                    <title>The OAuth 1.0 Protocol</title>
+                    <author initials='E.H.L' surname='Hammer-Lahav' fullname='Eran Hammer-Lahav' role='editor'></author>
+                </front>
+                <format type='TXT' target='http://tools.ietf.org/id/draft-hammer-oauth-10.txt' />
+                <format type='HTML' target='http://tools.ietf.org/html/draft-hammer-oauth-10' />
+            </reference>
+
+            <reference anchor="draft-hardt-oauth-01">
+                <front>
+                    <title abbrev='OAuth WRAP'>OAuth Web Resource Authorization Profiles</title>
+                    <author initials='B.' surname='Eaton' fullname='Brian Eaton'></author>
+                    <author initials='Y.' surname='Goland' fullname='Yaron Goland'></author>
+                    <author initials='D.' surname='Hardt' fullname='Dick Hardt' role='editor'></author>
+                    <author initials='A.' surname='Tom' fullname='Allen Tom'></author>
+                </front>
+                <format type='TXT' target='http://www.ietf.org/id/draft-hardt-oauth-01.txt' />
+            </reference>
+        </references>
+    </back>
+</rfc>

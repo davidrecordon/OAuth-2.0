@@ -1,0 +1,508 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en"><head><title>OAuth 2.0 DRAFT</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="description" content="OAuth 2.0 DRAFT">
+<meta name="generator" content="xml2rfc v1.34 (http://xml.resource.org/)">
+<style type='text/css'><!--
+        body {
+                font-family: verdana, charcoal, helvetica, arial, sans-serif;
+                font-size: small; color: #000; background-color: #FFF;
+                margin: 2em;
+        }
+        h1, h2, h3, h4, h5, h6 {
+                font-family: helvetica, monaco, "MS Sans Serif", arial, sans-serif;
+                font-weight: bold; font-style: normal;
+        }
+        h1 { color: #900; background-color: transparent; text-align: right; }
+        h3 { color: #333; background-color: transparent; }
+
+        td.RFCbug {
+                font-size: x-small; text-decoration: none;
+                width: 30px; height: 30px; padding-top: 2px;
+                text-align: justify; vertical-align: middle;
+                background-color: #000;
+        }
+        td.RFCbug span.RFC {
+                font-family: monaco, charcoal, geneva, "MS Sans Serif", helvetica, verdana, sans-serif;
+                font-weight: bold; color: #666;
+        }
+        td.RFCbug span.hotText {
+                font-family: charcoal, monaco, geneva, "MS Sans Serif", helvetica, verdana, sans-serif;
+                font-weight: normal; text-align: center; color: #FFF;
+        }
+
+        table.TOCbug { width: 30px; height: 15px; }
+        td.TOCbug {
+                text-align: center; width: 30px; height: 15px;
+                color: #FFF; background-color: #900;
+        }
+        td.TOCbug a {
+                font-family: monaco, charcoal, geneva, "MS Sans Serif", helvetica, sans-serif;
+                font-weight: bold; font-size: x-small; text-decoration: none;
+                color: #FFF; background-color: transparent;
+        }
+
+        td.header {
+                font-family: arial, helvetica, sans-serif; font-size: x-small;
+                vertical-align: top; width: 33%;
+                color: #FFF; background-color: #666;
+        }
+        td.author { font-weight: bold; font-size: x-small; margin-left: 4em; }
+        td.author-text { font-size: x-small; }
+
+        /* info code from SantaKlauss at http://www.madaboutstyle.com/tooltip2.html */
+        a.info {
+                /* This is the key. */
+                position: relative;
+                z-index: 24;
+                text-decoration: none;
+        }
+        a.info:hover {
+                z-index: 25;
+                color: #FFF; background-color: #900;
+        }
+        a.info span { display: none; }
+        a.info:hover span.info {
+                /* The span will display just on :hover state. */
+                display: block;
+                position: absolute;
+                font-size: smaller;
+                top: 2em; left: -5em; width: 15em;
+                padding: 2px; border: 1px solid #333;
+                color: #900; background-color: #EEE;
+                text-align: left;
+        }
+
+        a { font-weight: bold; }
+        a:link    { color: #900; background-color: transparent; }
+        a:visited { color: #633; background-color: transparent; }
+        a:active  { color: #633; background-color: transparent; }
+
+        p { margin-left: 2em; margin-right: 2em; }
+        p.copyright { font-size: x-small; }
+        p.toc { font-size: small; font-weight: bold; margin-left: 3em; }
+        table.toc { margin: 0 0 0 3em; padding: 0; border: 0; vertical-align: text-top; }
+        td.toc { font-size: small; font-weight: bold; vertical-align: text-top; }
+
+        ol.text { margin-left: 2em; margin-right: 2em; }
+        ul.text { margin-left: 2em; margin-right: 2em; }
+        li      { margin-left: 3em; }
+
+        /* RFC-2629 <spanx>s and <artwork>s. */
+        em     { font-style: italic; }
+        strong { font-weight: bold; }
+        dfn    { font-weight: bold; font-style: normal; }
+        cite   { font-weight: normal; font-style: normal; }
+        tt     { color: #036; }
+        tt, pre, pre dfn, pre em, pre cite, pre span {
+                font-family: "Courier New", Courier, monospace; font-size: small;
+        }
+        pre {
+                text-align: left; padding: 4px;
+                color: #000; background-color: #CCC;
+        }
+        pre dfn  { color: #900; }
+        pre em   { color: #66F; background-color: #FFC; font-weight: normal; }
+        pre .key { color: #33C; font-weight: bold; }
+        pre .id  { color: #900; }
+        pre .str { color: #000; background-color: #CFF; }
+        pre .val { color: #066; }
+        pre .rep { color: #909; }
+        pre .oth { color: #000; background-color: #FCF; }
+        pre .err { background-color: #FCC; }
+
+        /* RFC-2629 <texttable>s. */
+        table.all, table.full, table.headers, table.none {
+                font-size: small; text-align: center; border-width: 2px;
+                vertical-align: top; border-collapse: collapse;
+        }
+        table.all, table.full { border-style: solid; border-color: black; }
+        table.headers, table.none { border-style: none; }
+        th {
+                font-weight: bold; border-color: black;
+                border-width: 2px 2px 3px 2px;
+        }
+        table.all th, table.full th { border-style: solid; }
+        table.headers th { border-style: none none solid none; }
+        table.none th { border-style: none; }
+        table.all td {
+                border-style: solid; border-color: #333;
+                border-width: 1px 2px;
+        }
+        table.full td, table.headers td, table.none td { border-style: none; }
+
+        hr { height: 1px; }
+        hr.insert {
+                width: 80%; border-style: none; border-width: 0;
+                color: #CCC; background-color: #CCC;
+        }
+--></style>
+</head>
+<body>
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<table summary="layout" width="66%" border="0" cellpadding="0" cellspacing="0"><tr><td><table summary="layout" width="100%" border="0" cellpadding="2" cellspacing="1">
+<tr><td class="header">Network Working Group</td><td class="header">D. Recordon, Ed.</td></tr>
+<tr><td class="header">Internet-Draft</td><td class="header">Facebook, Inc</td></tr>
+<tr><td class="header">Intended status: Informational</td><td class="header">Mar 2010</td></tr>
+<tr><td class="header">Expires: September 2, 2010</td><td class="header">&nbsp;</td></tr>
+</table></td></tr></table>
+<h1><br />OAuth 2.0 DRAFT<br />draft-recordon-oauth2-01</h1>
+
+<h3>Abstract</h3>
+
+<p>OAuth 2.0 provides a method for an application (client) to access the Protected Resource hosted on a server on behalf of a resource owner (such as a different client or an end-user).  It provides a process for users to authorize third-party access to their protected resources via a variety of authorization profiles. These profiles generally do not include having to share their credentials (typically, a username and password pair).  A server can additionally delegate authorization to one or more authorities (authorization server) which issue access tokens to clients.
+</p>
+<h3>Status of this Memo</h3>
+<p>
+This Internet-Draft is submitted to IETF in full
+conformance with the provisions of BCP&nbsp;78 and BCP&nbsp;79.</p>
+<p>
+Internet-Drafts are working documents of the Internet Engineering
+Task Force (IETF), its areas, and its working groups.
+Note that other groups may also distribute working documents as
+Internet-Drafts.</p>
+<p>
+Internet-Drafts are draft documents valid for a maximum of six months
+and may be updated, replaced, or obsoleted by other documents at any time.
+It is inappropriate to use Internet-Drafts as reference material or to cite
+them other than as &ldquo;work in progress.&rdquo;</p>
+<p>
+The list of current Internet-Drafts can be accessed at
+<a href='http://www.ietf.org/ietf/1id-abstracts.txt'>http://www.ietf.org/ietf/1id-abstracts.txt</a>.</p>
+<p>
+The list of Internet-Draft Shadow Directories can be accessed at
+<a href='http://www.ietf.org/shadow.html'>http://www.ietf.org/shadow.html</a>.</p>
+<p>
+This Internet-Draft will expire on September 2, 2010.</p>
+
+<h3>Copyright Notice</h3>
+<p>
+Copyright (c) 2010 IETF Trust and the persons identified as the
+document authors.  All rights reserved.</p>
+<p>
+This document is subject to BCP 78 and the IETF Trust's Legal
+Provisions Relating to IETF Documents in effect on the date of
+publication of this document (http://trustee.ietf.org/license-info).
+Please review these documents carefully, as they describe your
+rights and restrictions with respect to this document.</p>
+<a name="toc"></a><br /><hr />
+<h3>Table of Contents</h3>
+<p class="toc">
+<a href="#anchor1">1.</a>&nbsp;
+Introduction<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor2">1.1.</a>&nbsp;
+Acknowledgements<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor3">1.2.</a>&nbsp;
+Terminology<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor4">1.2.1.</a>&nbsp;
+URLs<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor5">1.3.</a>&nbsp;
+Notational Conventions<br />
+<a href="#get_token">2.</a>&nbsp;
+Getting an Access Token<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor6">2.1.</a>&nbsp;
+Web App Profile<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor7">2.2.</a>&nbsp;
+Rich App Profile<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor8">2.3.</a>&nbsp;
+Device Profile<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor9">2.4.</a>&nbsp;
+Username and Password Profile<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor10">2.5.</a>&nbsp;
+Client Identifier and Secret Profile<br />
+<a href="#anchor11">3.</a>&nbsp;
+Refreshing an Access Token<br />
+<a href="#access_resource">4.</a>&nbsp;
+Accessing a Protected Resource<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor12">4.1.</a>&nbsp;
+Using TLS/SSL<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor13">4.2.</a>&nbsp;
+Using Signatures<br />
+<a href="#anchor14">5.</a>&nbsp;
+Security Considerations<br />
+<a href="#rfc.references1">6.</a>&nbsp;
+References<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#rfc.references1">6.1.</a>&nbsp;
+Normative References<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#rfc.references2">6.2.</a>&nbsp;
+Informative References<br />
+<a href="#rfc.authors">&#167;</a>&nbsp;
+Author's Address<br />
+</p>
+<br clear="all" />
+
+<a name="anchor1"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.1"></a><h3>1.&nbsp;
+Introduction</h3>
+
+<p>This specification consists of two major parts: <a class='info' href='#get_token'>Getting an Access Token<span> (</span><span class='info'>Getting an Access Token</span><span>)</span></a> and <a class='info' href='#access_resource'>Accessing a Protected Resource<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>.  The first part defines multiple authorization profiles describing how a client may obtain an access token when acting autonomously or on behalf of an end-user.  They involve resource owners authorizing client access to their resources, by authenticating directly with the server and provisioning tokens to the client for use with the authentication method.  The second part defines a method for making authenticated HTTP requests using access tokens either protected via TLS/SSL or by using an access token combined with an access token secret. The access token both identifies the client making the request as well as the resource owner on whose behalf the request is being made.
+</p>
+<p>The use of OAuth with any other transport protocol than <a class='info' href='#RFC2616'>HTTP<span> (</span><span class='info'>Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;Hypertext Transfer Protocol -- HTTP/1.1,&rdquo; .</span><span>)</span></a> [RFC2616] is undefined.
+</p>
+<p>TODO: This section should provide a longer description of the protocol flows and the evolution from OAuth 1.0. Both OAuth 1.0 and WRAP contain fairly complete introductory sections.  I think that the WRAP one is a bit too long and we should shoot for this section being a little over two pages (including terminology).
+</p>
+<a name="anchor2"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.1.1"></a><h3>1.1.&nbsp;
+Acknowledgements</h3>
+
+<p>This (early) draft was written pretty quickly and is heavily based on <a class='info' href='#draft-hammer-oauth-10'>The OAuth 1.0 Protocol<span> (</span><span class='info'>Hammer-Lahav, E., Ed., &ldquo;The OAuth 1.0 Protocol,&rdquo; .</span><span>)</span></a> [draft&#8209;hammer&#8209;oauth&#8209;10], <a class='info' href='#draft-hardt-oauth-01'>OAuth WRAP<span> (</span><span class='info'>Eaton, B., Goland, Y., Hardt, D., Ed., and A. Tom, &ldquo;OAuth Web Resource Authorization Profiles,&rdquo; .</span><span>)</span></a> [draft&#8209;hardt&#8209;oauth&#8209;01] and further discussion on the <a href='https://www.ietf.org/mailman/listinfo/oauth'>IETF OAuth Working Group mailing list</a>.  Those authors and editors include Allen Tom (Yahoo!), Brian Eaton (Google), Dick Hardt, Eran Hammer-Lahav (Yahoo!) and Yaron Goland (Microsoft).
+</p>
+<p>To provide feedback on this draft join the OAuth Working Group: <a href='http://www.ietf.org/dyn/wg/charter/oauth-charter.html'>http://www.ietf.org/dyn/wg/charter/oauth-charter.html</a>.
+</p>
+<a name="anchor3"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.1.2"></a><h3>1.2.&nbsp;
+Terminology</h3>
+
+<p>TODO: The terminology should be based on updated OAuth 1.0 terminology which is already close to the WRAP terminology as well.  We should err on the side of more generally understood terms.
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>access token</dt>
+<dd>An unique identifier issued by the authorization server and used by the client to make authenticated requests on behalf of the user whose authorization has been obtained by the client.  TODO (rephrase): When using SSL it is a short lived bearer token and when using signatures it is accompanied by an additional secret.
+</dd>
+<dt>authorization server</dt>
+<dd>A server that issues access tokens to clients after successful authorization. May be the same entity as the server hosting protected resources.
+</dd>
+<dt>client</dt>
+<dd>An HTTP client (per <a class='info' href='#RFC2616'>[RFC2616]<span> (</span><span class='info'>Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;Hypertext Transfer Protocol -- HTTP/1.1,&rdquo; .</span><span>)</span></a>) capable of making OAuth-authenticed requests for protected resources.
+</dd>
+<dt>client identifier</dt>
+<dd>An unique identifier issued by the authorization server and used used by the client to identify itself to the authorization server.
+</dd>
+<dt>client secret:</dt>
+<dd>An unique identifier issued by the authorization server and used by the client to establish ownership of the client identifier.
+</dd>
+<dt>protected resource</dt>
+<dd>An access-restricted resource which can be obtained from the server using an OAuth-authenticated request. May be the same entity as the authorization server.
+</dd>
+<dt>refresh token</dt>
+<dd>An unique long lived bearer token used by a client to acquire access tokens from an authorization server.
+</dd>
+<dt>resource owner</dt>
+<dd>An entity (generally an end-user) who can authenticate to the authorization server such that it issues the client an access token.
+</dd>
+<dt>server</dt>
+<dd>An HTTP server (per <a class='info' href='#RFC2616'>[RFC2616]<span> (</span><span class='info'>Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;Hypertext Transfer Protocol -- HTTP/1.1,&rdquo; .</span><span>)</span></a>) capable of accepting OAuth-authenticated requests.
+</dd>
+<dt>Verification Code:</dt>
+<dd>a code used by a Client to verify the User has authorized the Client to have specific access to a Protected Resource.
+</dd>
+</dl></blockquote>
+
+<a name="anchor4"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.1.2.1"></a><h3>1.2.1.&nbsp;
+URLs</h3>
+
+<p>TODO: remove this section? move them into context.
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>Access Token URL:</dt>
+<dd>the Authorization Server URL at which an Access Token is requested by the Client. The URL may accept a variety of parameters depending on the Profile. A Refresh Token may also be returned to the Client. This URL MUST be an HTTPS URL and MUST always be called with POST.
+</dd>
+<dt>Refresh Token URL:</dt>
+<dd>the Authorization Server URL at which a Refresh Token is presented in exchange for a new Access Token is requested. This URL MUST be an HTTPS URL and MUST always be called with POST.
+</dd>
+<dt>Callback URL:</dt>
+<dd>the Client URL where the User will be redirected after an authorization request to the Authorization Server.
+</dd>
+<dt>User Authorization URL:</dt>
+<dd>the Authorization Server URL where the Client redirects the User to make an authorization request.
+</dd>
+</dl></blockquote>
+
+<a name="anchor5"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.1.3"></a><h3>1.3.&nbsp;
+Notational Conventions</h3>
+
+<p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <a class='info' href='#RFC2119'>[RFC2119]<span> (</span><span class='info'>Bradner, B., &ldquo;Key words for use in RFCs to Indicate Requirement Levels,&rdquo; .</span><span>)</span></a>.
+</p>
+<a name="get_token"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.2"></a><h3>2.&nbsp;
+Getting an Access Token</h3>
+
+<p>TODO: This section really comes from WRAP.  I believe that a server MUST implement at least one of the profiles to be considered OAuth compatible. While the SAML assertion profile has been in WRAP, I haven't seen strong advocates on the mailing list or in the survey for it.  Let's draft it as a separate profile from the core spec.
+</p>
+<a name="anchor6"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.2.1"></a><h3>2.1.&nbsp;
+Web App Profile</h3>
+
+<p>The updated OAuth 1.0 spec could also be useful for more complete language around the Web App Profile though we should also draw from Luke Shepard's JavaScript profile (which needs updating).  I believe the main difference is the security characteristics.
+</p>
+<a name="anchor7"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.2.2"></a><h3>2.2.&nbsp;
+Rich App Profile</h3>
+
+<p>For desktop applications which can open or embed a web browser.
+</p>
+<a name="anchor8"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.2.3"></a><h3>2.3.&nbsp;
+Device Profile</h3>
+
+<p>For devices which cannot open or embed a web browser. Netflix and Apple have very nice flows here where the device presents a code that you type in on your computer's web browser.
+</p>
+<a name="anchor9"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.2.4"></a><h3>2.4.&nbsp;
+Username and Password Profile</h3>
+
+<p>Generally for trusted Clients.
+</p>
+<a name="anchor10"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.2.5"></a><h3>2.5.&nbsp;
+Client Identifier and Secret Profile</h3>
+
+<p>This profile is suitable when the client is also the resource owner and thus not accessing protected resources within the context of a given end-user. For example, when a client is accessing non-private data or modifying data about itself. This profile SHOULD NOT be used when the client is acting on behalf of an end-user.
+</p>
+<p>Prior to making a request using this profile, the client MUST have obtained a client identifier and secret from the authorization server.
+</p>
+<p>The client constructs an HTTP "POST" request to the token request endpoint and includes the following REQUIRED parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_client_identifier</dt>
+<dd>The client identifier.
+</dd>
+<dt>oauth_client_secret</dt>
+<dd>The client secret.
+</dd>
+</dl></blockquote>
+
+<p>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_scope</dt>
+<dd>If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.
+</dd>
+</dl></blockquote>
+
+<p>Since the request results in the transmission of plain text credentials in both the HTTP request and response, the authorization server MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).
+</p>
+<p>For example, the client makes the following HTTPS request:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    POST /request_token HTTP/1.1
+    Host: server.example.com
+    oauth_client_identifier=s6BhdRkqt3&amp;oauth_client_secret=8eSEIpnqmM
+</pre></div>
+<p>The authorization server MUST verify that the resource owner has authorized the provisioning of an access token to the client. If the request is authorized, the access token are included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <a class='info' href='#W3C.REC-html40-19980424'>[W3C.REC&#8209;html40&#8209;19980424]<span> (</span><span class='info'>Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;HTML 4.0 Specification,&rdquo; .</span><span>)</span></a> with a 200 status code (OK).
+</p>
+<p>The response contains the following REQUIRED parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token</dt>
+<dd>The access token.
+</dd>
+<dt>oauth_refresh_token</dt>
+<dd>The refresh token.
+</dd>
+</dl></blockquote>
+
+<p>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token_expires_in</dt>
+<dd>The lifetime of the access token in seconds.
+</dd>
+</dl></blockquote>
+
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_access_token=FJQbwq9OD8&amp;oauth_refresh_token=gO3CHNqpH8
+</pre></div>
+<p>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
+</p>
+<p>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>) using the access token received.
+</p>
+<p>Id the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.
+</p>
+<a name="anchor11"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.3"></a><h3>3.&nbsp;
+Refreshing an Access Token</h3>
+
+<p>TODO: In WRAP this functionality is described along with each individual authorization profile.  Some profiles require the client id and secret though not all of them.  In terms of writing more reusable code I imagine that implementors will write a single refresh_token(client_id, client_secret) function so breaking this out into its own section will be easier to implement. We could either require the client id and secret for all profiles or keep them as optional for some profiles.  Personally I lean toward consistency.
+</p>
+<a name="access_resource"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.4"></a><h3>4.&nbsp;
+Accessing a Protected Resource</h3>
+
+<p>TODO: This section is really a combination of WRAP and OAuth 1.0.  SSL support will be a MUST and signatures will be optional.
+</p>
+<a name="anchor12"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.4.1"></a><h3>4.1.&nbsp;
+Using TLS/SSL</h3>
+
+<p>TODO: The SSL section basically copies directly from WRAP section #4.  It's about a page and a half and really easy to implement.
+</p>
+<a name="anchor13"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.4.2"></a><h3>4.2.&nbsp;
+Using Signatures</h3>
+
+<p>TODO: We need to agree on the signature method though there is a lot of normative text in the OAuth 1.0 spec to draw from.   OAuth 1.0 is about three pages of text assuming people are happy with the mechanism; it would be good to simplify as much as possible. We could modify WRAP's refresh token request to let the client specify that they'd also like an access token secret for that request. This seems like the right way of doing it.
+</p>
+<a name="anchor14"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.5"></a><h3>5.&nbsp;
+Security Considerations</h3>
+
+<p>TODO: I'm the wrong person to write this section.
+</p>
+<a name="rfc.references"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.6"></a><h3>6.&nbsp;
+References</h3>
+
+<a name="rfc.references1"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<h3>6.1.&nbsp;Normative References</h3>
+<table width="99%" border="0">
+<tr><td class="author-text" valign="top"><a name="RFC2119">[RFC2119]</a></td>
+<td class="author-text">Bradner, B., &ldquo;<a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>,&rdquo; BCP&nbsp;14, RFC&nbsp;2119 (<a href="ftp://ftp.isi.edu/in-notes/rfc2119.txt">TXT</a>, <a href="http://xml.resource.org/public/rfc/html/rfc2119.html">HTML</a>).</td></tr>
+<tr><td class="author-text" valign="top"><a name="RFC2616">[RFC2616]</a></td>
+<td class="author-text">Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;<a href="http://tools.ietf.org/html/rfc2616">Hypertext Transfer Protocol -- HTTP/1.1</a>,&rdquo; RFC&nbsp;2616 (<a href="http://www.rfc-editor.org/rfc/rfc2616.txt">TXT</a>, <a href="http://xml.resource.org/public/rfc/html/rfc2616.html">HTML</a>).</td></tr>
+<tr><td class="author-text" valign="top"><a name="W3C.REC-html40-19980424">[W3C.REC-html40-19980424]</a></td>
+<td class="author-text">Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;<a href="http://www.w3.org/TR/1998/REC-html40-19980424">HTML 4.0 Specification</a>,&rdquo; W3C&nbsp;REC-html40-19980424.</td></tr>
+</table>
+
+<a name="rfc.references2"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<h3>6.2.&nbsp;Informative References</h3>
+<table width="99%" border="0">
+<tr><td class="author-text" valign="top"><a name="draft-hammer-oauth-10">[draft-hammer-oauth-10]</a></td>
+<td class="author-text">Hammer-Lahav, E., Ed., &ldquo;The OAuth 1.0 Protocol&rdquo; (<a href="http://tools.ietf.org/id/draft-hammer-oauth-10.txt">TXT</a>, <a href="http://tools.ietf.org/html/draft-hammer-oauth-10">HTML</a>).</td></tr>
+<tr><td class="author-text" valign="top"><a name="draft-hardt-oauth-01">[draft-hardt-oauth-01]</a></td>
+<td class="author-text">Eaton, B., Goland, Y., Hardt, D., Ed., and A. Tom, &ldquo;<a href="http://www.ietf.org/id/draft-hardt-oauth-01.txt">OAuth Web Resource Authorization Profiles</a>.&rdquo;</td></tr>
+</table>
+
+<a name="rfc.authors"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<h3>Author's Address</h3>
+<table width="99%" border="0" cellpadding="0" cellspacing="0">
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">David Recordon (editor)</td></tr>
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">Facebook, Inc</td></tr>
+<tr><td class="author" align="right">Email:&nbsp;</td>
+<td class="author-text"><a href="mailto:davidrecordon@facebook.com">davidrecordon@facebook.com</a></td></tr>
+</table>
+</body></html>
+
