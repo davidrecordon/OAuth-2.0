@@ -102,7 +102,7 @@
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                 </list></t>
 
-                <t>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t>The client MAY also include the following OPTIONAL parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the Resource Owner Authorization step is completed.  If the client is unable to receive callbacks or a callback URI has been established via other means, the parameter value MUST be set to "oob" (case sensitive), to indicate an out-of-band configuration. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URL or (TODO: reference) include a hash "#" in the URL to prevent transmission of plain text credentials.</t>
                     <t hangText="oauth_client_state">An opaque value that Clients can use to maintain state associated with this request.</t>
@@ -128,7 +128,7 @@
                     <t hangText="oauth_access_token">The access token.</t>
                 </list></t>
 
-                <t>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
                     <t hangText="oauth_refresh_token">The refresh token.</t>
@@ -167,7 +167,7 @@
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                 </list></t>
 
-                <t>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t>The client MAY also include the following OPTIONAL parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
                 </list></t>
@@ -188,7 +188,7 @@
                     <t hangText="oauth_verification_url">The user verification URL on the authorization server.</t>
                 </list></t>
 
-                <t>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_verification_token_expires_in">The lifetime of the two verification codes in seconds.</t>
                     <t hangText="oauth_verification_rate_limit">The minimum amount of time in seconds that the client SHOULD wait between polling requests to the device authorization URL.</t>
@@ -230,7 +230,7 @@
                     <t hangText="oauth_access_token">The access token.</t>
                 </list></t>
 
-                <t>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
                 </list></t>
@@ -270,7 +270,7 @@
                     <t hangText="oauth_password">The resource owner's password.</t>
                 </list></t>
 
-                <t>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t>The client MAY also include the following OPTIONAL parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
                 </list></t>
@@ -292,7 +292,7 @@
                     <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
-                <t>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
                 </list></t>
@@ -323,7 +323,7 @@
                     <t hangText="oauth_client_secret">The client secret.</t>
                 </list></t>
 
-                <t>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t>The client MAY also include the following OPTIONAL parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
                 </list></t>
@@ -345,7 +345,7 @@
                     <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
-                <t>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:</t>
+                <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
                 </list></t>
