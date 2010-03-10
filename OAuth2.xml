@@ -100,11 +100,11 @@
                 <t><list style="hanging">
                     <t hangText="oauth_mode">The parameter value MUST be set to "profile_pure_client" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
+                    <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URI or include a fragment identifier ("#") as defined by <xref target="RFC3986" /> section 3.5 in the URI to prevent transmission of plain text credentials.</t>
                 </list></t>
 
                 <t>The client MAY also include the following OPTIONAL parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed.  If the client is unable to receive callbacks or a callback URI has been established via other means, the parameter value MUST be set to "oob" (case sensitive), to indicate an out-of-band configuration. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URL or (TODO: reference) include a hash "#" in the URL to prevent transmission of plain text credentials.</t>
                     <t hangText="oauth_client_state">An opaque value that clients can use to maintain state associated with this request.</t>
                     <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
                 </list></t>
