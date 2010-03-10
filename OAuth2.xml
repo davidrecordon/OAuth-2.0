@@ -181,7 +181,7 @@
 
                 <t>For example, the client makes the following HTTPS request:</t>
                 <figure><artwork><![CDATA[
-   POST /request_token HTTP/1.1
+   POST /access_token HTTP/1.1
    Host: server.example.com
    oauth_client_identifier=s6BhdRkqt3
                 ]]></artwork></figure>
@@ -226,7 +226,7 @@
 
                 <t>For example, the client makes the following HTTPS request:</t>
                 <figure><artwork><![CDATA[
-    POST /device_authorize HTTP/1.1
+    POST /access_token HTTP/1.1
     Host: server.example.com
     oauth_client_identifier=s6BhdRkqt3&oauth_device_verification_code=J2vC42OifV
                 ]]></artwork></figure>
@@ -286,7 +286,7 @@
 
                 <t>For example, the client makes the following HTTPS request:</t>
                 <figure><artwork><![CDATA[
-    POST /request_token HTTP/1.1
+    POST /access_token HTTP/1.1
     Host: server.example.com
     oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_username=daveman692&oauth_password=1password
                 ]]></artwork></figure>
@@ -346,7 +346,7 @@
 
                 <t>For example, the client makes the following HTTPS request:</t>
                 <figure><artwork><![CDATA[
-    POST /request_token HTTP/1.1
+    POST /access_token HTTP/1.1
     Host: server.example.com
     oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM
                 ]]></artwork></figure>
