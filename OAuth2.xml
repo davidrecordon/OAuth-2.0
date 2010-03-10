@@ -149,6 +149,12 @@
                 <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
 
                 <t>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.</t>
+
+                <t>For example:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+                ]]></artwork></figure>
             </section>
 
             <section title="Rich App Profile">
@@ -311,6 +317,12 @@
                 <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
 
                 <t>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.</t>
+
+                <t>For example:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+                ]]></artwork></figure>
             </section>
 
             <section title="Client Identifier and Secret Profile">
@@ -365,6 +377,12 @@
                 <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
 
                 <t>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.</t>
+
+                <t>For example:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+                ]]></artwork></figure>
             </section>
         </section>
 
@@ -411,6 +429,12 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
             ]]></artwork></figure>
 
             <t>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.</t>
+
+            <t>For example:</t>
+            <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+            ]]></artwork></figure>
         </section>
 
         <section title="Accessing a Protected Resource" anchor="access_resource">
