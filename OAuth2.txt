@@ -1,0 +1,1009 @@
+
+
+
+Network Working Group                                   D. Recordon, Ed.
+Internet-Draft                                             Facebook, Inc
+Intended status: Informational                                  Mar 2010
+Expires: September 2, 2010
+
+
+                            OAuth 2.0 DRAFT
+                        draft-recordon-oauth2-01
+
+Abstract
+
+   OAuth 2.0 provides a method for an application (client) to access the
+   Protected Resource hosted on a server on behalf of a resource owner
+   (such as a different client or an end-user).  It provides a process
+   for users to authorize third-party access to their protected
+   resources via a variety of authorization profiles.  These profiles
+   generally do not include having to share their credentials
+   (typically, a username and password pair).  A server can additionally
+   delegate authorization to one or more authorities (authorization
+   server) which issue access tokens to clients.
+
+Status of this Memo
+
+   This Internet-Draft is submitted to IETF in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on September 2, 2010.
+
+Copyright Notice
+
+   Copyright (c) 2010 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+
+
+Recordon                Expires September 2, 2010               [Page 1]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the BSD License.
+
+
+Table of Contents
+
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
+     1.1.  Acknowledgements . . . . . . . . . . . . . . . . . . . . .  3
+     1.2.  Terminology  . . . . . . . . . . . . . . . . . . . . . . .  3
+       1.2.1.  Endpoints  . . . . . . . . . . . . . . . . . . . . . .  4
+     1.3.  Notational Conventions . . . . . . . . . . . . . . . . . .  5
+   2.  Getting an Access Token  . . . . . . . . . . . . . . . . . . .  5
+     2.1.  Web App Profile  . . . . . . . . . . . . . . . . . . . . .  5
+     2.2.  Pure Client Profile  . . . . . . . . . . . . . . . . . . .  5
+     2.3.  Rich App Profile . . . . . . . . . . . . . . . . . . . . .  8
+     2.4.  Device Profile . . . . . . . . . . . . . . . . . . . . . .  8
+     2.5.  Username and Password Profile  . . . . . . . . . . . . . . 11
+     2.6.  Client Identifier and Secret Profile . . . . . . . . . . . 13
+   3.  Refreshing an Access Token . . . . . . . . . . . . . . . . . . 15
+   4.  Accessing a Protected Resource . . . . . . . . . . . . . . . . 16
+     4.1.  Using TLS/SSL  . . . . . . . . . . . . . . . . . . . . . . 16
+     4.2.  Using Signatures . . . . . . . . . . . . . . . . . . . . . 16
+   5.  Security Considerations  . . . . . . . . . . . . . . . . . . . 17
+   6.  References . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+     6.1.  Normative References . . . . . . . . . . . . . . . . . . . 17
+     6.2.  Informative References . . . . . . . . . . . . . . . . . . 17
+   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 17
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Recordon                Expires September 2, 2010               [Page 2]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+1.  Introduction
+
+   This specification consists of two major parts: Getting an Access
+   Token (Section 2) and Accessing a Protected Resource (Section 4).
+   The first part defines multiple authorization profiles describing how
+   a client may obtain an access token when acting autonomously or on
+   behalf of an end-user.  They involve resource owners authorizing
+   client access to their resources, by authenticating directly with the
+   server and provisioning tokens to the client for use with the
+   authentication method.  The second part defines a method for making
+   authenticated HTTP requests using access tokens either protected via
+   TLS/SSL or by using an access token combined with an access token
+   secret.  The access token both identifies the client making the
+   request as well as the resource owner on whose behalf the request is
+   being made.
+
+   The use of OAuth with any other transport protocol than HTTP
+   [RFC2616] is undefined.
+
+   TODO: This section should provide a longer description of the
+   protocol flows and the evolution from OAuth 1.0.  Both OAuth 1.0 and
+   WRAP contain fairly complete introductory sections.  I think that the
+   WRAP one is a bit too long and we should shoot for this section being
+   a little over two pages (including terminology).
+
+1.1.  Acknowledgements
+
+   This (early) draft was written pretty quickly and is heavily based on
+   The OAuth 1.0 Protocol [draft-hammer-oauth-10], OAuth WRAP
+   [draft-hardt-oauth-01] and further discussion on the IETF OAuth
+   Working Group mailing list [1].  Those authors and editors include
+   Allen Tom (Yahoo!), Brian Eaton (Google), Dick Hardt, Eran Hammer-
+   Lahav (Yahoo!) and Yaron Goland (Microsoft).
+
+   To provide feedback on this draft join the OAuth Working Group:
+   http://www.ietf.org/dyn/wg/charter/oauth-charter.html.
+
+1.2.  Terminology
+
+   TODO: The terminology should be based on updated OAuth 1.0
+   terminology which is already close to the WRAP terminology as well.
+   We should err on the side of more generally understood terms.
+
+   access token  An unique identifier issued by the authorization server
+      and used by the client to make authenticated requests on behalf of
+      the user whose authorization has been obtained by the client.
+      TODO (rephrase): When using SSL it is a short lived bearer token
+      and when using signatures it is accompanied by an additional
+
+
+
+Recordon                Expires September 2, 2010               [Page 3]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+      secret.
+
+   authorization server  A server that issues access tokens to clients
+      after successful authorization.  May be the same entity as the
+      server hosting protected resources.
+
+   client  An HTTP client (per [RFC2616]) capable of making OAuth-
+      authenticed requests for protected resources.
+
+   client identifier  An unique identifier issued by the authorization
+      server and used used by the client to identify itself to the
+      authorization server.
+
+   client secret:  An unique identifier issued by the authorization
+      server and used by the client to establish ownership of the client
+      identifier.
+
+   protected resource  An access-restricted resource which can be
+      obtained from the server using an OAuth-authenticated request.
+      May be the same entity as the authorization server.
+
+   refresh token  An unique long lived bearer token used by a client to
+      acquire access tokens from an authorization server.
+
+   resource owner  An entity (generally an end-user) who can
+      authenticate to the authorization server such that it issues the
+      client an access token.
+
+   server  An HTTP server (per [RFC2616]) capable of accepting OAuth-
+      authenticated requests.
+
+1.2.1.  Endpoints
+
+   The authorization server MUST advertise the URIs of the following
+   three endpoints:
+
+   access token request  The authorization server endpoint used by the
+      client to obtain an access token via a HTTP "POST" request using
+      one of the authorization profiles (Section 2) or by refreshing an
+      access token (Section 3).
+
+   API request  The protected resource endpoint used by the client to
+      make OAuth-authenticated requests (Section 4).
+
+   user authorization request  The authorization server endpoint where
+      the client sends the resource owners's user-agent via a HTTP "GET"
+      request to make an authorization decision using one of the
+      authorization profiles (Section 2).
+
+
+
+Recordon                Expires September 2, 2010               [Page 4]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   The three URIs advertised by the server MAY include a query component
+   as defined by [RFC3986] section 3, but if present, the query MUST NOT
+   contain any parameters beginning with the "oauth_" prefix, to avoid
+   conflicts with the protocol parameters added to the URIs when used.
+
+   The methods in which the servers advertise and document its three
+   endpoints are beyond the scope of this specification.  Clients should
+   avoid making assumptions about the size of tokens and other server-
+   generated values, which are left undefined by this specification.  In
+   addition, protocol parameters MAY include values which require
+   encoding when transmitted.  Clients and servers should not make
+   assumptions about the possible range of their values.
+
+1.3.  Notational Conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in [RFC2119].
+
+
+2.  Getting an Access Token
+
+   TODO: This section really comes from WRAP.  I believe that a server
+   MUST implement at least one of the profiles to be considered OAuth
+   compatible.  While the SAML assertion profile has been in WRAP, I
+   haven't seen strong advocates on the mailing list or in the survey
+   for it.  Let's draft it as a separate profile from the core spec.
+
+2.1.  Web App Profile
+
+   The updated OAuth 1.0 spec could also be useful for more complete
+   language around the Web App Profile though we should also draw from
+   Luke Shepard's JavaScript profile (which needs updating).  I believe
+   the main difference is the security characteristics.
+
+2.2.  Pure Client Profile
+
+   The Pure Client Profile is similar to the Web App Profile
+   (Section 2.1), but it has different security characteristics.  Pure
+   client apps are applications that live entirely in JavaScript, on the
+   desktop, a mobile device, or in other environments where the code
+   does not have easy access to a server.  These applications have the
+   ability to display a web page to the user, but cannot receive the
+   response on a server.  Because the entirety of the client is
+   downloaded to the resource owner's user-agent, it is not possible to
+   completely protect the client secret.  This profile allows for
+   authorization while taking those security considerations into
+   account.
+
+
+
+Recordon                Expires September 2, 2010               [Page 5]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   Because there is no client secret to ensure authenticity, both the
+   client and authorization server should take some extra precautions
+   when using this profile.  Specifically, as the access token flows
+   directly to the user-agent, it should only be used when it is
+   acceptable for the end-user to have direct access to the access
+   token.  Additionally, care should be taken to choose a good callback
+   URL, as described below.
+
+   Prior to making a request using this profile, the client MUST have
+   obtained a client identifier and user authorization request endpoint
+   URI from the authorization server.  The authorization server MAY
+   require the client to pre-register their callback URI.
+
+   The client MUST first send the resource owners's user-agent to the
+   authorization server's user authorization request endpoint.  The
+   client constructs the request URI by adding the following REQUIRED
+   query parameters to the user authorization endpoint URI:
+
+   oauth_mode  The parameter value MUST be set to "profile_pure_client"
+      (case sensitive).
+
+   oauth_client_identifier  The client identifier.
+
+   oauth_callback_url  An absolute URI to which the authorization server
+      will redirect the resource owner back when the resource owner
+      authorization step is completed.  The client MUST either make use
+      of a transport-layer mechanism such as TLS or SSL (or a secure
+      channel with equivalent protections) for the callback URI or
+      include a fragment identifier ("#") as defined by [RFC3986]
+      section 3.5 in the URI to prevent transmission of plain text
+      credentials.
+
+   The client MAY also include the following OPTIONAL parameters:
+
+   oauth_client_state  An opaque value that clients can use to maintain
+      state associated with this request.
+
+   oauth_scope  If the authorization server has defined a manner for the
+      client to request certain capabilities of the access token, this
+      parameter SHOULD be used to do so.
+
+   The client directs the resource owner to the constructed URI using an
+   HTTP redirection response, or by other means available to it via the
+   resource owner's user-agent.  The request MUST use the HTTP "GET"
+   method.
+
+   For example, the client directs the resource owner's user-agent to
+   make one of the following HTTPS requests:
+
+
+
+Recordon                Expires September 2, 2010               [Page 6]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+    GET /user_authorization?oauth_client_only=true&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    Host: server.example.com
+
+
+    GET /user_authorization?oauth_client_only=true&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
+    Host: server.example.com
+
+   The way in which the server handles the user authorization request,
+   including whether it uses a secure channel such as TLS/SSL is beyond
+   the scope of this specification.  However, the server MUST first
+   verify the identity of the resource owner.
+
+   After receiving an authorization decision from the resource owner,
+   the server redirects the resource owner to the callback URI if one
+   was provided in the "oauth_callback" parameter or pre-registered by
+   other means.  The authorization server constructs the request URI by
+   adding the following REQUIRED parameters to the callback URI query
+   component:
+
+   oauth_access_token  The access token.
+
+   The authorization server MAY also include the following parameters:
+
+   oauth_access_token_expires_in  The lifetime of the access token in
+      seconds.
+
+   oauth_refresh_token  The refresh token.
+
+   If the callback URI already includes a query component as defined by
+   [RFC3986] section 3, the server MUST append the OAuth parameters to
+   the end of the existing query.  The callback URI's query component
+   MUST NOT contain any parameters beginning with the "oauth_" prefix.
+
+   For example, the server redirects the resource owner's user-agent to
+   make one of the following HTTPS/HTTP "GET" requests:
+
+    GET /cb?oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
+    Host: client.example.com
+
+
+    GET /cb#?oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
+    Host: client.example.com
+
+   The server must retain the scope, duration, and other attributes
+   approved by the resource owner, and enforce these restrictions when
+   receiving a client request made with the tokens issued.
+
+   Once the client receives and stores the token credentials, it can
+
+
+
+Recordon                Expires September 2, 2010               [Page 7]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   proceed to access protected resources on behalf of the resource owner
+   by making authenticated requests (Section 4) using the access token
+   received.
+
+   If the request fails verification, the authorization server SHOULD
+   respond with the appropriate HTTP response status code.  The
+   authorization server MAY include further details about why the
+   request was rejected in the response body.
+
+   For example:
+
+       HTTP/1.1 401 Authorization Required
+       WWW-Authenticate: OAuth realm="https://server.example.com/"
+
+2.3.  Rich App Profile
+
+   For desktop applications which can open or embed a web browser.
+
+2.4.  Device Profile
+
+   The Device Profile is suitable when the client is a device which does
+   not have an easy data-entry method (e.g. game consoles or
+   entertainment centers), but where the end-user has access to a
+   separate computer with simple data-entry methods (e.g. their home
+   computer, a laptop or a smartphone).
+
+   Prior to making a request using this profile, the client MUST have
+   obtained a client identifier and access token request endpoint URI
+   from the authorization server.
+
+   The client constructs an HTTP "POST" request to the access token
+   request endpoint and includes the following REQUIRED parameters:
+
+   oauth_mode  The parameter value MUST be set to "profile_device" (case
+      sensitive).
+
+   oauth_client_identifier  The client identifier.
+
+   The client MAY also include the following OPTIONAL parameters:
+
+   oauth_scope  If the authorization server has defined a manner for the
+      client to request certain capabilities of the access token, this
+      parameter SHOULD be used to do so.
+
+   Since the request results in the transmission of temporary plain text
+   credentials in the HTTP response, the authorization server MUST
+   require the use of a transport-layer mechanism such as TLS or SSL (or
+   a secure channel with equivalent protections).
+
+
+
+Recordon                Expires September 2, 2010               [Page 8]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   For example, the client makes the following HTTPS request:
+
+      POST /access_token HTTP/1.1
+      Host: server.example.com
+      oauth_client_identifier=s6BhdRkqt3
+
+   Upon receiving an authorization request by the client, the
+   authorization server generates a device verification code and a user
+   verification code.  These are included in the HTTP response body
+   using the "application/x-www-form-urlencoded" content type as defined
+   by [W3C.REC-html40-19980424] with a 200 status code (OK).  The
+   response contains the following REQUIRED parameters:
+
+   oauth_device_code  The device verification code.
+
+   oauth_user_code  The user verification code.
+
+   oauth_verification_url  The user verification URL on the
+      authorization server.
+
+   The authorization server MAY also include the following parameters:
+
+   oauth_verification_token_expires_in  The lifetime of the two
+      verification codes in seconds.
+
+   oauth_verification_rate_limit  The minimum amount of time in seconds
+      that the client SHOULD wait between polling requests to the device
+      authorization URL.
+
+   For example:
+
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_device_code=74tq5miHKB&oauth_user_code=94248&oauth_verification_url=http%3A%2F%2Fwww%2Eexample%2Ecom%2Fdevice&oauth_verification_rate_limit=3
+
+   The client MUST display the user verification URL and the user
+   verification code to the end-user, instruct them to visit the user
+   verification URL in a web browser, and to enter the user verification
+   token upon doing so (a user authorization request).
+
+   The way in which the authorization server handles the user
+   authorization request, including whether it uses a secure channel
+   such as TLS/SSL is beyond the scope of this specification.  However,
+   the server MUST first verify the identity of the resource owner.
+   After doing so, the server MUST prompt the end-user to enter the user
+   verification code.
+
+
+
+
+Recordon                Expires September 2, 2010               [Page 9]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   The authorization server MUST verify that the user verification code
+   is valid and MAY verify that the client is authorized to use this
+   profile.  If the request is authorized, the authorization server
+   directs the end-user to go back to the client device and follow its
+   instructions.
+
+   The client MAY have an interface element (such as a button) that the
+   end-user interacts with to communicate that they have finished the
+   authorization process.  The client MAY initiate the following request
+   at an arbitrary but reasonable interval in order to create a more
+   responsive user experience though MUST NOT exceed the verification
+   rate limit if one is specified.  The Client MAY both poll and have an
+   interface element, but MUST NOT have neither.
+
+   The client constructs an HTTP "POST" request to the access token
+   request endpoint and includes the following REQUIRED parameters:
+
+   oauth_mode  The parameter value MUST be set to "profile_device" (case
+      sensitive).
+
+   oauth_client_identifier  The client identifier.
+
+   oauth_device_verification_code  The device verification code.
+
+   Since the request results in the transmission of plain text
+   credentials in the HTTP response, the authorization server MUST
+   require the use of a transport-layer mechanism such as TLS or SSL (or
+   a secure channel with equivalent protections).
+
+   For example, the client makes the following HTTPS request:
+
+    POST /access_token HTTP/1.1
+    Host: server.example.com
+    oauth_client_identifier=s6BhdRkqt3&oauth_device_verification_code=J2vC42OifV
+
+   If the request is authorized, the access token is included in the
+   HTTP response body using the "application/x-www-form-urlencoded"
+   content type as defined by [W3C.REC-html40-19980424] with a 200
+   status code (OK).  The response contains the following REQUIRED
+   parameter:
+
+   oauth_access_token  The access token.
+
+   The authorization server MAY also include the following parameters:
+
+
+
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 10]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   oauth_access_token_expires_in  The lifetime of the access token in
+      seconds.
+
+   For example:
+
+       HTTP/1.1 200 OK
+       Content-Type: application/x-www-form-urlencoded
+
+       oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=600
+
+   If the authorization server is unable to issue an access token to the
+   client, the HTTP response body uses the "application/
+   x-www-form-urlencoded" content type as defined by
+   [W3C.REC-html40-19980424] with a 401 status code (Unauthorized).  The
+   response contains the following REQUIRED parameter:
+
+   oauth_error_reason  Value must be one of "authorization_declined",
+      "authorization_pending", "slow_down", or
+      "verification_code_expired" (case sensitive).
+
+   For example:
+
+       HTTP/1.1 401 Authorization Required
+       WWW-Authenticate: OAuth realm="https://server.example.com/"
+
+       oauth_error_reason=authorization_pending
+
+2.5.  Username and Password Profile
+
+   This profile is used when the authorization server generally trusts
+   the client to temporarily collect the end-user's username and
+   password and it is impossible to use one of the other authorization
+   profiles.  This profile enables a client to act on behalf of the
+   resource owner without having to permanently store their username and
+   password.
+
+   Prior to making a request using this profile, the client MUST have
+   obtained a client identifier, client secret, and access token request
+   endpoint URI from the authorization server.  How the client prompts
+   the resource owner for their username and password is beyond the
+   scope of this specification.  The client MUST discard the resource
+   owner's username and password once an access token has been obtained.
+
+   The client constructs an HTTP "POST" request to the access token
+   request endpoint and includes the following REQUIRED parameters:
+
+
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 11]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   oauth_mode  The parameter value MUST be set to
+      "profile_username_password" (case sensitive).
+
+   oauth_client_identifier  The client identifier.
+
+   oauth_client_secret  The client secret.
+
+   oauth_username  The resource owner's username.
+
+   oauth_password  The resource owner's password.
+
+   The client MAY also include the following OPTIONAL parameters:
+
+   oauth_scope  If the authorization server has defined a manner for the
+      client to request certain capabilities of the access token, this
+      parameter SHOULD be used to do so.
+
+   Since the request results in the transmission of plain text
+   credentials in both the HTTP request and response, the authorization
+   server MUST require the use of a transport-layer mechanism such as
+   TLS or SSL (or a secure channel with equivalent protections).
+
+   For example, the client makes the following HTTPS request:
+
+    POST /access_token HTTP/1.1
+    Host: server.example.com
+    oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_username=daveman692&oauth_password=1password
+
+   The authorization server MUST verify that the resource owner's
+   credentials are accurate and MAY verify that the client is authorized
+   to use this profile.  If the request is authorized, the access token
+   is included in the HTTP response body using the "application/
+   x-www-form-urlencoded" content type as defined by
+   [W3C.REC-html40-19980424] with a 200 status code (OK).
+
+   The response contains the following REQUIRED parameters:
+
+   oauth_access_token  The access token.
+
+   oauth_refresh_token  The refresh token.
+
+   The authorization server MAY also include the following parameters:
+
+   oauth_access_token_expires_in  The lifetime of the access token in
+      seconds.
+
+   For example:
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 12]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+       HTTP/1.1 200 OK
+       Content-Type: application/x-www-form-urlencoded
+
+       oauth_access_token=FJQbwq9OD8&oauth_refresh_token=gO3CHNqpH8
+
+   The server must retain the scope, duration, and other attributes
+   approved by the resource owner, and enforce these restrictions when
+   receiving a client request made with the tokens issued.
+
+   Once the client receives and stores the token credentials, it can
+   proceed to access protected resources on behalf of the resource owner
+   by making authenticated requests (Section 4) using the access token
+   received.
+
+   If the request fails verification, the authorization server SHOULD
+   respond with the appropriate HTTP response status code.  The
+   authorization server MAY include further details about why the
+   request was rejected in the response body.
+
+   For example:
+
+       HTTP/1.1 401 Authorization Required
+       WWW-Authenticate: OAuth realm="https://server.example.com/"
+
+2.6.  Client Identifier and Secret Profile
+
+   This profile is suitable when the client is also the resource owner
+   and thus not accessing protected resources within the context of a
+   given end-user.  For example, when a client is accessing non-private
+   data or modifying data about itself.  This profile SHOULD NOT be used
+   when the client is acting on behalf of an end-user.
+
+   Prior to making a request using this profile, the client MUST have
+   obtained a client identifier, client secret, and access token request
+   endpoint URI from the authorization server.
+
+   The client constructs an HTTP "POST" request to the access token
+   request endpoint and includes the following REQUIRED parameters:
+
+   oauth_mode  The parameter value MUST be set to "profile_client" (case
+      sensitive).
+
+   oauth_client_identifier  The client identifier.
+
+   oauth_client_secret  The client secret.
+
+   The client MAY also include the following OPTIONAL parameters:
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 13]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   oauth_scope  If the authorization server has defined a manner for the
+      client to request certain capabilities of the access token, this
+      parameter SHOULD be used to do so.
+
+   Since the request results in the transmission of plain text
+   credentials in both the HTTP request and response, the authorization
+   server MUST require the use of a transport-layer mechanism such as
+   TLS or SSL (or a secure channel with equivalent protections).
+
+   For example, the client makes the following HTTPS request:
+
+       POST /access_token HTTP/1.1
+       Host: server.example.com
+       oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM
+
+   The authorization server MUST verify that the resource owner has
+   authorized the provisioning of an access token to the client.  If the
+   request is authorized, the access token is included in the HTTP
+   response body using the "application/x-www-form-urlencoded" content
+   type as defined by [W3C.REC-html40-19980424] with a 200 status code
+   (OK).
+
+   The response contains the following REQUIRED parameters:
+
+   oauth_access_token  The access token.
+
+   oauth_refresh_token  The refresh token.
+
+   The authorization server MAY also include the following parameters:
+
+   oauth_access_token_expires_in  The lifetime of the access token in
+      seconds.
+
+   For example:
+
+       HTTP/1.1 200 OK
+       Content-Type: application/x-www-form-urlencoded
+
+       oauth_access_token=FJQbwq9OD8&oauth_refresh_token=gO3CHNqpH8
+
+   The server must retain the scope, duration, and other attributes
+   approved by the resource owner, and enforce these restrictions when
+   receiving a client request made with the tokens issued.
+
+   Once the client receives and stores the token credentials, it can
+   proceed to access protected resources on behalf of the resource owner
+   by making authenticated requests (Section 4) using the access token
+   received.
+
+
+
+Recordon                Expires September 2, 2010              [Page 14]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   If the request fails verification, the authorization server SHOULD
+   respond with the appropriate HTTP response status code.  The
+   authorization server MAY include further details about why the
+   request was rejected in the response body.
+
+   For example:
+
+       HTTP/1.1 401 Authorization Required
+       WWW-Authenticate: OAuth realm="https://server.example.com/"
+
+
+3.  Refreshing an Access Token
+
+   Authorization servers MAY issue access tokens that expire and thus
+   require clients to refresh them.  A client determines that an access
+   token needs refreshing either by using the access token's expiration
+   information or upon receiving the HTTP 401 Unauthorized response when
+   accessing protected resources per Section 4.
+
+   Prior to making a request using this profile, the client MUST have
+   obtained a client identifier, client secret, and access token request
+   endpoint URI from the authorization server.
+
+   The client constructs an HTTP "POST" request to the access token
+   request endpoint and includes the following REQUIRED parameters:
+
+   oauth_mode  The parameter value MUST be set to "refresh_token" (case
+      sensitive).
+
+   oauth_client_identifier  The client identifier.
+
+   oauth_client_secret  The client secret.
+
+   oauth_refresh_token  The refresh token associated with the access
+      token to be refreshed.
+
+   Since the request results in the transmission of plain text
+   credentials in both the HTTP request and response, the authorization
+   server MUST require the use of a transport-layer mechanism such as
+   TLS or SSL (or a secure channel with equivalent protections).
+
+   For example, the client makes the following HTTPS request:
+
+POST /refresh_token HTTP/1.1
+Host: server.example.com
+oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_token=n4E9O119d
+
+   The authorization server MUST verify that the resource owner has
+
+
+
+Recordon                Expires September 2, 2010              [Page 15]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   still authorized the provisioning of an access token to the client
+   and that the refresh token is valid.  If the request is authorized,
+   the access token is included in the HTTP response body using the
+   "application/x-www-form-urlencoded" content type as defined by
+   [W3C.REC-html40-19980424] with a 200 status code (OK).
+
+   The response contains the following REQUIRED parameters:
+
+   oauth_access_token  The access token.
+
+   The authorization server MAY also include the following parameters:
+
+   oauth_access_token_expires_in  The lifetime of the access token in
+      seconds.
+
+   For example:
+
+       HTTP/1.1 200 OK
+       Content-Type: application/x-www-form-urlencoded
+
+       oauth_access_token=8F44J2HGMl
+
+   If the request fails verification, the authorization server SHOULD
+   respond with the appropriate HTTP response status code.  The
+   authorization server MAY include further details about why the
+   request was rejected in the response body.
+
+   For example:
+
+       HTTP/1.1 401 Authorization Required
+       WWW-Authenticate: OAuth realm="https://server.example.com/"
+
+
+4.  Accessing a Protected Resource
+
+   TODO: This section is really a combination of WRAP and OAuth 1.0.
+   SSL support will be a MUST and signatures will be optional.
+
+4.1.  Using TLS/SSL
+
+   TODO: The SSL section basically copies directly from WRAP section #4.
+   It's about a page and a half and really easy to implement.
+
+4.2.  Using Signatures
+
+   TODO: We need to agree on the signature method though there is a lot
+   of normative text in the OAuth 1.0 spec to draw from.  OAuth 1.0 is
+   about three pages of text assuming people are happy with the
+
+
+
+Recordon                Expires September 2, 2010              [Page 16]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   mechanism; it would be good to simplify as much as possible.  We
+   could modify WRAP's refresh token request to let the client specify
+   that they'd also like an access token secret for that request.  This
+   seems like the right way of doing it.
+
+
+5.  Security Considerations
+
+   TODO: I'm the wrong person to write this section.
+
+
+6.  References
+
+6.1.  Normative References
+
+   [RFC2119]  Bradner, B., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119.
+
+   [RFC2616]  Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
+              Masinter, L., Leach, P., and T. Berners-Lee, "Hypertext
+              Transfer Protocol -- HTTP/1.1", RFC 2616.
+
+   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
+              Resource Identifier (URI): Generic Syntax", STD 66,
+              RFC 3986.
+
+   [W3C.REC-html40-19980424]
+              Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed.,
+              "HTML 4.0 Specification", W3C REC-html40-19980424.
+
+6.2.  Informative References
+
+   [draft-hammer-oauth-10]
+              Hammer-Lahav, E., Ed., "The OAuth 1.0 Protocol".
+
+   [draft-hardt-oauth-01]
+              Eaton, B., Goland, Y., Hardt, D., Ed., and A. Tom, "OAuth
+              Web Resource Authorization Profiles".
+
+URIs
+
+   [1]  <https://www.ietf.org/mailman/listinfo/oauth>
+
+
+
+
+
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 17]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+Author's Address
+
+   David Recordon (editor)
+   Facebook, Inc
+
+   Email: davidrecordon@facebook.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 18]
+
+

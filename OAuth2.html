@@ -195,7 +195,7 @@ Acknowledgements<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor3">1.2.</a>&nbsp;
 Terminology<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor4">1.2.1.</a>&nbsp;
-URLs<br />
+Endpoints<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor5">1.3.</a>&nbsp;
 Notational Conventions<br />
 <a href="#get_token">2.</a>&nbsp;
@@ -212,15 +212,15 @@ Device Profile<br />
 Username and Password Profile<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor10">2.6.</a>&nbsp;
 Client Identifier and Secret Profile<br />
-<a href="#anchor11">3.</a>&nbsp;
+<a href="#refresh_token">3.</a>&nbsp;
 Refreshing an Access Token<br />
 <a href="#access_resource">4.</a>&nbsp;
 Accessing a Protected Resource<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor12">4.1.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor11">4.1.</a>&nbsp;
 Using TLS/SSL<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor13">4.2.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor12">4.2.</a>&nbsp;
 Using Signatures<br />
-<a href="#anchor14">5.</a>&nbsp;
+<a href="#anchor13">5.</a>&nbsp;
 Security Considerations<br />
 <a href="#rfc.references1">6.</a>&nbsp;
 References<br />
@@ -289,34 +289,32 @@ Terminology</h3>
 <dt>server</dt>
 <dd>An HTTP server (per <a class='info' href='#RFC2616'>[RFC2616]<span> (</span><span class='info'>Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;Hypertext Transfer Protocol -- HTTP/1.1,&rdquo; .</span><span>)</span></a>) capable of accepting OAuth-authenticated requests.
 </dd>
-<dt>Verification Code:</dt>
-<dd>a code used by a Client to verify the User has authorized the Client to have specific access to a Protected Resource.
-</dd>
 </dl></blockquote>
 
 <a name="anchor4"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.1.2.1"></a><h3>1.2.1.&nbsp;
-URLs</h3>
+Endpoints</h3>
 
-<p>TODO: remove this section? move them into context.
+<p>The authorization server MUST advertise the URIs of the following three endpoints:
 </p>
 <p></p>
 <blockquote class="text"><dl>
-<dt>Access Token URL:</dt>
-<dd>the Authorization Server URL at which an Access Token is requested by the Client. The URL may accept a variety of parameters depending on the Profile. A Refresh Token may also be returned to the Client. This URL MUST be an HTTPS URL and MUST always be called with POST.
+<dt>access token request</dt>
+<dd>The authorization server endpoint used by the client to obtain an access token via a HTTP "POST" request using one of the authorization profiles (<a class='info' href='#get_token'>Section&nbsp;2<span> (</span><span class='info'>Getting an Access Token</span><span>)</span></a>) or by refreshing an access token (<a class='info' href='#refresh_token'>Section&nbsp;3<span> (</span><span class='info'>Refreshing an Access Token</span><span>)</span></a>).
 </dd>
-<dt>Refresh Token URL:</dt>
-<dd>the Authorization Server URL at which a Refresh Token is presented in exchange for a new Access Token is requested. This URL MUST be an HTTPS URL and MUST always be called with POST.
+<dt>API request</dt>
+<dd>The protected resource endpoint used by the client to make OAuth-authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>).
 </dd>
-<dt>Callback URL:</dt>
-<dd>the Client URL where the User will be redirected after an authorization request to the Authorization Server.
-</dd>
-<dt>User Authorization URL:</dt>
-<dd>the Authorization Server URL where the Client redirects the User to make an authorization request.
+<dt>user authorization request</dt>
+<dd>The authorization server endpoint where the client sends the resource owners's user-agent via a HTTP "GET" request to make an authorization decision using one of the authorization profiles (<a class='info' href='#get_token'>Section&nbsp;2<span> (</span><span class='info'>Getting an Access Token</span><span>)</span></a>).
 </dd>
 </dl></blockquote>
 
+<p>The three URIs advertised by the server MAY include a query component as defined by <a class='info' href='#RFC3986'>[RFC3986]<span> (</span><span class='info'>Berners-Lee, T., Fielding, R., and L. Masinter, &ldquo;Uniform Resource Identifier (URI): Generic Syntax,&rdquo; .</span><span>)</span></a> section 3, but if present, the query MUST NOT contain any parameters beginning with the "oauth_" prefix, to avoid conflicts with the protocol parameters added to the URIs when used.
+</p>
+<p>The methods in which the servers advertise and document its three endpoints are beyond the scope of this specification. Clients should avoid making assumptions about the size of tokens and other server-generated values, which are left undefined by this specification. In addition, protocol parameters MAY include values which require encoding when transmitted.  Clients and servers should not make assumptions about the possible range of their values.
+</p>
 <a name="anchor5"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.1.3"></a><h3>1.3.&nbsp;
@@ -345,31 +343,31 @@ Pure Client Profile</h3>
 
 <p>The Pure Client Profile is similar to the <a class='info' href='#web_profile'>Web App Profile<span> (</span><span class='info'>Web App Profile</span><span>)</span></a>, but it has different security characteristics. Pure client apps are applications that live entirely in JavaScript, on the desktop, a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This profile allows for authorization while taking those security considerations into account.
 </p>
-<p>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this profile. Specifically, as the access token flows directly to the user-agent, it should only be used when it is acceptable for the user to have direct access to the access token. Additionally, care should be taken to choose a good callback URL, as described below.
+<p>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this profile. Specifically, as the access token flows directly to the user-agent, it should only be used when it is acceptable for the end-user to have direct access to the access token. Additionally, care should be taken to choose a good callback URL, as described below.
 </p>
-<p>Prior to making a request using this profile, the client MUST have obtained a client identifier and secret from the authorization server. The authorization server MAY require the client to pre-register their callback URI.
+<p>Prior to making a request using this profile, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server MAY require the client to pre-register their callback URI.
 </p>
-<p>The client MUST send the end-user to the authorization server to authorize the request. The client constructs request URI by adding the following REQUIRED query parameters to the user authorization URL:
+<p>The client MUST first send the resource owners's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:
 </p>
 <p></p>
 <blockquote class="text"><dl>
-<dt>oauth_client_only</dt>
-<dd>Specifies that the authorization server should return an access token. The parameter value MUST be set to "true" (case sensitive).
+<dt>oauth_mode</dt>
+<dd>The parameter value MUST be set to "profile_pure_client" (case sensitive).
 </dd>
 <dt>oauth_client_identifier</dt>
 <dd>The client identifier.
 </dd>
+<dt>oauth_callback_url</dt>
+<dd>An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URI or include a fragment identifier ("#") as defined by <a class='info' href='#RFC3986'>[RFC3986]<span> (</span><span class='info'>Berners-Lee, T., Fielding, R., and L. Masinter, &ldquo;Uniform Resource Identifier (URI): Generic Syntax,&rdquo; .</span><span>)</span></a> section 3.5 in the URI to prevent transmission of plain text credentials.
+</dd>
 </dl></blockquote>
 
-<p>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:
+<p>The client MAY also include the following OPTIONAL parameters:
 </p>
 <p></p>
 <blockquote class="text"><dl>
-<dt>oauth_callback_url</dt>
-<dd>An absolute URI to which the authorization server will redirect the resource owner back when the Resource Owner Authorization step is completed.  If the client is unable to receive callbacks or a callback URI has been established via other means, the parameter value MUST be set to "oob" (case sensitive), to indicate an out-of-band configuration. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URL or (TODO: reference) include a hash "#" in the URL to prevent transmission of plain text credentials.
-</dd>
 <dt>oauth_client_state</dt>
-<dd>An opaque value that Clients can use to maintain state associated with this request.
+<dd>An opaque value that clients can use to maintain state associated with this request.
 </dd>
 <dt>oauth_scope</dt>
 <dd>If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.
@@ -378,7 +376,7 @@ Pure Client Profile</h3>
 
 <p>The client directs the resource owner to the constructed URI using an HTTP redirection response, or by other means available to it via the resource owner's user-agent.  The request MUST use the HTTP "GET" method.
 </p>
-<p>For example, the client directs the resource owner's user-agent make one of the following HTTPS requests:
+<p>For example, the client directs the resource owner's user-agent to make one of the following HTTPS requests:
 </p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
     GET /user_authorization?oauth_client_only=true&amp;oauth_client_identifier=s6BhdRkqt3&amp;oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
     Host: server.example.com
@@ -386,9 +384,9 @@ Pure Client Profile</h3>
     GET /user_authorization?oauth_client_only=true&amp;oauth_client_identifier=s6BhdRkqt3&amp;oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
     Host: server.example.com
 </pre></div>
-<p>The way in which the server handles the authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner.
+<p>The way in which the server handles the user authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner.
 </p>
-<p>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding the following REQUIRED parameters to the callback URI query component
+<p>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding the following REQUIRED parameters to the callback URI query component:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -397,7 +395,7 @@ Pure Client Profile</h3>
 </dd>
 </dl></blockquote>
 
-<p>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:
+<p>The authorization server MAY also include the following parameters:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -409,7 +407,7 @@ Pure Client Profile</h3>
 </dd>
 </dl></blockquote>
 
-<p>If the callback URI already includes a query component, the server MUST append the OAuth parameters to the end of the existing query.
+<p>If the callback URI already includes a query component as defined by <a class='info' href='#RFC3986'>[RFC3986]<span> (</span><span class='info'>Berners-Lee, T., Fielding, R., and L. Masinter, &ldquo;Uniform Resource Identifier (URI): Generic Syntax,&rdquo; .</span><span>)</span></a> section 3, the server MUST append the OAuth parameters to the end of the existing query. The callback URI's query component MUST NOT contain any parameters beginning with the "oauth_" prefix.
 </p>
 <p>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS/HTTP "GET" requests:
 </p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
@@ -425,6 +423,11 @@ Pure Client Profile</h3>
 </p>
 <p>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.
 </p>
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+</pre></div>
 <a name="anchor7"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.3"></a><h3>2.3.&nbsp;
@@ -437,8 +440,145 @@ Rich App Profile</h3>
 <a name="rfc.section.2.4"></a><h3>2.4.&nbsp;
 Device Profile</h3>
 
-<p>For devices which cannot open or embed a web browser. Netflix and Apple have very nice flows here where the device presents a code that you type in on your computer's web browser.
+<p>The Device Profile is suitable when the client is a device which does not have an easy data-entry method (e.g. game consoles or entertainment centers), but where the end-user has access to a separate computer with simple data-entry methods (e.g. their home computer, a laptop or a smartphone).
 </p>
+<p>Prior to making a request using this profile, the client MUST have obtained a client identifier and access token request endpoint URI from the authorization server.
+</p>
+<p>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_mode</dt>
+<dd>The parameter value MUST be set to "profile_device" (case sensitive).
+</dd>
+<dt>oauth_client_identifier</dt>
+<dd>The client identifier.
+</dd>
+</dl></blockquote>
+
+<p>The client MAY also include the following OPTIONAL parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_scope</dt>
+<dd>If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.
+</dd>
+</dl></blockquote>
+
+<p>Since the request results in the transmission of temporary plain text credentials in the HTTP response, the authorization server MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).
+</p>
+<p>For example, the client makes the following HTTPS request:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+   POST /access_token HTTP/1.1
+   Host: server.example.com
+   oauth_client_identifier=s6BhdRkqt3
+</pre></div>
+<p>Upon receiving an authorization request by the client, the authorization server generates a device verification code and a user verification code. These are included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <a class='info' href='#W3C.REC-html40-19980424'>[W3C.REC&#8209;html40&#8209;19980424]<span> (</span><span class='info'>Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;HTML 4.0 Specification,&rdquo; .</span><span>)</span></a> with a 200 status code (OK). The response contains the following REQUIRED parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_device_code</dt>
+<dd>The device verification code.
+</dd>
+<dt>oauth_user_code</dt>
+<dd>The user verification code.
+</dd>
+<dt>oauth_verification_url</dt>
+<dd>The user verification URL on the authorization server.
+</dd>
+</dl></blockquote>
+
+<p>The authorization server MAY also include the following parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_verification_token_expires_in</dt>
+<dd>The lifetime of the two verification codes in seconds.
+</dd>
+<dt>oauth_verification_rate_limit</dt>
+<dd>The minimum amount of time in seconds that the client SHOULD wait between polling requests to the device authorization URL.
+</dd>
+</dl></blockquote>
+
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_device_code=74tq5miHKB&amp;oauth_user_code=94248&amp;oauth_verification_url=http%3A%2F%2Fwww%2Eexample%2Ecom%2Fdevice&amp;oauth_verification_rate_limit=3
+</pre></div>
+<p>The client MUST display the user verification URL and the user verification code to the end-user, instruct them to visit the user verification URL in a web browser, and to enter the user verification token upon doing so (a user authorization request).
+</p>
+<p>The way in which the authorization server handles the user authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner. After doing so, the server MUST prompt the end-user to enter the user verification code.
+</p>
+<p>The authorization server MUST verify that the user verification code is valid and MAY verify that the client is authorized to use this profile.  If the request is authorized, the authorization server directs the end-user to go back to the client device and follow its instructions.
+</p>
+<p>The client MAY have an interface element (such as a button) that the end-user interacts with to communicate that they have finished the authorization process. The client MAY initiate the following request at an arbitrary but reasonable interval in order to create a more responsive user experience though MUST NOT exceed the verification rate limit if one is specified. The Client MAY both poll and have an interface element, but MUST NOT have neither.
+</p>
+<p>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_mode</dt>
+<dd>The parameter value MUST be set to "profile_device" (case sensitive).
+</dd>
+<dt>oauth_client_identifier</dt>
+<dd>The client identifier.
+</dd>
+<dt>oauth_device_verification_code</dt>
+<dd>The device verification code.
+</dd>
+</dl></blockquote>
+
+<p>Since the request results in the transmission of plain text credentials in the HTTP response, the authorization server MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).
+</p>
+<p>For example, the client makes the following HTTPS request:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    POST /access_token HTTP/1.1
+    Host: server.example.com
+    oauth_client_identifier=s6BhdRkqt3&amp;oauth_device_verification_code=J2vC42OifV
+</pre></div>
+<p>If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <a class='info' href='#W3C.REC-html40-19980424'>[W3C.REC&#8209;html40&#8209;19980424]<span> (</span><span class='info'>Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;HTML 4.0 Specification,&rdquo; .</span><span>)</span></a> with a 200 status code (OK). The response contains the following REQUIRED parameter:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token</dt>
+<dd>The access token.
+</dd>
+</dl></blockquote>
+
+<p>The authorization server MAY also include the following parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token_expires_in</dt>
+<dd>The lifetime of the access token in seconds.
+</dd>
+</dl></blockquote>
+
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_access_token=FJQbwq9OD8&amp;oauth_access_token_expires_in=600
+</pre></div>
+<p>If the authorization server is unable to issue an access token to the client, the HTTP response body uses the "application/x-www-form-urlencoded" content type as defined by <a class='info' href='#W3C.REC-html40-19980424'>[W3C.REC&#8209;html40&#8209;19980424]<span> (</span><span class='info'>Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;HTML 4.0 Specification,&rdquo; .</span><span>)</span></a> with a 401 status code (Unauthorized). The response contains the following REQUIRED parameter:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_error_reason</dt>
+<dd>Value must be one of "authorization_declined", "authorization_pending", "slow_down", or "verification_code_expired" (case sensitive).
+</dd>
+</dl></blockquote>
+
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+
+    oauth_error_reason=authorization_pending
+</pre></div>
 <a name="anchor9"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.5"></a><h3>2.5.&nbsp;
@@ -446,12 +586,15 @@ Username and Password Profile</h3>
 
 <p>This profile is used when the authorization server generally trusts the client to temporarily collect the end-user's username and password and it is impossible to use one of the other authorization profiles. This profile enables a client to act on behalf of the resource owner without having to permanently store their username and password.
 </p>
-<p>Prior to making a request using this profile, the client MUST have obtained a client identifier and secret from the authorization server. How the client prompts the resource owner for their username and password is beyond the scope of this specification. The client MUST discard the resource owner's username and password once an access token has been obtained.
+<p>Prior to making a request using this profile, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server. How the client prompts the resource owner for their username and password is beyond the scope of this specification. The client MUST discard the resource owner's username and password once an access token has been obtained.
 </p>
-<p>The client constructs an HTTP "POST" request to the token request endpoint and includes the following REQUIRED parameters:
+<p>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:
 </p>
 <p></p>
 <blockquote class="text"><dl>
+<dt>oauth_mode</dt>
+<dd>The parameter value MUST be set to "profile_username_password" (case sensitive).
+</dd>
 <dt>oauth_client_identifier</dt>
 <dd>The client identifier.
 </dd>
@@ -466,7 +609,7 @@ Username and Password Profile</h3>
 </dd>
 </dl></blockquote>
 
-<p>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:
+<p>The client MAY also include the following OPTIONAL parameters:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -479,7 +622,7 @@ Username and Password Profile</h3>
 </p>
 <p>For example, the client makes the following HTTPS request:
 </p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
-    POST /request_token HTTP/1.1
+    POST /access_token HTTP/1.1
     Host: server.example.com
     oauth_client_identifier=s6BhdRkqt3&amp;oauth_client_secret=8eSEIpnqmM&amp;oauth_username=daveman692&amp;oauth_password=1password
 </pre></div>
@@ -497,7 +640,7 @@ Username and Password Profile</h3>
 </dd>
 </dl></blockquote>
 
-<p>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:
+<p>The authorization server MAY also include the following parameters:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -519,6 +662,11 @@ Username and Password Profile</h3>
 </p>
 <p>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.
 </p>
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+</pre></div>
 <a name="anchor10"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.6"></a><h3>2.6.&nbsp;
@@ -526,12 +674,15 @@ Client Identifier and Secret Profile</h3>
 
 <p>This profile is suitable when the client is also the resource owner and thus not accessing protected resources within the context of a given end-user. For example, when a client is accessing non-private data or modifying data about itself. This profile SHOULD NOT be used when the client is acting on behalf of an end-user.
 </p>
-<p>Prior to making a request using this profile, the client MUST have obtained a client identifier and secret from the authorization server.
+<p>Prior to making a request using this profile, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server.
 </p>
-<p>The client constructs an HTTP "POST" request to the token request endpoint and includes the following REQUIRED parameters:
+<p>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:
 </p>
 <p></p>
 <blockquote class="text"><dl>
+<dt>oauth_mode</dt>
+<dd>The parameter value MUST be set to "profile_client" (case sensitive).
+</dd>
 <dt>oauth_client_identifier</dt>
 <dd>The client identifier.
 </dd>
@@ -540,7 +691,7 @@ Client Identifier and Secret Profile</h3>
 </dd>
 </dl></blockquote>
 
-<p>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:
+<p>The client MAY also include the following OPTIONAL parameters:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -553,11 +704,11 @@ Client Identifier and Secret Profile</h3>
 </p>
 <p>For example, the client makes the following HTTPS request:
 </p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
-    POST /request_token HTTP/1.1
+    POST /access_token HTTP/1.1
     Host: server.example.com
     oauth_client_identifier=s6BhdRkqt3&amp;oauth_client_secret=8eSEIpnqmM
 </pre></div>
-<p>The authorization server MUST verify that the resource owner has authorized the provisioning of an access token to the client. If the request is authorized, the access token are included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <a class='info' href='#W3C.REC-html40-19980424'>[W3C.REC&#8209;html40&#8209;19980424]<span> (</span><span class='info'>Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;HTML 4.0 Specification,&rdquo; .</span><span>)</span></a> with a 200 status code (OK).
+<p>The authorization server MUST verify that the resource owner has authorized the provisioning of an access token to the client. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <a class='info' href='#W3C.REC-html40-19980424'>[W3C.REC&#8209;html40&#8209;19980424]<span> (</span><span class='info'>Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;HTML 4.0 Specification,&rdquo; .</span><span>)</span></a> with a 200 status code (OK).
 </p>
 <p>The response contains the following REQUIRED parameters:
 </p>
@@ -571,7 +722,7 @@ Client Identifier and Secret Profile</h3>
 </dd>
 </dl></blockquote>
 
-<p>The authorization server MAY also include the following parameters as well as any additional parameters as defined by the authorization server:
+<p>The authorization server MAY also include the following parameters:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -593,13 +744,80 @@ Client Identifier and Secret Profile</h3>
 </p>
 <p>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.
 </p>
-<a name="anchor11"></a><br /><hr />
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+</pre></div>
+<a name="refresh_token"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.3"></a><h3>3.&nbsp;
 Refreshing an Access Token</h3>
 
-<p>TODO: In WRAP this functionality is described along with each individual authorization profile.  Some profiles require the client id and secret though not all of them.  In terms of writing more reusable code I imagine that implementors will write a single refresh_token(client_id, client_secret) function so breaking this out into its own section will be easier to implement. We could either require the client id and secret for all profiles or keep them as optional for some profiles.  Personally I lean toward consistency.
+<p>Authorization servers MAY issue access tokens that expire and thus require clients to refresh them. A client determines that an access token needs refreshing either by using the access token's expiration information or upon receiving the HTTP 401 Unauthorized response when accessing protected resources per <a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>.
 </p>
+<p>Prior to making a request using this profile, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server.
+</p>
+<p>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_mode</dt>
+<dd>The parameter value MUST be set to "refresh_token" (case sensitive).
+</dd>
+<dt>oauth_client_identifier</dt>
+<dd>The client identifier.
+</dd>
+<dt>oauth_client_secret</dt>
+<dd>The client secret.
+</dd>
+<dt>oauth_refresh_token</dt>
+<dd>The refresh token associated with the access token to be refreshed.
+</dd>
+</dl></blockquote>
+
+<p>Since the request results in the transmission of plain text credentials in both the HTTP request and response, the authorization server MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).
+</p>
+<p>For example, the client makes the following HTTPS request:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+POST /refresh_token HTTP/1.1
+Host: server.example.com
+oauth_client_identifier=s6BhdRkqt3&amp;oauth_client_secret=8eSEIpnqmM&amp;oauth_refresh_token=n4E9O119d
+</pre></div>
+<p>The authorization server MUST verify that the resource owner has still authorized the provisioning of an access token to the client and that the refresh token is valid. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <a class='info' href='#W3C.REC-html40-19980424'>[W3C.REC&#8209;html40&#8209;19980424]<span> (</span><span class='info'>Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;HTML 4.0 Specification,&rdquo; .</span><span>)</span></a> with a 200 status code (OK).
+</p>
+<p>The response contains the following REQUIRED parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token</dt>
+<dd>The access token.
+</dd>
+</dl></blockquote>
+
+<p>The authorization server MAY also include the following parameters:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token_expires_in</dt>
+<dd>The lifetime of the access token in seconds.
+</dd>
+</dl></blockquote>
+
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_access_token=8F44J2HGMl
+</pre></div>
+<p>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.
+</p>
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+</pre></div>
 <a name="access_resource"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.4"></a><h3>4.&nbsp;
@@ -607,21 +825,21 @@ Accessing a Protected Resource</h3>
 
 <p>TODO: This section is really a combination of WRAP and OAuth 1.0.  SSL support will be a MUST and signatures will be optional.
 </p>
-<a name="anchor12"></a><br /><hr />
+<a name="anchor11"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.4.1"></a><h3>4.1.&nbsp;
 Using TLS/SSL</h3>
 
 <p>TODO: The SSL section basically copies directly from WRAP section #4.  It's about a page and a half and really easy to implement.
 </p>
-<a name="anchor13"></a><br /><hr />
+<a name="anchor12"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.4.2"></a><h3>4.2.&nbsp;
 Using Signatures</h3>
 
 <p>TODO: We need to agree on the signature method though there is a lot of normative text in the OAuth 1.0 spec to draw from.   OAuth 1.0 is about three pages of text assuming people are happy with the mechanism; it would be good to simplify as much as possible. We could modify WRAP's refresh token request to let the client specify that they'd also like an access token secret for that request. This seems like the right way of doing it.
 </p>
-<a name="anchor14"></a><br /><hr />
+<a name="anchor13"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.5"></a><h3>5.&nbsp;
 Security Considerations</h3>
@@ -641,6 +859,8 @@ References</h3>
 <td class="author-text">Bradner, B., &ldquo;<a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>,&rdquo; BCP&nbsp;14, RFC&nbsp;2119 (<a href="ftp://ftp.isi.edu/in-notes/rfc2119.txt">TXT</a>, <a href="http://xml.resource.org/public/rfc/html/rfc2119.html">HTML</a>).</td></tr>
 <tr><td class="author-text" valign="top"><a name="RFC2616">[RFC2616]</a></td>
 <td class="author-text">Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;<a href="http://tools.ietf.org/html/rfc2616">Hypertext Transfer Protocol -- HTTP/1.1</a>,&rdquo; RFC&nbsp;2616 (<a href="http://www.rfc-editor.org/rfc/rfc2616.txt">TXT</a>, <a href="http://xml.resource.org/public/rfc/html/rfc2616.html">HTML</a>).</td></tr>
+<tr><td class="author-text" valign="top"><a name="RFC3986">[RFC3986]</a></td>
+<td class="author-text">Berners-Lee, T., Fielding, R., and L. Masinter, &ldquo;<a href="http://tools.ietf.org/html/rfc3986">Uniform Resource Identifier (URI): Generic Syntax</a>,&rdquo; STD&nbsp;66, RFC&nbsp;3986 (<a href="ftp://ftp.isi.edu/in-notes/rfc3986.txt">TXT</a>, <a href="http://xml.resource.org/public/rfc/html/rfc3986.html">HTML</a>).</td></tr>
 <tr><td class="author-text" valign="top"><a name="W3C.REC-html40-19980424">[W3C.REC-html40-19980424]</a></td>
 <td class="author-text">Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;<a href="http://www.w3.org/TR/1998/REC-html40-19980424">HTML 4.0 Specification</a>,&rdquo; W3C&nbsp;REC-html40-19980424.</td></tr>
 </table>
