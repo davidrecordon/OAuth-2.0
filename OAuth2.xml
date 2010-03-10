@@ -371,7 +371,48 @@
         </section>
 
         <section title="Refreshing an Access Token" anchor="refresh_token">
-            <t>TODO: In WRAP this functionality is described along with each individual authorization profile.  Some profiles require the client id and secret though not all of them.  In terms of writing more reusable code I imagine that implementors will write a single refresh_token(client_id, client_secret) function so breaking this out into its own section will be easier to implement. We could either require the client id and secret for all profiles or keep them as optional for some profiles.  Personally I lean toward consistency.</t>
+            <t>Authorization servers MAY issue access tokens that expire and thus require clients to refresh them. A client determines that an access token needs refreshing either by using the access token's expiration information or upon receiving the HTTP 401 Unauthorized response when accessing protected resources per <xref target="access_resource" />.</t>
+
+            <t>Prior to making a request using this profile, the client MUST have obtained a client identifier, client secret, and refresh token request endpoint URI from the authorization server.</t>
+
+            <t>The client constructs an HTTP "POST" request to the refresh token request endpoint and includes the following REQUIRED parameters:</t>
+            <t><list style="hanging">
+                <t hangText="oauth_mode">The parameter value MUST be set to "refresh_token" (case sensitive).</t>
+                <t hangText="oauth_client_identifier">The client identifier.</t>
+                <t hangText="oauth_client_secret">The client secret.</t>
+                <t hangText="oauth_refresh_token">The refresh token associated with the access token to be refreshed.</t>
+            </list></t>
+
+            <t>Since the request results in the transmission of plain text credentials in both the HTTP request and response, the authorization server MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).</t>
+
+            <t>For example, the client makes the following HTTPS request:</t>
+            <figure><artwork><![CDATA[
+POST /refresh_token HTTP/1.1
+Host: server.example.com
+oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_token=n4E9O119d
+            ]]></artwork></figure>
+
+            <t>The authorization server MUST verify that the resource owner has still authorized the provisioning of an access token to the client and that the refresh token is valid. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
+
+            <t>The response contains the following REQUIRED parameters:</t>
+            <t><list style="hanging">
+                <t hangText="oauth_access_token">The access token.</t>
+            </list></t>
+
+            <t>The authorization server MAY also include the following parameters:</t>
+            <t><list style="hanging">
+                <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+            </list></t>
+
+            <t>For example:</t>
+            <figure><artwork><![CDATA[
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_access_token=8F44J2HGMl
+            ]]></artwork></figure>
+
+            <t>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.</t>
         </section>
 
         <section title="Accessing a Protected Resource" anchor="access_resource">
