@@ -339,7 +339,7 @@
     oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM
                 ]]></artwork></figure>
 
-                <t>The authorization server MUST verify that the resource owner has authorized the provisioning of an access token to the client. If the request is authorized, the access token are included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
+                <t>The authorization server MUST verify that the resource owner has authorized the provisioning of an access token to the client. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
 
                 <t>The response contains the following REQUIRED parameters:</t>
                 <t><list style="hanging">
