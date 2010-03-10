@@ -62,11 +62,9 @@
                 <section title="Endpoints">
                     <t>The authorization server MUST advertise the URIs of the following three endpoints:</t>
                     <t><list style="hanging">
-                        <t hangText="access token request">The authorization server endpoint used by the client to directly obtain an access token via a HTTP "POST" request using one of the authorization profiles (<xref target="get_token" />).</t>
+                        <t hangText="access token request">The authorization server endpoint used by the client to obtain an access token via a HTTP "POST" request using one of the authorization profiles (<xref target="get_token" />) or by refreshing an access token (<xref target="refresh_token" />).</t>
 
                         <t hangText="API request">The protected resource endpoint used by the client to make OAuth-authenticated requests (<xref target="access_resource" />).</t>
-
-                        <t hangText="refresh token request">The authorization server endpoint used by the client to obtain a new access token after presenting a refresh token (<xref target="refresh_token" />).</t>
 
                         <t hangText="user authorization request">The authorization server endpoint where the client sends the resource owners's user-agent via a HTTP "GET" request to make an authorization decision using one of the authorization profiles (<xref target="get_token" />).</t>
                     </list></t>
@@ -373,9 +371,9 @@
         <section title="Refreshing an Access Token" anchor="refresh_token">
             <t>Authorization servers MAY issue access tokens that expire and thus require clients to refresh them. A client determines that an access token needs refreshing either by using the access token's expiration information or upon receiving the HTTP 401 Unauthorized response when accessing protected resources per <xref target="access_resource" />.</t>
 
-            <t>Prior to making a request using this profile, the client MUST have obtained a client identifier, client secret, and refresh token request endpoint URI from the authorization server.</t>
+            <t>Prior to making a request using this profile, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server.</t>
 
-            <t>The client constructs an HTTP "POST" request to the refresh token request endpoint and includes the following REQUIRED parameters:</t>
+            <t>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
             <t><list style="hanging">
                 <t hangText="oauth_mode">The parameter value MUST be set to "refresh_token" (case sensitive).</t>
                 <t hangText="oauth_client_identifier">The client identifier.</t>
