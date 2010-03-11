@@ -71,7 +71,7 @@
 
                     <t>The three URIs advertised by the server MAY include a query component as defined by <xref target="RFC3986" /> section 3, but if present, the query MUST NOT contain any parameters beginning with the "oauth_" prefix, to avoid conflicts with the protocol parameters added to the URIs when used.</t>
 
-                    <t>The methods in which the servers advertise and document its three endpoints are beyond the scope of this specification. Clients should avoid making assumptions about the size of tokens and other server-generated values, which are left undefined by this specification. In addition, protocol parameters MAY include values which require encoding when transmitted.  Clients and servers should not make assumptions about the possible range of their values.</t>
+                    <t>The methods in which the servers advertise and document its three endpoints are beyond the scope of this specification. Clients should avoid making assumptions about the size of tokens and other server-generated values, which are left undefined by this specification. However it is strongly RECOMMENDED that authorization servers make their identifiers, secrets, and tokens not over 255 characters in length in order to ease client implementations. In addition, protocol parameters MAY include values which require encoding when transmitted.  Clients and servers should not make assumptions about the possible range of their values.</t>
                 </section>
             </section>
 
