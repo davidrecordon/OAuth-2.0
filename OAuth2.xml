@@ -441,13 +441,94 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
         </section>
 
         <section title="Accessing a Protected Resource" anchor="access_resource">
-            <t>TODO: This section is really a combination of WRAP and OAuth 1.0.  SSL support will be a MUST and signatures will be optional.</t>
+            <t>OAuth 2.0 supports the ability for clients to make protected resource requests either by using TLS/SSL (<xref target="using_ssl" />) or by signing their HTTP request with shared secrets (<xref target="using_signatures" />). Protected resources MUST support clients making authenticated requests via TLS/SSL (<xref target="using_ssl" />) and MAY choose to also support signatures (<xref target="using_signatures" />). It is RECOMMENDED that clients make authenticated requests via TLS/SSL.</t>
 
-            <section title="Using TLS/SSL">
-                <t>TODO: The SSL section basically copies directly from WRAP section #4.  It's about a page and a half and really easy to implement.</t>
+            <section title="Using TLS/SSL" anchor="using_ssl">
+                <t>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <xref target="RFC2617" /> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to insure that access tokens are not inadvertently logged or captured.</t>
+
+                <section title="Client Calls Protected Resource Using HTTP Header">
+                    <t>The protected resource SHOULD allow clients to make authenticated requests by including the access token in the HTTP "Authorization" header. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI.</t>
+
+                    <t>The client constructs a HTTP request to the API request endpoint URI and includes the HTTP "Authorization" header field with the auth-scheme name set to "OAuth" (case-insensitive).</t>
+
+                    <t>Since the request results in the transmission of plain text credentials in the HTTP request, the protected resource MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).</t>
+
+                    <t>For example, the client makes the following HTTPS request:</t>
+                    <figure><artwork><![CDATA[
+    GET /user/daveman692.json HTTP/1.1
+    Host: api.example.com
+    Authorization: OAuth oauth_access_token="vF9dft4qmT"
+                    ]]></artwork></figure>
+
+                    <t>Note that per <xref target="RFC2617" /> section 1.2 that the following request is also valid:</t>
+                    <figure><artwork><![CDATA[
+    GET /user/daveman692.json HTTP/1.1
+    Host: api.example.com
+    Authorization:  OAuth  oauth_access_token = vF9dft4qmT
+                    ]]></artwork></figure>
+
+                    <t>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code. The protected resource MAY include further details about why the request was rejected in the response body.</t>
+
+                    <t>For example:</t>
+                    <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://api.example.com/"
+                    ]]></artwork></figure>
+                </section>
+
+                <section title="Client Calls Protected Resource Using URL Query Parameter">
+                    <t>The protected resource MAY allow clients to make authenticated requests by including the access token as a URL query parameter. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI.</t>
+
+                    <t>The client constructs the request URI by adding the following REQUIRED query parameter to the API request endpoint:</t>
+                    <t><list style="hanging">
+                        <t hangText="oauth_access_token">The access token.</t>
+                    </list></t>
+
+                    <t>Since the request results in the transmission of plain text credentials in the HTTP request, the protected resource MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).</t>
+
+                    <t>For example, the client makes the following HTTPS request:</t>
+                    <figure><artwork><![CDATA[
+    GET /user/daveman692.json?oauth_acess_token=vF9dft4qmT HTTP/1.1
+    Host: api.example.com
+                    ]]></artwork></figure>
+
+                    <t>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code. The protected resource MAY include further details about why the request was rejected in the response body.</t>
+
+                    <t>For example:</t>
+                    <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://api.example.com/"
+                    ]]></artwork></figure>
+                </section>
+
+                <section title="Client Calls Protected Resource Using Post Parameter">
+                    <t>The protected resource MAY allow clients to make authenticated requests by including the access token as a parameter in the body of a HTTP "POST" request. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI.</t>
+
+                    <t>The client constructs an HTTP "POST" request to the API request endpoint and includes the following REQUIRED parameter:</t>
+                    <t><list style="hanging">
+                        <t hangText="oauth_access_token">The access token.</t>
+                    </list></t>
+
+                    <t>Since the request results in the transmission of plain text credentials in the HTTP request, the protected resource MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).</t>
+
+                    <t>For example, the client makes the following HTTPS request:</t>
+                    <figure><artwork><![CDATA[
+    POST /blog/entry HTTP/1.1
+    Host: api.example.com
+    oauth_access_token=vF9dft4qmT
+                    ]]></artwork></figure>
+
+                    <t>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code. The protected resource MAY include further details about why the request was rejected in the response body.</t>
+
+                    <t>For example:</t>
+                    <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://api.example.com/"
+                    ]]></artwork></figure>
+                </section>
             </section>
 
-            <section title="Using Signatures">
+            <section title="Using Signatures" anchor="using_signatures">
                 <t>TODO: We need to agree on the signature method though there is a lot of normative text in the OAuth 1.0 spec to draw from.   OAuth 1.0 is about three pages of text assuming people are happy with the mechanism; it would be good to simplify as much as possible. We could modify WRAP's refresh token request to let the client specify that they'd also like an access token secret for that request. This seems like the right way of doing it.</t>
             </section>
         </section>
@@ -484,6 +565,22 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
                 <seriesInfo name='RFC' value='2616' /> 
                 <format type='TXT' target='http://www.rfc-editor.org/rfc/rfc2616.txt' />
                 <format type='HTML' target='http://xml.resource.org/public/rfc/html/rfc2616.html' /> 
+            </reference>
+
+            <reference anchor="RFC2617">
+                <front> 
+                    <title abbrev='HTTP Authentication'>HTTP Authentication: Basic and Digest Access Authentication</title> 
+                    <author initials='J.' surname='Franks' fullname='John Franks'></author>
+                    <author initials='P.M.' surname='Hallam-Baker' fullname='Phillip M. Hallam-Baker'></author>
+                    <author initials='J.L.' surname='Hostetler' fullname='Jeffery L. Hostetler'></author>
+                    <author initials='S.D.' surname='Lawrence' fullname='Scott D. Lawrence'></author>
+                    <author initials='P.J.' surname='Leach' fullname='Paul J. Leach'></author>
+                    <author initials='A.' surname='Luotonen' fullname='Ari Luotonen'></author>
+                    <author initials='L.' surname='Stewart' fullname='Lawrence C. Stewart'> </author>
+                </front>
+                <seriesInfo name='RFC' value='2617' /> 
+                <format type='TXT' octets='77638' target='ftp://ftp.isi.edu/in-notes/rfc2617.txt' />
+                <format type='HTML' octets='116625' target='http://xml.resource.org/public/rfc/html/rfc2617.html' />
             </reference>
 
             <reference anchor="RFC3986">
