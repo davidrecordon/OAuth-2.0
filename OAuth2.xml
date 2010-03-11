@@ -37,8 +37,6 @@
             </section>
 
             <section title="Terminology">
-                <t>TODO: The terminology should be based on updated OAuth 1.0 terminology which is already close to the WRAP terminology as well.  We should err on the side of more generally understood terms.</t>
-
                 <t><list style="hanging">
                     <t hangText="access token">An unique identifier issued by the authorization server and used by the client to make authenticated requests on behalf of the user whose authorization has been obtained by the client.  TODO (rephrase): When using SSL it is a short lived bearer token and when using signatures it is accompanied by an additional secret.</t>
 
