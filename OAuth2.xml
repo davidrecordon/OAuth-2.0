@@ -113,11 +113,11 @@
 
                 <t>For example, the client directs the resource owner's user-agent to make one of the following HTTPS requests:</t>
                 <figure><artwork><![CDATA[
-    GET /user_authorization?oauth_client_only=true&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    GET /user_authorization?oauth_mode=profile_pure_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
     Host: server.example.com
                 ]]></artwork></figure>
                 <figure><artwork><![CDATA[
-    GET /user_authorization?oauth_client_only=true&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
+    GET /user_authorization?oauth_mode=profile_pure_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
     Host: server.example.com
                 ]]></artwork></figure>
 
