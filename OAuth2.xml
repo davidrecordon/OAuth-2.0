@@ -541,18 +541,18 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
     <back>
         <references title="Normative References">
             <reference anchor="RFC2119">
-                <front> 
-                    <title abbrev='RFC Key Words'>Key words for use in RFCs to Indicate Requirement Levels</title> 
+                <front>
+                    <title abbrev='RFC Key Words'>Key words for use in RFCs to Indicate Requirement Levels</title>
                     <author initials='B.' surname='Bradner' fullname='Scott Bradner'></author>
                 </front>
                 <seriesInfo name='BCP' value='14' />
-                <seriesInfo name='RFC' value='2119' /> 
-                <format type='TXT' target='ftp://ftp.isi.edu/in-notes/rfc2119.txt' /> 
-                <format type='HTML' target='http://xml.resource.org/public/rfc/html/rfc2119.html' /> 
+                <seriesInfo name='RFC' value='2119' />
+                <format type='TXT' target='ftp://ftp.isi.edu/in-notes/rfc2119.txt' />
+                <format type='HTML' target='http://xml.resource.org/public/rfc/html/rfc2119.html' />
             </reference>
 
             <reference anchor="RFC2616">
-                <front> 
+                <front>
                     <title abbrev='HTTP/1.1'>Hypertext Transfer Protocol -- HTTP/1.1</title>
                     <author initials='R.' surname='Fielding' fullname='Roy T. Fielding'></author>
                     <author initials='J.' surname='Gettys' fullname='James Gettys'></author>
@@ -562,14 +562,14 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
                     <author initials='P.' surname='Leach' fullname='Paul J. Leach'></author>
                     <author initials='T.' surname='Berners-Lee' fullname='Tim Berners-Lee'></author>
                 </front>
-                <seriesInfo name='RFC' value='2616' /> 
+                <seriesInfo name='RFC' value='2616' />
                 <format type='TXT' target='http://www.rfc-editor.org/rfc/rfc2616.txt' />
-                <format type='HTML' target='http://xml.resource.org/public/rfc/html/rfc2616.html' /> 
+                <format type='HTML' target='http://xml.resource.org/public/rfc/html/rfc2616.html' />
             </reference>
 
             <reference anchor="RFC2617">
-                <front> 
-                    <title abbrev='HTTP Authentication'>HTTP Authentication: Basic and Digest Access Authentication</title> 
+                <front>
+                    <title abbrev='HTTP Authentication'>HTTP Authentication: Basic and Digest Access Authentication</title>
                     <author initials='J.' surname='Franks' fullname='John Franks'></author>
                     <author initials='P.M.' surname='Hallam-Baker' fullname='Phillip M. Hallam-Baker'></author>
                     <author initials='J.L.' surname='Hostetler' fullname='Jeffery L. Hostetler'></author>
@@ -578,33 +578,33 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
                     <author initials='A.' surname='Luotonen' fullname='Ari Luotonen'></author>
                     <author initials='L.' surname='Stewart' fullname='Lawrence C. Stewart'> </author>
                 </front>
-                <seriesInfo name='RFC' value='2617' /> 
+                <seriesInfo name='RFC' value='2617' />
                 <format type='TXT' octets='77638' target='ftp://ftp.isi.edu/in-notes/rfc2617.txt' />
                 <format type='HTML' octets='116625' target='http://xml.resource.org/public/rfc/html/rfc2617.html' />
             </reference>
 
             <reference anchor="RFC3986">
-                <front> 
-                <title abbrev='URI Generic Syntax'>Uniform Resource Identifier (URI): Generic Syntax</title> 
+                <front>
+                <title abbrev='URI Generic Syntax'>Uniform Resource Identifier (URI): Generic Syntax</title>
                 <author initials='T.' surname='Berners-Lee' fullname='Tim Berners-Lee'></author>
                 <author initials='R.' surname='Fielding' fullname='Roy T. Fielding'></author>
                 <author initials='L.' surname='Masinter' fullname='Larry Masinter'></author>
                 </front>
-                <seriesInfo name='STD' value='66' /> 
-                <seriesInfo name='RFC' value='3986' /> 
-                <format type='TXT' octets='141811' target='ftp://ftp.isi.edu/in-notes/rfc3986.txt' /> 
+                <seriesInfo name='STD' value='66' />
+                <seriesInfo name='RFC' value='3986' />
+                <format type='TXT' octets='141811' target='ftp://ftp.isi.edu/in-notes/rfc3986.txt' />
                 <format type='HTML' octets='213584' target='http://xml.resource.org/public/rfc/html/rfc3986.html' />
             </reference>
 
             <reference anchor="W3C.REC-html40-19980424">
-                <front> 
-                    <title abbrev='HTML 4.0'>HTML 4.0 Specification</title> 
+                <front>
+                    <title abbrev='HTML 4.0'>HTML 4.0 Specification</title>
                     <author initials='D.' surname='Ragget' fullname='Dave Ragget' role="editor"></author>
                     <author initials='A.' surname='Le Hors' fullname='Arnaud Le Hors' role="editor"></author>
                     <author initials='I.' surname='Jacobs' fullname='Ian Jacobs' role="editor"></author>
                 </front>
-                <seriesInfo name='W3C' value='REC-html40-19980424' /> 
-                <format type='HTML' target='http://www.w3.org/TR/1998/REC-html40-19980424' /> 
+                <seriesInfo name='W3C' value='REC-html40-19980424' />
+                <format type='HTML' target='http://www.w3.org/TR/1998/REC-html40-19980424' />
             </reference>
         </references>
 
