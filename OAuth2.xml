@@ -458,7 +458,7 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
     Authorization: OAuth oauth_access_token="vF9dft4qmT"
                     ]]></artwork></figure>
 
-                    <t>Note that per <xref target="RFC2617" /> section 1.2 that the following request is also valid:</t>
+                    <t>Note that per <xref target="RFC2617" /> section 1.2 the following request is also valid:</t>
                     <figure><artwork><![CDATA[
     GET /user/daveman692.json HTTP/1.1
     Host: api.example.com
