@@ -42,7 +42,7 @@
 
                     <t hangText="authorization server">A server that issues access tokens to clients after successful authorization. May be the same entity as the server hosting protected resources.</t>
 
-                    <t hangText="client">An HTTP client (per <xref target='RFC2616' />) capable of making OAuth-authenticed requests for protected resources.</t>
+                    <t hangText="client">An HTTP client (per <xref target='RFC2616' />) capable of making OAuth-authenticated requests for protected resources.</t>
 
                     <t hangText="client identifier">An unique identifier issued by the authorization server and used used by the client to identify itself to the authorization server.</t>
 
