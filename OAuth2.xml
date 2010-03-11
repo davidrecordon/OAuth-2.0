@@ -276,12 +276,11 @@
                 <t><list style="hanging">
                     <t hangText="oauth_mode">The parameter value MUST be set to "profile_username_password" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
-                    <t hangText="oauth_client_secret">The client secret.</t>
                     <t hangText="oauth_username">The resource owner's username.</t>
                     <t hangText="oauth_password">The resource owner's password.</t>
                 </list></t>
 
-                <t>The client MAY also include the following OPTIONAL parameters:</t>
+                <t>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
                 </list></t>
