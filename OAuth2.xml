@@ -488,7 +488,7 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
 
                     <t>For example, the client makes the following HTTPS request:</t>
                     <figure><artwork><![CDATA[
-    GET /user/daveman692.json?oauth_acess_token=vF9dft4qmT HTTP/1.1
+    GET /user/daveman692.json?oauth_access_token=vF9dft4qmT HTTP/1.1
     Host: api.example.com
                     ]]></artwork></figure>
 
