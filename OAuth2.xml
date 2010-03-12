@@ -94,7 +94,7 @@
 
                 <t>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this profile. Specifically, as the access token flows directly to the user-agent, it should only be used when it is acceptable for the end-user to have direct access to the access token. Additionally, care should be taken to choose a good callback URL, as described below.</t>
 
-                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server MAY require the client to pre-register their callback URI.</t>
+                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server SHOULD require the client to pre-register their callback URI.</t>
 
                 <t>The client MUST first send the resource owners's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:</t>
                 <t><list style="hanging">
@@ -122,6 +122,8 @@
                 ]]></artwork></figure>
 
                 <t>The way in which the server handles the user authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner.</t>
+
+                <t>TODO: Marcel to write/make sense here.The server SHOULD also verify that the callback URI provided in the "oauth_callback" parameter is the callback URI the client has pre-registered.</t>
 
                 <t>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding the following REQUIRED parameters to the callback URI query component:</t>
                 <t><list style="hanging">
