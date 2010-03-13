@@ -265,7 +265,7 @@
             </section>
 
             <section title="Rich App Profile">
-                <t>For desktop applications which can open or embed a web browser.</t>
+                <t>TODO: Should be possible to combine with the Pure Client profile. For desktop applications which can open or embed a web browser.</t>
             </section>
 
             <section title="Device Profile">
