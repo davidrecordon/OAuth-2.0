@@ -158,12 +158,12 @@
                 <t>If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK). The response contains the following REQUIRED parameter:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token">The access token.</t>
-                    <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
                 <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                    <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
                 <t>For example:</t>
@@ -228,7 +228,7 @@
 
                 <t>TODO: Marcel to write/make sense here.The server SHOULD also verify that the callback URI provided in the "oauth_callback" parameter is the callback URI the client has pre-registered.</t>
 
-                <t>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding the following REQUIRED parameters to the callback URI query component:</t>
+                <t>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding the following REQUIRED parameter to the callback URI query component:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token">The access token.</t>
                 </list></t>
@@ -346,6 +346,7 @@
                 <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                    <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
                 <t>For example:</t>
@@ -403,15 +404,15 @@
 
                 <t>The authorization server MUST verify that the resource owner's credentials are accurate and MAY verify that the client is authorized to use this profile. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
 
-                <t>The response contains the following REQUIRED parameters:</t>
+                <t>The response contains the following REQUIRED parameter:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token">The access token.</t>
-                    <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
                 <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                    <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
                 <t>For example:</t>
@@ -463,15 +464,15 @@
 
                 <t>The authorization server MUST verify that the resource owner has authorized the provisioning of an access token to the client. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
 
-                <t>The response contains the following REQUIRED parameters:</t>
+                <t>The response contains the following REQUIRED parameter:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token">The access token.</t>
-                    <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
                 <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                    <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
                 <t>For example:</t>
