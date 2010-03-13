@@ -86,7 +86,110 @@
             <t>Unlike the others, <xref target="client_profile">Client Identifier and Secret profile</xref> is intended for a client acting on behalf of itself and not a separate resource owner. For example, when a client is accessing non-private data or modifying data about itself.</t>
 
             <section title="Web App Profile" anchor="web_profile">
-                <t>The updated OAuth 1.0 spec could also be useful for more complete language around the Web App Profile though we should also draw from Luke Shepard's JavaScript profile (which needs updating).  I believe the main difference is the security characteristics.</t>
+                <t>This profile is suitable when the client is a web application calling the protected resource on behalf of a resource owner. It enables clients to act on behalf of resource owners without acquiring an end-user's credentials.</t>
+
+                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server MAY require the client to pre-register their callback URI.</t>
+
+                <t>The client MUST first send the resource owners's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_mode">The parameter value MUST be set to "profile_web_app" (case sensitive).</t>
+                    <t hangText="oauth_client_identifier">The client identifier.</t>
+                    <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed.</t>
+                </list></t>
+
+                <t>The client MAY also include the following OPTIONAL parameters:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_client_state">An opaque value that clients can use to maintain state associated with this request.</t>
+                    <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
+                </list></t>
+
+                <t>The client directs the resource owner to the constructed URI using an HTTP redirection response, or by other means available to it via the resource owner's user-agent.  The request MUST use the HTTP "GET" method.</t>
+
+                <t>For example, the client directs the resource owner's user-agent to make the following HTTPS requests:</t>
+                <figure><artwork><![CDATA[
+    GET /user_authorization?oauth_mode=profile_web_app&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    Host: server.example.com
+                ]]></artwork></figure>
+
+                <t>The way in which the server handles the user authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner. If the resource owner approves the authorization request, the authorization server MUST generate a verification code and associate it with the client identifier and callback URI.</t>
+
+                <t>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding one of the two following REQUIRED parameters to the callback URI query component depending on if the resource owner approved (oauth_verification_code) or declined (oauth_error_reason) the authorization request:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_verification_code">The verification code.</t>
+                    <t hangText="oauth_error_reason">The parameter value MUST be set to "user_denied" (case sensitive).</t>
+                </list></t>
+
+                <t>The authorization server MAY also include the following parameters:</t>
+                    <t><list style="hanging">
+                        <t hangText="oauth_client_state">REQUIRED if the client sent the parameter in its request.</t>
+                </list></t>
+
+                <t>If the callback URI already includes a query component as defined by <xref target="RFC3986" /> section 3, the server MUST append the OAuth parameters to the end of the existing query. The callback URI's query component MUST NOT contain any parameters beginning with the "oauth_" prefix.</t>
+
+                <t>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS "GET" requests:</t>
+                <figure><artwork><![CDATA[
+    GET /cb?oauth_verification_code=i1WsRn1uB1 HTTP/1.1
+    Host: client.example.com
+                ]]></artwork></figure>
+
+                <figure><artwork><![CDATA[
+    GET /cb?oauth_error_reason=user_denied HTTP/1.1
+    Host: client.example.com
+                ]]></artwork></figure>
+
+                <t>If the client receives a verification code, it constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_mode">The parameter value MUST be set to "profile_web_app" (case sensitive).</t>
+                    <t hangText="oauth_client_identifier">The client identifier.</t>
+                    <t hangText="oauth_client_secret">The client secret.</t>
+                    <t hangText="oauth_verification_code">The verification code.</t>
+                    <t hangText="oauth_callback_url">The callback URI from the user authorization request.</t>
+                </list></t>
+
+                <t>Since the request results in the transmission of plain text credentials in the HTTP request and response, the authorization server MUST require the use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections).</t>
+
+                <t>For example, the client makes the following HTTPS request:</t>
+                <figure><artwork><![CDATA[
+    POST /access_token HTTP/1.1
+    Host: server.example.com
+   oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=gX1fBat3bV&oauth_verification_code=i1WsRn1uB1&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
+                ]]></artwork></figure>
+
+                <t>If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK). The response contains the following REQUIRED parameter:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_access_token">The access token.</t>
+                    <t hangText="oauth_refresh_token">The refresh token.</t>
+                </list></t>
+
+                <t>The authorization server MAY also include the following parameters:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                </list></t>
+
+                <t>For example:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+    oauth_access_token=SlAV32hkKG&oauth_refresh_token=8xLOxBtZp8
+                ]]></artwork></figure>
+
+                <t>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.</t>
+
+                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
+
+                <t>If the authorization server is unable to issue an access token to the client, the HTTP response body uses the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 401 status code (Unauthorized). The response contains the following OPTIONAL parameter:</t>
+                <t><list style="hanging">
+                    <t hangText="oauth_error_reason">Value must be one of "callback_url_mismatch" or "expired_verification_code" (case sensitive).</t>
+                </list></t>
+
+                <t>For example:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="https://server.example.com/"
+
+    oauth_error_reason=expired_verification_code
+                ]]></artwork></figure>
             </section>
 
             <section title="Pure Client Profile">
@@ -252,6 +355,10 @@
 
     oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=600
                 ]]></artwork></figure>
+
+                <t>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.</t>
+
+                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
 
                 <t>If the authorization server is unable to issue an access token to the client, the HTTP response body uses the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 401 status code (Unauthorized). The response contains the following REQUIRED parameter:</t>
                 <t><list style="hanging">
