@@ -186,7 +186,7 @@
                 <t>For example:</t>
                 <figure><artwork><![CDATA[
     HTTP/1.1 401 Authorization Required
-    WWW-Authenticate: OAuth realm="https://server.example.com/"
+    WWW-Authenticate: OAuth realm="example"
 
     oauth_error_reason=expired_verification_code
                 ]]></artwork></figure>
@@ -262,7 +262,7 @@
                 <t>For example:</t>
                 <figure><artwork><![CDATA[
     HTTP/1.1 401 Authorization Required
-    WWW-Authenticate: OAuth realm="https://server.example.com/"
+    WWW-Authenticate: OAuth realm="example"
                 ]]></artwork></figure>
             </section>
 
@@ -371,7 +371,7 @@
                 <t>For example:</t>
                 <figure><artwork><![CDATA[
     HTTP/1.1 401 Authorization Required
-    WWW-Authenticate: OAuth realm="https://server.example.com/"
+    WWW-Authenticate: OAuth realm="example"
 
     oauth_error_reason=authorization_pending
                 ]]></artwork></figure>
@@ -434,7 +434,7 @@
                 <t>For example:</t>
                 <figure><artwork><![CDATA[
     HTTP/1.1 401 Authorization Required
-    WWW-Authenticate: OAuth realm="https://server.example.com/"
+    WWW-Authenticate: OAuth realm="example"
                 ]]></artwork></figure>
             </section>
 
@@ -494,7 +494,7 @@
                 <t>For example:</t>
                 <figure><artwork><![CDATA[
     HTTP/1.1 401 Authorization Required
-    WWW-Authenticate: OAuth realm="https://server.example.com/"
+    WWW-Authenticate: OAuth realm="example"
                 ]]></artwork></figure>
             </section>
         </section>
@@ -546,7 +546,7 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
             <t>For example:</t>
             <figure><artwork><![CDATA[
     HTTP/1.1 401 Authorization Required
-    WWW-Authenticate: OAuth realm="https://server.example.com/"
+    WWW-Authenticate: OAuth realm="example"
             ]]></artwork></figure>
         </section>
 
