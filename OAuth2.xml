@@ -40,25 +40,23 @@
                 <t><list style="hanging">
                     <t hangText="access token">An unique identifier issued by the authorization server and used by the client to make authenticated requests on behalf of the user whose authorization has been obtained by the client.  TODO (rephrase): When using SSL it is a short lived bearer token and when using signatures it is accompanied by an additional secret.</t>
 
-                    <t hangText="authorization server">A server that issues access tokens to clients after successful authorization. May be the same entity as the server hosting protected resources.</t>
+                    <t hangText="authorization server">A HTTP server (per <xref target='RFC2616' />) that issues access tokens to clients after successful authorization. May be the same entity as the server hosting protected resources.</t>
 
                     <t hangText="client">An HTTP client (per <xref target='RFC2616' />) capable of making OAuth-authenticated requests for protected resources.</t>
 
                     <t hangText="client identifier">An unique identifier issued by the authorization server and used used by the client to identify itself to the authorization server.</t>
 
-                    <t hangText="client secret:">An unique identifier issued by the authorization server and used by the client to establish ownership of the client identifier.</t>
+                    <t hangText="client secret">A string issued by the authorization server and used by the client to establish ownership of the client identifier.</t>
 
-                    <t hangText="protected resource">An access-restricted resource which can be obtained from the server using an OAuth-authenticated request. May be the same entity as the authorization server.</t>
+                    <t hangText="protected resource">An access-restricted resource which can be obtained from a HTTP server (per <xref target='RFC2616' />) using an OAuth-authenticated request. May be the same entity as the authorization server.</t>
 
                     <t hangText="refresh token">An unique long lived bearer token used by a client to acquire access tokens from an authorization server.</t>
 
                     <t hangText="resource owner">An entity (generally an end-user) who can authenticate to the authorization server such that it issues the client an access token.</t>
-
-                    <t hangText="server">An HTTP server (per <xref target='RFC2616' />) capable of accepting OAuth-authenticated requests.</t>
                   </list></t>
 
                 <section title="Endpoints">
-                    <t>The authorization server MUST advertise the URIs of the following three endpoints:</t>
+                    <t>The authorization server advertises (such as via documentation) the URIs of the following three endpoints:</t>
                     <t><list style="hanging">
                         <t hangText="access token request">The authorization server endpoint used by the client to obtain an access token via a HTTP "POST" request using one of the authorization profiles (<xref target="get_token" />) or by refreshing an access token (<xref target="refresh_token" />).</t>
 
@@ -69,7 +67,7 @@
 
                     <t>The three URIs advertised by the server MAY include a query component as defined by <xref target="RFC3986" /> section 3, but if present, the query MUST NOT contain any parameters beginning with the "oauth_" prefix, to avoid conflicts with the protocol parameters added to the URIs when used.</t>
 
-                    <t>The methods in which the servers advertise and document its three endpoints are beyond the scope of this specification. Clients should avoid making assumptions about the size of tokens and other server-generated values, which are left undefined by this specification. However it is strongly RECOMMENDED that authorization servers make their identifiers, secrets, and tokens not over 255 characters in length in order to ease client implementations. In addition, protocol parameters MAY include values which require encoding when transmitted.  Clients and servers should not make assumptions about the possible range of their values.</t>
+                    <t>The methods in which the servers advertise and document its three endpoints are beyond the scope of this specification. Clients should avoid making assumptions about the size of tokens and other server-generated values, which are left undefined by this specification. However it is strongly RECOMMENDED that authorization servers make their identifiers, secrets, and tokens not over 255 characters in length in order to ease client implementations. In addition, protocol parameters MAY include values which require encoding when transmitted.  Clients and servers should not make assumptions about the possible range of their values. TODO: identifiers, secrets and tokens should be URL safe.</t>
                 </section>
             </section>
 
@@ -85,7 +83,7 @@
 
             <t>Unlike the others, <xref target="client_profile">Client Identifier and Secret profile</xref> is intended for a client acting on behalf of itself and not a separate resource owner. For example, when a client is accessing non-private data or modifying data about itself.</t>
 
-            <section title="Web App Profile" anchor="web_profile">
+            <section title="OAuth 1.0a-style Profile" anchor="web_profile">
                 <t>This profile is suitable when the client is a web application calling the protected resource on behalf of a resource owner. It enables clients to act on behalf of resource owners without acquiring an end-user's credentials.</t>
 
                 <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server MAY require the client to pre-register their callback URI.</t>
@@ -203,7 +201,7 @@
                 <t><list style="hanging">
                     <t hangText="oauth_mode">The parameter value MUST be set to "profile_pure_client" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
-                    <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URI or include a fragment identifier ("#") as defined by <xref target="RFC3986" /> section 3.5 in the URI to prevent transmission of plain text credentials.</t>
+                    <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URI or include a fragment identifier ("#") as defined by <xref target="RFC3986" /> section 3.5 in the URI to prevent transmission of plain text credentials. TODO: better wording of what if I do both SSL and fragement?!?</t>
                 </list></t>
 
                 <t>The client MAY also include the following OPTIONAL parameters:</t>
