@@ -109,7 +109,7 @@
     Host: server.example.com
                 ]]></artwork></figure>
 
-                <t>The way in which the server handles the user authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner. If the resource owner approves the authorization request, the authorization server MUST generate a verification code and associate it with the client identifier and callback URI.</t>
+                <t>The way in which the server handles the user authorization request (such as via cookies), including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner. If the resource owner approves the authorization request, the authorization server MUST generate a verification code and associate it with the client identifier and callback URI.</t>
 
                 <t>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding one of the two following REQUIRED parameters to the callback URI query component depending on if the resource owner approved (oauth_verification_code) or declined (oauth_error_reason) the authorization request:</t>
                 <t><list style="hanging">
@@ -224,7 +224,7 @@
     Host: server.example.com
                 ]]></artwork></figure>
 
-                <t>The way in which the server handles the user authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner.</t>
+                <t>The way in which the server handles the user authorization request (such as via cookies), including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner.</t>
 
                 <t>TODO: Marcel to write/make sense here.The server SHOULD also verify that the callback URI provided in the "oauth_callback" parameter is the callback URI the client has pre-registered.</t>
 
