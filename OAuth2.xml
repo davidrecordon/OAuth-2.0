@@ -275,7 +275,7 @@
 
                 <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and access token request endpoint URI from the authorization server.</t>
 
-                <t>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
+                <t>The client constructs an HTTP "GET" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_mode">The parameter value MUST be set to "profile_device" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
@@ -290,9 +290,8 @@
 
                 <t>For example, the client makes the following HTTPS request:</t>
                 <figure><artwork><![CDATA[
-   POST /access_token HTTP/1.1
+   GET /access_token?oauth_client_identifier=s6BhdRkqt3&oauth_mode=profile_device HTTP/1.1
    Host: server.example.com
-   oauth_client_identifier=s6BhdRkqt3
                 ]]></artwork></figure>
 
                 <t>Upon receiving an authorization request by the client, the authorization server generates a device verification code and a user verification code. These are included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK). The response contains the following REQUIRED parameters:</t>
@@ -304,7 +303,7 @@
 
                 <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_verification_token_expires_in">The lifetime of the two verification codes in seconds.</t>
+                    <t hangText="oauth_expires">The lifetime of the two verification codes in seconds.</t>
                     <t hangText="oauth_verification_rate_limit">The minimum amount of time in seconds that the client SHOULD wait between polling requests to the device authorization URL.</t>
                 </list></t>
 
@@ -324,7 +323,7 @@
 
                 <t>The client MAY have an interface element (such as a button) that the end-user interacts with to communicate that they have finished the authorization process. The client MAY initiate the following request at an arbitrary but reasonable interval in order to create a more responsive user experience though MUST NOT exceed the verification rate limit if one is specified. The Client MAY both poll and have an interface element, but MUST NOT have neither.</t>
 
-                <t>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
+                <t>The client constructs an HTTP "GET" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_mode">The parameter value MUST be set to "profile_device" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
@@ -335,9 +334,8 @@
 
                 <t>For example, the client makes the following HTTPS request:</t>
                 <figure><artwork><![CDATA[
-    POST /access_token HTTP/1.1
+    GET /access_token?oauth_client_identifier=s6BhdRkqt3&oauth_device_verification_code=J2vC42OifV HTTP/1.1
     Host: server.example.com
-    oauth_client_identifier=s6BhdRkqt3&oauth_device_verification_code=J2vC42OifV
                 ]]></artwork></figure>
 
                 <t>If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK). The response contains the following REQUIRED parameter:</t>
