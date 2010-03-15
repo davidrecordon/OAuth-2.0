@@ -124,6 +124,8 @@
 
                 <t>If the callback URI already includes a query component as defined by <xref target="RFC3986" /> section 3, the server MUST append the OAuth parameters to the end of the existing query. The callback URI's query component MUST NOT contain any parameters beginning with the "oauth_" prefix.</t>
 
+                <t>TODO: For example, 302 redirect.</t>
+
                 <t>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS "GET" requests:</t>
                 <figure><artwork><![CDATA[
     GET /cb?oauth_verification_code=i1WsRn1uB1 HTTP/1.1
@@ -238,6 +240,8 @@
                 </list></t>
 
                 <t>If the callback URI already includes a query component as defined by <xref target="RFC3986" /> section 3, the server MUST append the OAuth parameters to the end of the existing query. The callback URI's query component MUST NOT contain any parameters beginning with the "oauth_" prefix.</t>
+
+                <t>TODO: For example, 302 redirect.</t>
 
                 <t>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS/HTTP "GET" requests:</t>
                 <figure><artwork><![CDATA[
