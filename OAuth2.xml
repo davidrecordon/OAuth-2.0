@@ -160,7 +160,7 @@
 
                 <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                    <t hangText="oauth_expires">The lifetime of the access token in seconds.</t>
                     <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
@@ -233,7 +233,7 @@
 
                 <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                    <t hangText="oauth_expires">The lifetime of the access token in seconds.</t>
                     <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
@@ -241,11 +241,11 @@
 
                 <t>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS/HTTP "GET" requests:</t>
                 <figure><artwork><![CDATA[
-    GET /cb?oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
+    GET /cb?oauth_access_token=FJQbwq9OD8&oauth_expires=10800 HTTP/1.1
     Host: client.example.com
                 ]]></artwork></figure>
                 <figure><artwork><![CDATA[
-    GET /cb#?oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
+    GET /cb#?oauth_access_token=FJQbwq9OD8&oauth_expires=10800 HTTP/1.1
     Host: client.example.com
                 ]]></artwork></figure>
 
@@ -343,7 +343,7 @@
 
                 <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                    <t hangText="oauth_expires">The lifetime of the access token in seconds.</t>
                     <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
@@ -352,7 +352,7 @@
     HTTP/1.1 200 OK
     Content-Type: application/x-www-form-urlencoded
 
-    oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=600
+    oauth_access_token=FJQbwq9OD8&oauth_expires=600
                 ]]></artwork></figure>
 
                 <t>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.</t>
@@ -409,7 +409,7 @@
 
                 <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                    <t hangText="oauth_expires">The lifetime of the access token in seconds.</t>
                     <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
@@ -469,7 +469,7 @@
 
                 <t>The authorization server MAY also include the following parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                    <t hangText="oauth_expires">The lifetime of the access token in seconds.</t>
                     <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
@@ -526,7 +526,7 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
 
             <t>The authorization server MAY also include the following parameters:</t>
             <t><list style="hanging">
-                <t hangText="oauth_access_token_expires_in">The lifetime of the access token in seconds.</t>
+                <t hangText="oauth_expires">The lifetime of the access token in seconds.</t>
             </list></t>
 
             <t>For example:</t>
