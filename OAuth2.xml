@@ -38,7 +38,7 @@
 
             <section title="Terminology">
                 <t><list style="hanging">
-                    <t hangText="access token">An unique identifier issued by the authorization server and used by the client to make authenticated requests on behalf of the user whose authorization has been obtained by the client.  TODO (rephrase): When using SSL it is a short lived bearer token and when using signatures it is accompanied by an additional secret.</t>
+                    <t hangText="access token">An unique identifier issued by the authorization server and used by the client to make authenticated requests on behalf of the user whose authorization has been obtained by the client.  When making protected resource requests, the access token is either a bearer token presented over SSL/TLS and/or accompanied by an additional secret when using a signature mechanism.</t>
 
                     <t hangText="authorization server">A HTTP server (per <xref target='RFC2616' />) that issues access tokens to clients after successful authorization. May be the same entity as the server hosting protected resources.</t>
 
@@ -67,7 +67,7 @@
 
                     <t>The three URIs advertised by the server MAY include a query component as defined by <xref target="RFC3986" /> section 3, but if present, the query MUST NOT contain any parameters beginning with the "oauth_" prefix, to avoid conflicts with the protocol parameters added to the URIs when used.</t>
 
-                    <t>The methods in which the servers advertise and document its three endpoints are beyond the scope of this specification. Clients should avoid making assumptions about the size of tokens and other server-generated values, which are left undefined by this specification. However it is strongly RECOMMENDED that authorization servers make their identifiers, secrets, and tokens not over 255 characters in length in order to ease client implementations. In addition, protocol parameters MAY include values which require encoding when transmitted.  Clients and servers should not make assumptions about the possible range of their values. TODO: identifiers, secrets and tokens should be URL safe.</t>
+                    <t>The methods in which the servers advertise and document its three endpoints are beyond the scope of this specification. Clients should avoid making assumptions about the size of tokens and other server-generated values, which are left undefined by this specification. However it is strongly RECOMMENDED that authorization servers make their identifiers, secrets, and tokens not over 255 characters in length in order to ease client implementations. In addition, protocol parameters MAY include values which require encoding when transmitted.  All identifiers, secrets, tokens, and codes MUST use URL safe characters and not require further encoding.  Clients and servers should not make other assumptions about the possible range of their values.</t>
                 </section>
             </section>
 
@@ -124,9 +124,13 @@
 
                 <t>If the callback URI already includes a query component as defined by <xref target="RFC3986" /> section 3, the server MUST append the OAuth parameters to the end of the existing query. The callback URI's query component MUST NOT contain any parameters beginning with the "oauth_" prefix.</t>
 
-                <t>TODO: For example, 302 redirect.</t>
+                <t>For example, the server redirects the resource owner's user-agent:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 302 Found
+    Location: https://client.example.com/cb?oauth_verification_code=i1WsRn1uB1
+                ]]></artwork></figure>
 
-                <t>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS "GET" requests:</t>
+                <t>Continuing the example, this results in the resource owner's user-agent making the following HTTPS "GET" request:</t>
                 <figure><artwork><![CDATA[
     GET /cb?oauth_verification_code=i1WsRn1uB1 HTTP/1.1
     Host: client.example.com
@@ -241,9 +245,17 @@
 
                 <t>If the callback URI already includes a query component as defined by <xref target="RFC3986" /> section 3, the server MUST append the OAuth parameters to the end of the existing query. The callback URI's query component MUST NOT contain any parameters beginning with the "oauth_" prefix.</t>
 
-                <t>TODO: For example, 302 redirect.</t>
+                <t>For example, the server redirects the resource owner's user-agent:</t>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 302 Found
+    Location: https://client.example.com/cb?oauth_access_token=FJQbwq9OD8&oauth_expires=10800
+                ]]></artwork></figure>
+                <figure><artwork><![CDATA[
+    HTTP/1.1 302 Found
+    Location: http://client.example.com/cb#?oauth_access_token=FJQbwq9OD8&oauth_expires=10800
+                ]]></artwork></figure>
 
-                <t>For example, the server redirects the resource owner's user-agent to make one of the following HTTPS/HTTP "GET" requests:</t>
+                <t>Continuing the example, this results in the resource owner's user-agent to make the following HTTPS/HTTP "GET" request:</t>
                 <figure><artwork><![CDATA[
     GET /cb?oauth_access_token=FJQbwq9OD8&oauth_expires=10800 HTTP/1.1
     Host: client.example.com
@@ -549,7 +561,7 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
         </section>
 
         <section title="Accessing a Protected Resource" anchor="access_resource">
-            <t>OAuth 2.0 supports the ability for clients to make protected resource requests either by using TLS/SSL (<xref target="using_ssl" />) or by signing their HTTP request with shared secrets (<xref target="using_signatures" />). Protected resources MUST support clients making authenticated requests via TLS/SSL (<xref target="using_ssl" />) and MAY choose to also support signatures (<xref target="using_signatures" />). It is RECOMMENDED that clients make authenticated requests via TLS/SSL.</t>
+            <t>OAuth 2.0 supports the ability for clients to make protected resource requests by using TLS/SSL (<xref target="using_ssl" />) and/or by signing their HTTP request with shared secrets (<xref target="using_signatures" />). Protected resources MUST support clients making authenticated requests via TLS/SSL (<xref target="using_ssl" />) and MAY choose to also support signatures (<xref target="using_signatures" />). It is RECOMMENDED that clients make authenticated requests via TLS/SSL.</t>
 
             <section title="Using TLS/SSL" anchor="using_ssl">
                 <t>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <xref target="RFC2617" /> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to insure that access tokens are not inadvertently logged or captured.</t>
@@ -585,7 +597,7 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
                 </section>
 
                 <section title="Client Calls Protected Resource Using URL Query Parameter">
-                    <t>The protected resource MAY allow clients to make authenticated requests by including the access token as a URL query parameter. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI.</t>
+                    <t>The protected resource MAY allow clients to make authenticated requests by including the access token as a URL query parameter. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI. While the following examples use the HTTP "GET" method, there's nothing limiting a client to use query parameters with other HTTP methods.</t>
 
                     <t>The client constructs the request URI by adding the following REQUIRED query parameter to the API request endpoint:</t>
                     <t><list style="hanging">
