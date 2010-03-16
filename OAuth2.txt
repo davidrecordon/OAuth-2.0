@@ -16,7 +16,7 @@ Abstract
    Protected Resource hosted on a server on behalf of a resource owner
    (such as a different client or an end-user).  It provides a process
    for users to authorize third-party access to their protected
-   resources via a variety of authorization profiles.  These profiles
+   resources via a variety of authorization flows.  These flows
    generally do not include having to share their credentials
    (typically, a username and password pair).  A server can additionally
    delegate authorization to one or more authorities (authorization
@@ -76,26 +76,26 @@ Table of Contents
        1.2.1.  Endpoints  . . . . . . . . . . . . . . . . . . . . . .  4
      1.3.  Notational Conventions . . . . . . . . . . . . . . . . . .  5
    2.  Getting an Access Token  . . . . . . . . . . . . . . . . . . .  5
-     2.1.  Web App Profile  . . . . . . . . . . . . . . . . . . . . .  5
-     2.2.  Pure Client Profile  . . . . . . . . . . . . . . . . . . .  6
-     2.3.  Rich App Profile . . . . . . . . . . . . . . . . . . . . .  8
-     2.4.  Device Profile . . . . . . . . . . . . . . . . . . . . . .  8
-     2.5.  Username and Password Profile  . . . . . . . . . . . . . . 11
-     2.6.  Client Identifier and Secret Profile . . . . . . . . . . . 13
-   3.  Refreshing an Access Token . . . . . . . . . . . . . . . . . . 15
-   4.  Accessing a Protected Resource . . . . . . . . . . . . . . . . 17
-     4.1.  Using TLS/SSL  . . . . . . . . . . . . . . . . . . . . . . 17
-       4.1.1.  Client Calls Protected Resource Using HTTP Header  . . 17
+     2.1.  OAuth 1.0a-style Flow  . . . . . . . . . . . . . . . . . .  5
+     2.2.  Client-side Application Flow . . . . . . . . . . . . . . .  9
+     2.3.  Device Flow  . . . . . . . . . . . . . . . . . . . . . . . 12
+     2.4.  Username and Password Flow . . . . . . . . . . . . . . . . 15
+     2.5.  Client Identifier and Secret Flow  . . . . . . . . . . . . 17
+   3.  Refreshing an Access Token . . . . . . . . . . . . . . . . . . 19
+   4.  Accessing a Protected Resource . . . . . . . . . . . . . . . . 21
+     4.1.  Using TLS/SSL  . . . . . . . . . . . . . . . . . . . . . . 21
+       4.1.1.  Client Calls Protected Resource Using HTTP Header  . . 21
        4.1.2.  Client Calls Protected Resource Using URL Query
-               Parameter  . . . . . . . . . . . . . . . . . . . . . . 18
+               Parameter  . . . . . . . . . . . . . . . . . . . . . . 22
        4.1.3.  Client Calls Protected Resource Using Post
-               Parameter  . . . . . . . . . . . . . . . . . . . . . . 18
-     4.2.  Using Signatures . . . . . . . . . . . . . . . . . . . . . 19
-   5.  Security Considerations  . . . . . . . . . . . . . . . . . . . 19
-   6.  References . . . . . . . . . . . . . . . . . . . . . . . . . . 19
-     6.1.  Normative References . . . . . . . . . . . . . . . . . . . 19
-     6.2.  Informative References . . . . . . . . . . . . . . . . . . 20
-   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 20
+               Parameter  . . . . . . . . . . . . . . . . . . . . . . 23
+     4.2.  Using Signatures . . . . . . . . . . . . . . . . . . . . . 23
+   5.  Security Considerations  . . . . . . . . . . . . . . . . . . . 24
+   6.  References . . . . . . . . . . . . . . . . . . . . . . . . . . 24
+     6.1.  Normative References . . . . . . . . . . . . . . . . . . . 24
+     6.2.  Informative References . . . . . . . . . . . . . . . . . . 24
+   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 25
+
 
 
 
@@ -117,8 +117,8 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
    This specification consists of two major parts: Getting an Access
    Token (Section 2) and Accessing a Protected Resource (Section 4).
-   The first part defines multiple authorization profiles describing how
-   a client may obtain an access token when acting autonomously or on
+   The first part defines multiple authorization flows describing how a
+   client may obtain an access token when acting autonomously or on
    behalf of an end-user.  They involve resource owners authorizing
    client access to their resources, by authenticating directly with the
    server and provisioning tokens to the client for use with the
@@ -155,9 +155,9 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    access token  An unique identifier issued by the authorization server
       and used by the client to make authenticated requests on behalf of
       the user whose authorization has been obtained by the client.
-      TODO (rephrase): When using SSL it is a short lived bearer token
-      and when using signatures it is accompanied by an additional
-      secret.
+      When making protected resource requests, the access token is
+      either a bearer token presented over SSL/TLS and/or accompanied by
+      an additional secret when using a signature mechanism.
 
 
 
@@ -169,9 +169,9 @@ Recordon                Expires September 2, 2010               [Page 3]
 Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
 
-   authorization server  A server that issues access tokens to clients
-      after successful authorization.  May be the same entity as the
-      server hosting protected resources.
+   authorization server  A HTTP server (per [RFC2616]) that issues
+      access tokens to clients after successful authorization.  May be
+      the same entity as the server hosting protected resources.
 
    client  An HTTP client (per [RFC2616]) capable of making OAuth-
       authenticated requests for protected resources.
@@ -180,13 +180,13 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
       server and used used by the client to identify itself to the
       authorization server.
 
-   client secret:  An unique identifier issued by the authorization
-      server and used by the client to establish ownership of the client
-      identifier.
+   client secret  A string issued by the authorization server and used
+      by the client to establish ownership of the client identifier.
 
    protected resource  An access-restricted resource which can be
-      obtained from the server using an OAuth-authenticated request.
-      May be the same entity as the authorization server.
+      obtained from a HTTP server (per [RFC2616]) using an OAuth-
+      authenticated request.  May be the same entity as the
+      authorization server.
 
    refresh token  An unique long lived bearer token used by a client to
       acquire access tokens from an authorization server.
@@ -195,17 +195,14 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
       authenticate to the authorization server such that it issues the
       client an access token.
 
-   server  An HTTP server (per [RFC2616]) capable of accepting OAuth-
-      authenticated requests.
-
 1.2.1.  Endpoints
 
-   The authorization server MUST advertise the URIs of the following
-   three endpoints:
+   The authorization server advertises (such as via documentation) the
+   URIs of the following three endpoints:
 
    access token request  The authorization server endpoint used by the
       client to obtain an access token via a HTTP "POST" request using
-      one of the authorization profiles (Section 2) or by refreshing an
+      one of the authorization flows (Section 2) or by refreshing an
       access token (Section 3).
 
    API request  The protected resource endpoint used by the client to
@@ -214,9 +211,12 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    user authorization request  The authorization server endpoint where
       the client sends the resource owners's user-agent via a HTTP "GET"
       request to make an authorization decision using one of the
-      authorization profiles (Section 2).
+      authorization flows (Section 2).
 
    The three URIs advertised by the server MAY include a query component
+   as defined by [RFC3986] section 3, but if present, the query MUST NOT
+   contain any parameters beginning with the "oauth_" prefix, to avoid
+   conflicts with the protocol parameters added to the URIs when used.
 
 
 
@@ -224,10 +224,6 @@ Recordon                Expires September 2, 2010               [Page 4]
 
 Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
-
-   as defined by [RFC3986] section 3, but if present, the query MUST NOT
-   contain any parameters beginning with the "oauth_" prefix, to avoid
-   conflicts with the protocol parameters added to the URIs when used.
 
    The methods in which the servers advertise and document its three
    endpoints are beyond the scope of this specification.  Clients should
@@ -237,8 +233,10 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    their identifiers, secrets, and tokens not over 255 characters in
    length in order to ease client implementations.  In addition,
    protocol parameters MAY include values which require encoding when
-   transmitted.  Clients and servers should not make assumptions about
-   the possible range of their values.
+   transmitted.  All identifiers, secrets, tokens, and codes MUST use
+   URL safe characters and not require further encoding.  Clients and
+   servers should not make other assumptions about the possible range of
+   their values.
 
 1.3.  Notational Conventions
 
@@ -249,30 +247,32 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
 2.  Getting an Access Token
 
-   This specification defines six core authorization profiles which are
+   This specification defines five core authorization flows which are
    used by a client to request an access token from authorization
    servers.  An authorization server MUST implement at least one of the
-   following profiles.
+   following flows.
 
    Common scenarios involve the resource owner delegating to a client to
    act on their behalf, adding another party (the resource owner) to the
-   protocol.  In these profiles, the client receives a refresh token
-   when it acquires the first access token.  When an access token
-   expires, the client presents the refresh token to acquire a new
-   access token.  Refresh tokens are sensitive as they represent long-
-   lived permissions to access a Protected Resource and are always
-   transmitted using HTTPS.
+   protocol.  In these flows, the client receives a refresh token when
+   it acquires the first access token.  When an access token expires,
+   the client presents the refresh token to acquire a new access token.
+   Refresh tokens are sensitive as they represent long-lived permissions
+   to access a Protected Resource and are always transmitted using
+   HTTPS.
 
-   Unlike the others, Client Identifier and Secret profile (Section 2.6)
-   is intended for a client acting on behalf of itself and not a
-   separate resource owner.  For example, when a client is accessing
-   non-private data or modifying data about itself.
+   Unlike the others, Client Identifier and Secret flow (Section 2.5) is
+   intended for a client acting on behalf of itself and not a separate
+   resource owner.  For example, when a client is accessing non-private
+   data or modifying data about itself.
 
-2.1.  Web App Profile
+2.1.  OAuth 1.0a-style Flow
 
-   The updated OAuth 1.0 spec could also be useful for more complete
-   language around the Web App Profile though we should also draw from
-   Luke Shepard's JavaScript profile (which needs updating).  I believe
+   This flow is suitable when the client is a web application calling
+   the protected resource on behalf of a resource owner.  It enables
+   clients to act on behalf of resource owners without acquiring an end-
+   user's credentials.
+
 
 
 
@@ -281,31 +281,7 @@ Recordon                Expires September 2, 2010               [Page 5]
 Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
 
-   the main difference is the security characteristics.
-
-2.2.  Pure Client Profile
-
-   The Pure Client Profile is similar to the Web App Profile
-   (Section 2.1), but it has different security characteristics.  Pure
-   client apps are applications that live entirely in JavaScript, on the
-   desktop, a mobile device, or in other environments where the code
-   does not have easy access to a server.  These applications have the
-   ability to display a web page to the user, but cannot receive the
-   response on a server.  Because the entirety of the client is
-   downloaded to the resource owner's user-agent, it is not possible to
-   completely protect the client secret.  This profile allows for
-   authorization while taking those security considerations into
-   account.
-
-   Because there is no client secret to ensure authenticity, both the
-   client and authorization server should take some extra precautions
-   when using this profile.  Specifically, as the access token flows
-   directly to the user-agent, it should only be used when it is
-   acceptable for the end-user to have direct access to the access
-   token.  Additionally, care should be taken to choose a good callback
-   URL, as described below.
-
-   Prior to making a request using this profile, the client MUST have
+   Prior to making a request using this flow, the client MUST have
    obtained a client identifier and user authorization request endpoint
    URI from the authorization server.  The authorization server MAY
    require the client to pre-register their callback URI.
@@ -315,7 +291,223 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    client constructs the request URI by adding the following REQUIRED
    query parameters to the user authorization endpoint URI:
 
-   oauth_mode  The parameter value MUST be set to "profile_pure_client"
+   oauth_mode  The parameter value MUST be set to "flow_web_app" (case
+      sensitive).
+
+   oauth_client_identifier  The client identifier.
+
+   oauth_callback_url  An absolute URI to which the authorization server
+      will redirect the resource owner back when the resource owner
+      authorization step is completed.
+
+   The client MAY also include the following OPTIONAL parameters:
+
+   oauth_client_state  An opaque value that clients can use to maintain
+      state associated with this request.
+
+   oauth_scope  If the authorization server has defined a manner for the
+      client to request certain capabilities of the access token, this
+      parameter SHOULD be used to do so.
+
+   The client directs the resource owner to the constructed URI using an
+   HTTP redirection response, or by other means available to it via the
+   resource owner's user-agent.  The request MUST use the HTTP "GET"
+   method.
+
+   For example, the client directs the resource owner's user-agent to
+   make the following HTTPS requests:
+
+    GET /user_authorization?oauth_mode=flow_web_app&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    Host: server.example.com
+
+   The way in which the server handles the user authorization request
+   (such as via cookies), including whether it uses a secure channel
+   such as TLS/SSL is beyond the scope of this specification.  However,
+   the server MUST first verify the identity of the resource owner.  If
+   the resource owner approves the authorization request, the
+   authorization server MUST generate a verification code and associate
+   it with the client identifier and callback URI.
+
+   After receiving an authorization decision from the resource owner,
+
+
+
+Recordon                Expires September 2, 2010               [Page 6]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   the server redirects the resource owner to the callback URI if one
+   was provided in the "oauth_callback" parameter or pre-registered by
+   other means.  The authorization server constructs the request URI by
+   adding one of the two following REQUIRED parameters to the callback
+   URI query component depending on if the resource owner approved
+   (oauth_verification_code) or declined (oauth_error_reason) the
+   authorization request:
+
+   oauth_verification_code  The verification code.
+
+   oauth_error_reason  The parameter value MUST be set to "user_denied"
+      (case sensitive).
+
+   The authorization server MAY also include the following parameters:
+
+   oauth_client_state  REQUIRED if the client sent the parameter in its
+      request.
+
+   If the callback URI already includes a query component as defined by
+   [RFC3986] section 3, the server MUST append the OAuth parameters to
+   the end of the existing query.  The callback URI's query component
+   MUST NOT contain any parameters beginning with the "oauth_" prefix.
+
+   For example, the server redirects the resource owner's user-agent:
+
+    HTTP/1.1 302 Found
+    Location: https://client.example.com/cb?oauth_verification_code=i1WsRn1uB1
+
+   Continuing the example, this results in the resource owner's user-
+   agent making the following HTTPS "GET" request:
+
+       GET /cb?oauth_verification_code=i1WsRn1uB1 HTTP/1.1
+       Host: client.example.com
+
+
+       GET /cb?oauth_error_reason=user_denied HTTP/1.1
+       Host: client.example.com
+
+   If the client receives a verification code, it constructs an HTTP
+   "POST" request to the access token request endpoint and includes the
+   following REQUIRED parameters:
+
+   oauth_mode  The parameter value MUST be set to "flow_web_app" (case
+      sensitive).
+
+
+
+
+
+
+
+Recordon                Expires September 2, 2010               [Page 7]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   oauth_client_identifier  The client identifier.
+
+   oauth_client_secret  The client secret.
+
+   oauth_verification_code  The verification code.
+
+   oauth_callback_url  The callback URI from the user authorization
+      request.
+
+   Since the request results in the transmission of plain text
+   credentials in the HTTP request and response, the authorization
+   server MUST require the use of a transport-layer mechanism such as
+   TLS or SSL (or a secure channel with equivalent protections).
+
+   For example, the client makes the following HTTPS request:
+
+    POST /access_token HTTP/1.1
+    Host: server.example.com
+   oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=gX1fBat3bV&oauth_verification_code=i1WsRn1uB1&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
+
+   If the request is authorized, the access token is included in the
+   HTTP response body using the "application/x-www-form-urlencoded"
+   content type as defined by [W3C.REC-html40-19980424] with a 200
+   status code (OK).  The response contains the following REQUIRED
+   parameter:
+
+   oauth_access_token  The access token.
+
+   The authorization server MAY also include the following parameters:
+
+   oauth_expires  The lifetime of the access token in seconds.
+
+   oauth_refresh_token  The refresh token.
+
+   For example:
+
+       HTTP/1.1 200 OK
+       Content-Type: application/x-www-form-urlencoded
+
+       oauth_access_token=SlAV32hkKG&oauth_refresh_token=8xLOxBtZp8
+
+   The server must retain the scope, duration, and other attributes
+   approved by the resource owner, and enforce these restrictions when
+   receiving a client request made with the tokens issued.
+
+   Once the client receives and stores the token credentials, it can
+   proceed to access protected resources on behalf of the resource owner
+   by making authenticated requests (Section 4) using the access token
+
+
+
+Recordon                Expires September 2, 2010               [Page 8]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   received.
+
+   If the authorization server is unable to issue an access token to the
+   client, the HTTP response body uses the "application/
+   x-www-form-urlencoded" content type as defined by
+   [W3C.REC-html40-19980424] with a 401 status code (Unauthorized).  The
+   response contains the following OPTIONAL parameter:
+
+   oauth_error_reason  Value must be one of "callback_url_mismatch" or
+      "expired_verification_code" (case sensitive).
+
+   For example:
+
+       HTTP/1.1 401 Authorization Required
+       WWW-Authenticate: OAuth realm="example"
+
+       oauth_error_reason=expired_verification_code
+
+2.2.  Client-side Application Flow
+
+   The Client-side Flow is similar to the Web App Flow (Section 2.1),
+   but it has different security characteristics.  Client-side
+   applications are those that live entirely in JavaScript, on the
+   desktop, a mobile device, or in other environments where the code
+   does not have easy access to a server.  These applications have the
+   ability to display a web page to the user, but cannot receive the
+   response on a server.  Because the entirety of the client is
+   downloaded to the resource owner's user-agent, it is not possible to
+   completely protect the client secret.  This flow allows for
+   authorization while taking those security considerations into
+   account.
+
+   Because there is no client secret to ensure authenticity, both the
+   client and authorization server should take some extra precautions
+   when using this flow.  Specifically, as the access token flows
+   directly to the user-agent, it should only be used when it is
+   acceptable for the end-user to have direct access to the access
+   token.  Additionally, care should be taken to choose a good callback
+   URL, as described below.
+
+   Prior to making a request using this flow, the client MUST have
+   obtained a client identifier and user authorization request endpoint
+   URI from the authorization server.  The authorization server SHOULD
+   require the client to pre-register their callback URI.
+
+   The client MUST first send the resource owners's user-agent to the
+   authorization server's user authorization request endpoint.  The
+   client constructs the request URI by adding the following REQUIRED
+
+
+
+Recordon                Expires September 2, 2010               [Page 9]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   query parameters to the user authorization endpoint URI:
+
+   oauth_mode  The parameter value MUST be set to "flow_pure_client"
       (case sensitive).
 
    oauth_client_identifier  The client identifier.
@@ -327,15 +519,8 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
       channel with equivalent protections) for the callback URI or
       include a fragment identifier ("#") as defined by [RFC3986]
       section 3.5 in the URI to prevent transmission of plain text
-      credentials.
-
-
-
-
-Recordon                Expires September 2, 2010               [Page 6]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
+      credentials.  TODO: better wording of what if I do both SSL and
+      fragement?!?
 
    The client MAY also include the following OPTIONAL parameters:
 
@@ -354,56 +539,68 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    For example, the client directs the resource owner's user-agent to
    make one of the following HTTPS requests:
 
-    GET /user_authorization?oauth_client_only=true&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_pure_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
     Host: server.example.com
 
 
-    GET /user_authorization?oauth_client_only=true&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_pure_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
     Host: server.example.com
 
-   The way in which the server handles the user authorization request,
-   including whether it uses a secure channel such as TLS/SSL is beyond
-   the scope of this specification.  However, the server MUST first
-   verify the identity of the resource owner.
+   The way in which the server handles the user authorization request
+   (such as via cookies), including whether it uses a secure channel
+   such as TLS/SSL is beyond the scope of this specification.  However,
+   the server MUST first verify the identity of the resource owner.
+
+   TODO: Marcel to write/make sense here.The server SHOULD also verify
+   that the callback URI provided in the "oauth_callback" parameter is
+
+
+
+Recordon                Expires September 2, 2010              [Page 10]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   the callback URI the client has pre-registered.
 
    After receiving an authorization decision from the resource owner,
    the server redirects the resource owner to the callback URI if one
    was provided in the "oauth_callback" parameter or pre-registered by
    other means.  The authorization server constructs the request URI by
-   adding the following REQUIRED parameters to the callback URI query
+   adding the following REQUIRED parameter to the callback URI query
    component:
 
    oauth_access_token  The access token.
 
    The authorization server MAY also include the following parameters:
 
-   oauth_access_token_expires_in  The lifetime of the access token in
-      seconds.
+   oauth_expires  The lifetime of the access token in seconds.
 
    oauth_refresh_token  The refresh token.
 
    If the callback URI already includes a query component as defined by
    [RFC3986] section 3, the server MUST append the OAuth parameters to
    the end of the existing query.  The callback URI's query component
-
-
-
-Recordon                Expires September 2, 2010               [Page 7]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
-
    MUST NOT contain any parameters beginning with the "oauth_" prefix.
 
-   For example, the server redirects the resource owner's user-agent to
-   make one of the following HTTPS/HTTP "GET" requests:
+   For example, the server redirects the resource owner's user-agent:
 
-    GET /cb?oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
-    Host: client.example.com
+    HTTP/1.1 302 Found
+    Location: https://client.example.com/cb?oauth_access_token=FJQbwq9OD8&oauth_expires=10800
 
 
-    GET /cb#?oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=10800 HTTP/1.1
-    Host: client.example.com
+    HTTP/1.1 302 Found
+    Location: http://client.example.com/cb#?oauth_access_token=FJQbwq9OD8&oauth_expires=10800
+
+   Continuing the example, this results in the resource owner's user-
+   agent to make the following HTTPS/HTTP "GET" request:
+
+       GET /cb?oauth_access_token=FJQbwq9OD8&oauth_expires=10800 HTTP/1.1
+       Host: client.example.com
+
+
+       GET /cb#?oauth_access_token=FJQbwq9OD8&oauth_expires=10800 HTTP/1.1
+       Host: client.example.com
 
    The server must retain the scope, duration, and other attributes
    approved by the resource owner, and enforce these restrictions when
@@ -412,6 +609,14 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    Once the client receives and stores the token credentials, it can
    proceed to access protected resources on behalf of the resource owner
    by making authenticated requests (Section 4) using the access token
+
+
+
+Recordon                Expires September 2, 2010              [Page 11]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
    received.
 
    If the request fails verification, the authorization server SHOULD
@@ -422,36 +627,24 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    For example:
 
        HTTP/1.1 401 Authorization Required
-       WWW-Authenticate: OAuth realm="https://server.example.com/"
+       WWW-Authenticate: OAuth realm="example"
 
-2.3.  Rich App Profile
+2.3.  Device Flow
 
-   For desktop applications which can open or embed a web browser.
-
-2.4.  Device Profile
-
-   The Device Profile is suitable when the client is a device which does
+   The Device Flow is suitable when the client is a device which does
    not have an easy data-entry method (e.g. game consoles or
    entertainment centers), but where the end-user has access to a
    separate computer with simple data-entry methods (e.g. their home
    computer, a laptop or a smartphone).
 
-   Prior to making a request using this profile, the client MUST have
+   Prior to making a request using this flow, the client MUST have
    obtained a client identifier and access token request endpoint URI
    from the authorization server.
 
-   The client constructs an HTTP "POST" request to the access token
-
-
-
-Recordon                Expires September 2, 2010               [Page 8]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
-
+   The client constructs an HTTP "GET" request to the access token
    request endpoint and includes the following REQUIRED parameters:
 
-   oauth_mode  The parameter value MUST be set to "profile_device" (case
+   oauth_mode  The parameter value MUST be set to "flow_device" (case
       sensitive).
 
    oauth_client_identifier  The client identifier.
@@ -469,9 +662,16 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
    For example, the client makes the following HTTPS request:
 
-      POST /access_token HTTP/1.1
-      Host: server.example.com
-      oauth_client_identifier=s6BhdRkqt3
+   GET /access_token?oauth_client_identifier=s6BhdRkqt3&oauth_mode=flow_device HTTP/1.1
+   Host: server.example.com
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 12]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
 
    Upon receiving an authorization request by the client, the
    authorization server generates a device verification code and a user
@@ -489,21 +689,13 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
    The authorization server MAY also include the following parameters:
 
-   oauth_verification_token_expires_in  The lifetime of the two
-      verification codes in seconds.
+   oauth_expires  The lifetime of the two verification codes in seconds.
 
    oauth_verification_rate_limit  The minimum amount of time in seconds
       that the client SHOULD wait between polling requests to the device
       authorization URL.
 
    For example:
-
-
-
-Recordon                Expires September 2, 2010               [Page 9]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
 
     HTTP/1.1 200 OK
     Content-Type: application/x-www-form-urlencoded
@@ -524,11 +716,19 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
    The authorization server MUST verify that the user verification code
    is valid and MAY verify that the client is authorized to use this
-   profile.  If the request is authorized, the authorization server
-   directs the end-user to go back to the client device and follow its
+   flow.  If the request is authorized, the authorization server directs
+   the end-user to go back to the client device and follow its
    instructions.
 
    The client MAY have an interface element (such as a button) that the
+
+
+
+Recordon                Expires September 2, 2010              [Page 13]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
    end-user interacts with to communicate that they have finished the
    authorization process.  The client MAY initiate the following request
    at an arbitrary but reasonable interval in order to create a more
@@ -536,10 +736,10 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    rate limit if one is specified.  The Client MAY both poll and have an
    interface element, but MUST NOT have neither.
 
-   The client constructs an HTTP "POST" request to the access token
+   The client constructs an HTTP "GET" request to the access token
    request endpoint and includes the following REQUIRED parameters:
 
-   oauth_mode  The parameter value MUST be set to "profile_device" (case
+   oauth_mode  The parameter value MUST be set to "flow_device" (case
       sensitive).
 
    oauth_client_identifier  The client identifier.
@@ -553,17 +753,8 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
    For example, the client makes the following HTTPS request:
 
-
-
-
-Recordon                Expires September 2, 2010              [Page 10]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
-
-    POST /access_token HTTP/1.1
+    GET /access_token?oauth_client_identifier=s6BhdRkqt3&oauth_device_verification_code=J2vC42OifV HTTP/1.1
     Host: server.example.com
-    oauth_client_identifier=s6BhdRkqt3&oauth_device_verification_code=J2vC42OifV
 
    If the request is authorized, the access token is included in the
    HTTP response body using the "application/x-www-form-urlencoded"
@@ -575,15 +766,33 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
    The authorization server MAY also include the following parameters:
 
-   oauth_access_token_expires_in  The lifetime of the access token in
-      seconds.
+   oauth_expires  The lifetime of the access token in seconds.
+
+   oauth_refresh_token  The refresh token.
 
    For example:
 
        HTTP/1.1 200 OK
        Content-Type: application/x-www-form-urlencoded
 
-       oauth_access_token=FJQbwq9OD8&oauth_access_token_expires_in=600
+       oauth_access_token=FJQbwq9OD8&oauth_expires=600
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 14]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+   The server must retain the scope, duration, and other attributes
+   approved by the resource owner, and enforce these restrictions when
+   receiving a client request made with the tokens issued.
+
+   Once the client receives and stores the token credentials, it can
+   proceed to access protected resources on behalf of the resource owner
+   by making authenticated requests (Section 4) using the access token
+   received.
 
    If the authorization server is unable to issue an access token to the
    client, the HTTP response body uses the "application/
@@ -598,28 +807,19 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    For example:
 
        HTTP/1.1 401 Authorization Required
-       WWW-Authenticate: OAuth realm="https://server.example.com/"
+       WWW-Authenticate: OAuth realm="example"
 
        oauth_error_reason=authorization_pending
 
-2.5.  Username and Password Profile
+2.4.  Username and Password Flow
 
-   This profile is used when the authorization server generally trusts
-   the client to temporarily collect the end-user's username and
-   password and it is impossible to use one of the other authorization
-   profiles.  This profile enables a client to act on behalf of the
-   resource owner without having to permanently store their username and
+   This flow is used when the authorization server generally trusts the
+   client to temporarily collect the end-user's username and password
+   and it is impossible to use one of the other authorization flows.
+   This flow enables a client to act on behalf of the resource owner
+   without having to permanently store their username and password.
 
-
-
-Recordon                Expires September 2, 2010              [Page 11]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
-
-   password.
-
-   Prior to making a request using this profile, the client MUST have
+   Prior to making a request using this flow, the client MUST have
    obtained a client identifier, client secret, and access token request
    endpoint URI from the authorization server.  How the client prompts
    the resource owner for their username and password is beyond the
@@ -629,8 +829,20 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    The client constructs an HTTP "POST" request to the access token
    request endpoint and includes the following REQUIRED parameters:
 
+
+
+
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 15]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
    oauth_mode  The parameter value MUST be set to
-      "profile_username_password" (case sensitive).
+      "flow_username_password" (case sensitive).
 
    oauth_client_identifier  The client identifier.
 
@@ -658,31 +870,32 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
    The authorization server MUST verify that the resource owner's
    credentials are accurate and MAY verify that the client is authorized
-   to use this profile.  If the request is authorized, the access token
-   is included in the HTTP response body using the "application/
+   to use this flow.  If the request is authorized, the access token is
+   included in the HTTP response body using the "application/
    x-www-form-urlencoded" content type as defined by
    [W3C.REC-html40-19980424] with a 200 status code (OK).
 
-   The response contains the following REQUIRED parameters:
-
-
-
-
-Recordon                Expires September 2, 2010              [Page 12]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
+   The response contains the following REQUIRED parameter:
 
    oauth_access_token  The access token.
 
-   oauth_refresh_token  The refresh token.
-
    The authorization server MAY also include the following parameters:
 
-   oauth_access_token_expires_in  The lifetime of the access token in
-      seconds.
+   oauth_expires  The lifetime of the access token in seconds.
+
+   oauth_refresh_token  The refresh token.
 
    For example:
+
+
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 16]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
 
        HTTP/1.1 200 OK
        Content-Type: application/x-www-form-urlencoded
@@ -706,32 +919,24 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    For example:
 
        HTTP/1.1 401 Authorization Required
-       WWW-Authenticate: OAuth realm="https://server.example.com/"
+       WWW-Authenticate: OAuth realm="example"
 
-2.6.  Client Identifier and Secret Profile
+2.5.  Client Identifier and Secret Flow
 
-   This profile is suitable when the client is also the resource owner
-   and thus not accessing protected resources within the context of a
-   given end-user.  For example, when a client is accessing non-private
-   data or modifying data about itself.  This profile SHOULD NOT be used
-   when the client is acting on behalf of an end-user.
+   This flow is suitable when the client is also the resource owner and
+   thus not accessing protected resources within the context of a given
+   end-user.  For example, when a client is accessing non-private data
+   or modifying data about itself.  This flow SHOULD NOT be used when
+   the client is acting on behalf of an end-user.
 
-   Prior to making a request using this profile, the client MUST have
+   Prior to making a request using this flow, the client MUST have
    obtained a client identifier, client secret, and access token request
    endpoint URI from the authorization server.
 
    The client constructs an HTTP "POST" request to the access token
-
-
-
-Recordon                Expires September 2, 2010              [Page 13]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
-
    request endpoint and includes the following REQUIRED parameters:
 
-   oauth_mode  The parameter value MUST be set to "profile_client" (case
+   oauth_mode  The parameter value MUST be set to "flow_client" (case
       sensitive).
 
    oauth_client_identifier  The client identifier.
@@ -739,6 +944,14 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    oauth_client_secret  The client secret.
 
    The client MAY also include the following OPTIONAL parameters:
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 17]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
 
    oauth_scope  If the authorization server has defined a manner for the
       client to request certain capabilities of the access token, this
@@ -762,28 +975,17 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    type as defined by [W3C.REC-html40-19980424] with a 200 status code
    (OK).
 
-   The response contains the following REQUIRED parameters:
+   The response contains the following REQUIRED parameter:
 
    oauth_access_token  The access token.
 
-   oauth_refresh_token  The refresh token.
-
    The authorization server MAY also include the following parameters:
 
-   oauth_access_token_expires_in  The lifetime of the access token in
-      seconds.
+   oauth_expires  The lifetime of the access token in seconds.
+
+   oauth_refresh_token  The refresh token.
 
    For example:
-
-
-
-
-
-
-Recordon                Expires September 2, 2010              [Page 14]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
 
        HTTP/1.1 200 OK
        Content-Type: application/x-www-form-urlencoded
@@ -799,6 +1001,14 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    by making authenticated requests (Section 4) using the access token
    received.
 
+
+
+
+Recordon                Expires September 2, 2010              [Page 18]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
    If the request fails verification, the authorization server SHOULD
    respond with the appropriate HTTP response status code.  The
    authorization server MAY include further details about why the
@@ -807,7 +1017,7 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    For example:
 
        HTTP/1.1 401 Authorization Required
-       WWW-Authenticate: OAuth realm="https://server.example.com/"
+       WWW-Authenticate: OAuth realm="example"
 
 
 3.  Refreshing an Access Token
@@ -816,9 +1026,12 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    require clients to refresh them.  A client determines that an access
    token needs refreshing either by using the access token's expiration
    information or upon receiving the HTTP 401 Unauthorized response when
-   accessing protected resources per Section 4.
+   accessing protected resources per Section 4.  A client will also
+   refresh a token if they wish to obtain a corresponding access token
+   secret for use when accessing protected resources via signatures
+   (Section 4.2).
 
-   Prior to making a request using this profile, the client MUST have
+   Prior to making a request using this flow, the client MUST have
    obtained a client identifier, client secret, and access token request
    endpoint URI from the authorization server.
 
@@ -830,24 +1043,28 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
    oauth_client_identifier  The client identifier.
 
-
-
-
-
-
-
-Recordon                Expires September 2, 2010              [Page 15]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
-
    oauth_client_secret  The client secret.
 
    oauth_refresh_token  The refresh token associated with the access
       token to be refreshed.
 
+   If the client wishes to obtain an access token for use when accessing
+   protected resources via signatures, the following parameters MUST
+   also be added to the request:
+
+   oauth_want_secret  The parameter value MUST be set to "true" (case
+      sensitive).
+
    Since the request results in the transmission of plain text
    credentials in both the HTTP request and response, the authorization
+
+
+
+Recordon                Expires September 2, 2010              [Page 19]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
    server MUST require the use of a transport-layer mechanism such as
    TLS or SSL (or a secure channel with equivalent protections).
 
@@ -864,14 +1081,26 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
    "application/x-www-form-urlencoded" content type as defined by
    [W3C.REC-html40-19980424] with a 200 status code (OK).
 
+   If an access token secret is included in the response, the protected
+   resource MUST NOT allow the use of the corresponding access token
+   without its secret (Section 4.1).
+
    The response contains the following REQUIRED parameters:
 
    oauth_access_token  The access token.
 
    The authorization server MAY also include the following parameters:
 
-   oauth_access_token_expires_in  The lifetime of the access token in
-      seconds.
+   oauth_expires  The lifetime of the access token in seconds.
+
+   oauth_access_token_secret  A corresponding access token secret if the
+      client requested one.
+
+   oauth_signature_methods  A comma-separated list of signature methods
+      supported by the protected resource.  REQUIRED if an access token
+      secret is being returned.  Possible values include "HMAC-SHA1" and
+      "HMAC-SHA256" (case-sensitive) as well as any other values defined
+      by extensions to this protocol.
 
    For example:
 
@@ -879,6 +1108,20 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
        Content-Type: application/x-www-form-urlencoded
 
        oauth_access_token=8F44J2HGMl
+
+
+    HTTP/1.1 200 OK
+    Content-Type: application/x-www-form-urlencoded
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 20]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
+    oauth_access_token=8F44J2HGMl&oauth_access_token_secret=h3B2Tw1CHw&oauth_signature_methods=HMAC-SHA1,HMAC-SHA256
 
    If the request fails verification, the authorization server SHOULD
    respond with the appropriate HTTP response status code.  The
@@ -888,21 +1131,15 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
    For example:
 
        HTTP/1.1 401 Authorization Required
-       WWW-Authenticate: OAuth realm="https://server.example.com/"
-
-
-
-Recordon                Expires September 2, 2010              [Page 16]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+       WWW-Authenticate: OAuth realm="example"
 
 
 4.  Accessing a Protected Resource
 
    OAuth 2.0 supports the ability for clients to make protected resource
-   requests either by using TLS/SSL (Section 4.1) or by signing their
-   HTTP request with shared secrets (Section 4.2).  Protected resources
-   MUST support clients making authenticated requests via TLS/SSL
+   requests by using TLS/SSL (Section 4.1) and/or by signing their HTTP
+   request with shared secrets (Section 4.2).  Protected resources MUST
+   support clients making authenticated requests via TLS/SSL
    (Section 4.1) and MAY choose to also support signatures
    (Section 4.2).  It is RECOMMENDED that clients make authenticated
    requests via TLS/SSL.
@@ -933,6 +1170,13 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    the use of a transport-layer mechanism such as TLS or SSL (or a
    secure channel with equivalent protections).
 
+
+
+Recordon                Expires September 2, 2010              [Page 21]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
    For example, the client makes the following HTTPS request:
 
        GET /user/daveman692.json HTTP/1.1
@@ -945,13 +1189,6 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
        GET /user/daveman692.json HTTP/1.1
        Host: api.example.com
        Authorization:  OAuth  oauth_access_token = vF9dft4qmT
-
-
-
-Recordon                Expires September 2, 2010              [Page 17]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
 
    If the request fails verification, the protected resource SHOULD
    respond with the appropriate HTTP response status code.  The
@@ -968,7 +1205,9 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    The protected resource MAY allow clients to make authenticated
    requests by including the access token as a URL query parameter.
    Prior to making a request, the client MUST have obtained a valid
-   access token and the API request endpoint URI.
+   access token and the API request endpoint URI.  While the following
+   examples use the HTTP "GET" method, there's nothing limiting a client
+   to use query parameters with other HTTP methods.
 
    The client constructs the request URI by adding the following
    REQUIRED query parameter to the API request endpoint:
@@ -982,10 +1221,18 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
    For example, the client makes the following HTTPS request:
 
-       GET /user/daveman692.json?oauth_acess_token=vF9dft4qmT HTTP/1.1
+       GET /user/daveman692.json?oauth_access_token=vF9dft4qmT HTTP/1.1
        Host: api.example.com
 
    If the request fails verification, the protected resource SHOULD
+
+
+
+Recordon                Expires September 2, 2010              [Page 22]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
    respond with the appropriate HTTP response status code.  The
    protected resource MAY include further details about why the request
    was rejected in the response body.
@@ -1001,13 +1248,6 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    requests by including the access token as a parameter in the body of
    a HTTP "POST" request.  Prior to making a request, the client MUST
    have obtained a valid access token and the API request endpoint URI.
-
-
-
-Recordon                Expires September 2, 2010              [Page 18]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
 
    The client constructs an HTTP "POST" request to the API request
    endpoint and includes the following REQUIRED parameter:
@@ -1041,6 +1281,14 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
    of normative text in the OAuth 1.0 spec to draw from.  OAuth 1.0 is
    about three pages of text assuming people are happy with the
    mechanism; it would be good to simplify as much as possible.  We
+
+
+
+Recordon                Expires September 2, 2010              [Page 23]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
    could modify WRAP's refresh token request to let the client specify
    that they'd also like an access token secret for that request.  This
    seems like the right way of doing it.
@@ -1057,13 +1305,6 @@ Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
 
    [RFC2119]  Bradner, B., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119.
-
-
-
-Recordon                Expires September 2, 2010              [Page 19]
-
-Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
-
 
    [RFC2616]  Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,
               Masinter, L., Leach, P., and T. Berners-Lee, "Hypertext
@@ -1096,6 +1337,14 @@ URIs
    [1]  <https://www.ietf.org/mailman/listinfo/oauth>
 
 
+
+
+
+Recordon                Expires September 2, 2010              [Page 24]
+
+Internet-Draft               OAuth 2.0 DRAFT                    Mar 2010
+
+
 Author's Address
 
    David Recordon (editor)
@@ -1116,6 +1365,37 @@ Author's Address
 
 
 
-Recordon                Expires September 2, 2010              [Page 20]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Recordon                Expires September 2, 2010              [Page 25]
 
 
