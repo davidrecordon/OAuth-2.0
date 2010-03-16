@@ -19,13 +19,13 @@
         <date year="2010" month="Mar"/>
 
         <abstract>
-            <t>OAuth 2.0 provides a method for an application (client) to access the Protected Resource hosted on a server on behalf of a resource owner (such as a different client or an end-user).  It provides a process for users to authorize third-party access to their protected resources via a variety of authorization profiles. These profiles generally do not include having to share their credentials (typically, a username and password pair).  A server can additionally delegate authorization to one or more authorities (authorization server) which issue access tokens to clients.</t>
+            <t>OAuth 2.0 provides a method for an application (client) to access the Protected Resource hosted on a server on behalf of a resource owner (such as a different client or an end-user).  It provides a process for users to authorize third-party access to their protected resources via a variety of authorization flows. These flows generally do not include having to share their credentials (typically, a username and password pair).  A server can additionally delegate authorization to one or more authorities (authorization server) which issue access tokens to clients.</t>
         </abstract>
     </front>
 
     <middle>
         <section title="Introduction">
-            <t>This specification consists of two major parts: <xref target='get_token'>Getting an Access Token</xref> and <xref target='access_resource'>Accessing a Protected Resource</xref>.  The first part defines multiple authorization profiles describing how a client may obtain an access token when acting autonomously or on behalf of an end-user.  They involve resource owners authorizing client access to their resources, by authenticating directly with the server and provisioning tokens to the client for use with the authentication method.  The second part defines a method for making authenticated HTTP requests using access tokens either protected via TLS/SSL or by using an access token combined with an access token secret. The access token both identifies the client making the request as well as the resource owner on whose behalf the request is being made.</t>
+            <t>This specification consists of two major parts: <xref target='get_token'>Getting an Access Token</xref> and <xref target='access_resource'>Accessing a Protected Resource</xref>.  The first part defines multiple authorization flows describing how a client may obtain an access token when acting autonomously or on behalf of an end-user.  They involve resource owners authorizing client access to their resources, by authenticating directly with the server and provisioning tokens to the client for use with the authentication method.  The second part defines a method for making authenticated HTTP requests using access tokens either protected via TLS/SSL or by using an access token combined with an access token secret. The access token both identifies the client making the request as well as the resource owner on whose behalf the request is being made.</t>
 
             <t>The use of OAuth with any other transport protocol than <xref target='RFC2616'>HTTP</xref> is undefined.</t>
 
@@ -58,11 +58,11 @@
                 <section title="Endpoints">
                     <t>The authorization server advertises (such as via documentation) the URIs of the following three endpoints:</t>
                     <t><list style="hanging">
-                        <t hangText="access token request">The authorization server endpoint used by the client to obtain an access token via a HTTP "POST" request using one of the authorization profiles (<xref target="get_token" />) or by refreshing an access token (<xref target="refresh_token" />).</t>
+                        <t hangText="access token request">The authorization server endpoint used by the client to obtain an access token via a HTTP "POST" request using one of the authorization flows (<xref target="get_token" />) or by refreshing an access token (<xref target="refresh_token" />).</t>
 
                         <t hangText="API request">The protected resource endpoint used by the client to make OAuth-authenticated requests (<xref target="access_resource" />).</t>
 
-                        <t hangText="user authorization request">The authorization server endpoint where the client sends the resource owners's user-agent via a HTTP "GET" request to make an authorization decision using one of the authorization profiles (<xref target="get_token" />).</t>
+                        <t hangText="user authorization request">The authorization server endpoint where the client sends the resource owners's user-agent via a HTTP "GET" request to make an authorization decision using one of the authorization flows (<xref target="get_token" />).</t>
                     </list></t>
 
                     <t>The three URIs advertised by the server MAY include a query component as defined by <xref target="RFC3986" /> section 3, but if present, the query MUST NOT contain any parameters beginning with the "oauth_" prefix, to avoid conflicts with the protocol parameters added to the URIs when used.</t>
@@ -77,20 +77,20 @@
         </section>
 
         <section title="Getting an Access Token" anchor="get_token">
-            <t>This specification defines six core authorization profiles which are used by a client to request an access token from authorization servers. An authorization server MUST implement at least one of the following profiles.</t>
+            <t>This specification defines five core authorization flows which are used by a client to request an access token from authorization servers. An authorization server MUST implement at least one of the following flows.</t>
 
-            <t>Common scenarios involve the resource owner delegating to a client to act on their behalf, adding another party (the resource owner) to the protocol. In these profiles, the client receives a refresh token when it acquires the first access token. When an access token expires, the client presents the refresh token to acquire a new access token. Refresh tokens are sensitive as they represent long-lived permissions to access a Protected Resource and are always transmitted using HTTPS.</t>
+            <t>Common scenarios involve the resource owner delegating to a client to act on their behalf, adding another party (the resource owner) to the protocol. In these flows, the client receives a refresh token when it acquires the first access token. When an access token expires, the client presents the refresh token to acquire a new access token. Refresh tokens are sensitive as they represent long-lived permissions to access a Protected Resource and are always transmitted using HTTPS.</t>
 
-            <t>Unlike the others, <xref target="client_profile">Client Identifier and Secret profile</xref> is intended for a client acting on behalf of itself and not a separate resource owner. For example, when a client is accessing non-private data or modifying data about itself.</t>
+            <t>Unlike the others, <xref target="client_profile">Client Identifier and Secret flow</xref> is intended for a client acting on behalf of itself and not a separate resource owner. For example, when a client is accessing non-private data or modifying data about itself.</t>
 
-            <section title="OAuth 1.0a-style Profile" anchor="web_profile">
-                <t>This profile is suitable when the client is a web application calling the protected resource on behalf of a resource owner. It enables clients to act on behalf of resource owners without acquiring an end-user's credentials.</t>
+            <section title="OAuth 1.0a-style Flow" anchor="web_profile">
+                <t>This flow is suitable when the client is a web application calling the protected resource on behalf of a resource owner. It enables clients to act on behalf of resource owners without acquiring an end-user's credentials.</t>
 
-                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server MAY require the client to pre-register their callback URI.</t>
+                <t>Prior to making a request using this flow, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server MAY require the client to pre-register their callback URI.</t>
 
                 <t>The client MUST first send the resource owners's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_mode">The parameter value MUST be set to "profile_web_app" (case sensitive).</t>
+                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_web_app" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                     <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed.</t>
                 </list></t>
@@ -105,7 +105,7 @@
 
                 <t>For example, the client directs the resource owner's user-agent to make the following HTTPS requests:</t>
                 <figure><artwork><![CDATA[
-    GET /user_authorization?oauth_mode=profile_web_app&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_web_app&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
     Host: server.example.com
                 ]]></artwork></figure>
 
@@ -143,7 +143,7 @@
 
                 <t>If the client receives a verification code, it constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_mode">The parameter value MUST be set to "profile_web_app" (case sensitive).</t>
+                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_web_app" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                     <t hangText="oauth_client_secret">The client secret.</t>
                     <t hangText="oauth_verification_code">The verification code.</t>
@@ -196,16 +196,16 @@
                 ]]></artwork></figure>
             </section>
 
-            <section title="Pure Client Profile">
-                <t>The Pure Client Profile is similar to the <xref target="web_profile">Web App Profile</xref>, but it has different security characteristics. Pure client apps are applications that live entirely in JavaScript, on the desktop, a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This profile allows for authorization while taking those security considerations into account.</t>
+            <section title="Client-side Application Flow">
+                <t>The Client-side Flow is similar to the <xref target="web_profile">Web App Flow</xref>, but it has different security characteristics. Client-side applications are those that live entirely in JavaScript, on the desktop, a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This flow allows for authorization while taking those security considerations into account.</t>
 
-                <t>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this profile. Specifically, as the access token flows directly to the user-agent, it should only be used when it is acceptable for the end-user to have direct access to the access token. Additionally, care should be taken to choose a good callback URL, as described below.</t>
+                <t>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this flow. Specifically, as the access token flows directly to the user-agent, it should only be used when it is acceptable for the end-user to have direct access to the access token. Additionally, care should be taken to choose a good callback URL, as described below.</t>
 
-                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server SHOULD require the client to pre-register their callback URI.</t>
+                <t>Prior to making a request using this flow, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server SHOULD require the client to pre-register their callback URI.</t>
 
                 <t>The client MUST first send the resource owners's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_mode">The parameter value MUST be set to "profile_pure_client" (case sensitive).</t>
+                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_pure_client" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                     <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URI or include a fragment identifier ("#") as defined by <xref target="RFC3986" /> section 3.5 in the URI to prevent transmission of plain text credentials. TODO: better wording of what if I do both SSL and fragement?!?</t>
                 </list></t>
@@ -220,11 +220,11 @@
 
                 <t>For example, the client directs the resource owner's user-agent to make one of the following HTTPS requests:</t>
                 <figure><artwork><![CDATA[
-    GET /user_authorization?oauth_mode=profile_pure_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_pure_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
     Host: server.example.com
                 ]]></artwork></figure>
                 <figure><artwork><![CDATA[
-    GET /user_authorization?oauth_mode=profile_pure_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_pure_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
     Host: server.example.com
                 ]]></artwork></figure>
 
@@ -278,18 +278,14 @@
                 ]]></artwork></figure>
             </section>
 
-            <section title="Rich App Profile">
-                <t>TODO: Should be possible to combine with the Pure Client profile. For desktop applications which can open or embed a web browser.</t>
-            </section>
+            <section title="Device Flow">
+                <t>The Device Flow is suitable when the client is a device which does not have an easy data-entry method (e.g. game consoles or entertainment centers), but where the end-user has access to a separate computer with simple data-entry methods (e.g. their home computer, a laptop or a smartphone).</t>
 
-            <section title="Device Profile">
-                <t>The Device Profile is suitable when the client is a device which does not have an easy data-entry method (e.g. game consoles or entertainment centers), but where the end-user has access to a separate computer with simple data-entry methods (e.g. their home computer, a laptop or a smartphone).</t>
-
-                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier and access token request endpoint URI from the authorization server.</t>
+                <t>Prior to making a request using this flow, the client MUST have obtained a client identifier and access token request endpoint URI from the authorization server.</t>
 
                 <t>The client constructs an HTTP "GET" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_mode">The parameter value MUST be set to "profile_device" (case sensitive).</t>
+                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_device" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                 </list></t>
 
@@ -302,7 +298,7 @@
 
                 <t>For example, the client makes the following HTTPS request:</t>
                 <figure><artwork><![CDATA[
-   GET /access_token?oauth_client_identifier=s6BhdRkqt3&oauth_mode=profile_device HTTP/1.1
+   GET /access_token?oauth_client_identifier=s6BhdRkqt3&oauth_mode=flow_device HTTP/1.1
    Host: server.example.com
                 ]]></artwork></figure>
 
@@ -331,13 +327,13 @@
 
                 <t>The way in which the authorization server handles the user authorization request, including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner. After doing so, the server MUST prompt the end-user to enter the user verification code.</t>
 
-                <t>The authorization server MUST verify that the user verification code is valid and MAY verify that the client is authorized to use this profile.  If the request is authorized, the authorization server directs the end-user to go back to the client device and follow its instructions.</t>
+                <t>The authorization server MUST verify that the user verification code is valid and MAY verify that the client is authorized to use this flow.  If the request is authorized, the authorization server directs the end-user to go back to the client device and follow its instructions.</t>
 
                 <t>The client MAY have an interface element (such as a button) that the end-user interacts with to communicate that they have finished the authorization process. The client MAY initiate the following request at an arbitrary but reasonable interval in order to create a more responsive user experience though MUST NOT exceed the verification rate limit if one is specified. The Client MAY both poll and have an interface element, but MUST NOT have neither.</t>
 
                 <t>The client constructs an HTTP "GET" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_mode">The parameter value MUST be set to "profile_device" (case sensitive).</t>
+                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_device" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                     <t hangText="oauth_device_verification_code">The device verification code.</t>
                 </list></t>
@@ -387,14 +383,14 @@
                 ]]></artwork></figure>
             </section>
 
-            <section title="Username and Password Profile">
-                <t>This profile is used when the authorization server generally trusts the client to temporarily collect the end-user's username and password and it is impossible to use one of the other authorization profiles. This profile enables a client to act on behalf of the resource owner without having to permanently store their username and password.</t>
+            <section title="Username and Password Flow">
+                <t>This flow is used when the authorization server generally trusts the client to temporarily collect the end-user's username and password and it is impossible to use one of the other authorization flows. This flow enables a client to act on behalf of the resource owner without having to permanently store their username and password.</t>
 
-                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server. How the client prompts the resource owner for their username and password is beyond the scope of this specification. The client MUST discard the resource owner's username and password once an access token has been obtained.</t>
+                <t>Prior to making a request using this flow, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server. How the client prompts the resource owner for their username and password is beyond the scope of this specification. The client MUST discard the resource owner's username and password once an access token has been obtained.</t>
 
                 <t>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_mode">The parameter value MUST be set to "profile_username_password" (case sensitive).</t>
+                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_username_password" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                     <t hangText="oauth_username">The resource owner's username.</t>
                     <t hangText="oauth_password">The resource owner's password.</t>
@@ -414,7 +410,7 @@
     oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_username=daveman692&oauth_password=1password
                 ]]></artwork></figure>
 
-                <t>The authorization server MUST verify that the resource owner's credentials are accurate and MAY verify that the client is authorized to use this profile. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
+                <t>The authorization server MUST verify that the resource owner's credentials are accurate and MAY verify that the client is authorized to use this flow. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
 
                 <t>The response contains the following REQUIRED parameter:</t>
                 <t><list style="hanging">
@@ -448,14 +444,14 @@
                 ]]></artwork></figure>
             </section>
 
-            <section title="Client Identifier and Secret Profile" anchor="client_profile">
-                <t>This profile is suitable when the client is also the resource owner and thus not accessing protected resources within the context of a given end-user. For example, when a client is accessing non-private data or modifying data about itself. This profile SHOULD NOT be used when the client is acting on behalf of an end-user.</t>
+            <section title="Client Identifier and Secret Flow" anchor="client_profile">
+                <t>This flow is suitable when the client is also the resource owner and thus not accessing protected resources within the context of a given end-user. For example, when a client is accessing non-private data or modifying data about itself. This flow SHOULD NOT be used when the client is acting on behalf of an end-user.</t>
 
-                <t>Prior to making a request using this profile, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server.</t>
+                <t>Prior to making a request using this flow, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server.</t>
 
                 <t>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_mode">The parameter value MUST be set to "profile_client" (case sensitive).</t>
+                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_client" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                     <t hangText="oauth_client_secret">The client secret.</t>
                 </list></t>
@@ -512,7 +508,7 @@
         <section title="Refreshing an Access Token" anchor="refresh_token">
             <t>Authorization servers MAY issue access tokens that expire and thus require clients to refresh them. A client determines that an access token needs refreshing either by using the access token's expiration information or upon receiving the HTTP 401 Unauthorized response when accessing protected resources per <xref target="access_resource" />. A client will also refresh a token if they wish to obtain a corresponding access token secret for use when accessing protected resources via signatures (<xref target="using_signatures"/>).</t>
 
-            <t>Prior to making a request using this profile, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server.</t>
+            <t>Prior to making a request using this flow, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server.</t>
 
             <t>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
             <t><list style="hanging">
