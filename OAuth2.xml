@@ -207,7 +207,7 @@
                 <t><list style="hanging">
                     <t hangText="oauth_mode">The parameter value MUST be set to "flow_pure_client" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
-                    <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URI or include a fragment identifier ("#") as defined by <xref target="RFC3986" /> section 3.5 in the URI to prevent transmission of plain text credentials. TODO: better wording of what if I do both SSL and fragement?!?</t>
+                    <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the authorization step is completed. The client MUST make use of at least one of either a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URI or including a fragment identifier ("#") as defined by <xref target="RFC3986" /> section 3.5 in the URI to prevent transmission of plain text credentials.</t>
                 </list></t>
 
                 <t>The client MAY also include the following OPTIONAL parameters:</t>
@@ -230,7 +230,7 @@
 
                 <t>The way in which the server handles the user authorization request (such as via cookies), including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner.</t>
 
-                <t>TODO: Marcel to write/make sense here.The server SHOULD also verify that the callback URI provided in the "oauth_callback" parameter is the callback URI the client has pre-registered.</t>
+                <t>If the Client has previously registered a callback URI with the authorization server, it SHOULD verify that the callback URI provided in the "oauth_callback" parameter is valid given the pre-registered URI.</t>
 
                 <t>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI. The authorization server constructs the request URI by adding the following REQUIRED parameter to the callback URI query component:</t>
 
