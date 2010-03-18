@@ -90,7 +90,7 @@
 
                 <t>The client MUST first send the resource owners's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_web_app" (case sensitive).</t>
+                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_web_server" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                     <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed.</t>
                 </list></t>
@@ -105,7 +105,7 @@
 
                 <t>For example, the client directs the resource owner's user-agent to make the following HTTPS requests:</t>
                 <figure><artwork><![CDATA[
-    GET /user_authorization?oauth_mode=flow_web_app&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_web_server&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
     Host: server.example.com
                 ]]></artwork></figure>
 
@@ -156,7 +156,7 @@
                 <figure><artwork><![CDATA[
     POST /access_token HTTP/1.1
     Host: server.example.com
-   oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=gX1fBat3bV&oauth_verification_code=i1WsRn1uB1&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
+    oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=gX1fBat3bV&oauth_verification_code=i1WsRn1uB1&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
                 ]]></artwork></figure>
 
                 <t>If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK). The response contains the following REQUIRED parameter:</t>
@@ -205,7 +205,7 @@
 
                 <t>The client MUST first send the resource owners's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:</t>
                 <t><list style="hanging">
-                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_pure_client" (case sensitive).</t>
+                    <t hangText="oauth_mode">The parameter value MUST be set to "flow_web_client" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                     <t hangText="oauth_callback_url">An absolute URI to which the authorization server will redirect the resource owner back when the authorization step is completed. The client MUST make use of at least one of either a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URI or including a fragment identifier ("#") as defined by <xref target="RFC3986" /> section 3.5 in the URI to prevent transmission of plain text credentials.</t>
                 </list></t>
@@ -220,11 +220,11 @@
 
                 <t>For example, the client directs the resource owner's user-agent to make one of the following HTTPS requests:</t>
                 <figure><artwork><![CDATA[
-    GET /user_authorization?oauth_mode=flow_pure_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_web_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
     Host: server.example.com
                 ]]></artwork></figure>
                 <figure><artwork><![CDATA[
-    GET /user_authorization?oauth_mode=flow_pure_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_web_client&oauth_client_identifier=s6BhdRkqt3&oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
     Host: server.example.com
                 ]]></artwork></figure>
 
@@ -290,7 +290,7 @@
                     <t hangText="oauth_client_identifier">The client identifier.</t>
                 </list></t>
 
-                <t>The client MAY also include the following OPTIONAL parameters:</t>
+                <t>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_scope">If the authorization server has defined a manner for the client to request certain capabilities of the access token, this parameter SHOULD be used to do so.</t>
                 </list></t>
@@ -577,7 +577,7 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
             <t>OAuth 2.0 supports the ability for clients to make protected resource requests by using TLS/SSL (<xref target="using_ssl" />) and/or by signing their HTTP request with shared secrets (<xref target="using_signatures" />). Protected resources MUST support clients making authenticated requests via TLS/SSL (<xref target="using_ssl" />) and MAY choose to also support signatures (<xref target="using_signatures" />). It is RECOMMENDED that clients make authenticated requests via TLS/SSL.</t>
 
             <section title="Using TLS/SSL" anchor="using_ssl">
-                <t>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <xref target="RFC2617" /> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to insure that access tokens are not inadvertently logged or captured.</t>
+                <t>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <xref target="RFC2617" /> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to ensure that access tokens are not inadvertently logged or captured.</t>
 
                 <section title="Client Calls Protected Resource Using HTTP Header">
                     <t>The protected resource SHOULD allow clients to make authenticated requests by including the access token in the HTTP "Authorization" header. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI.</t>
@@ -634,10 +634,10 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
                     ]]></artwork></figure>
                 </section>
 
-                <section title="Client Calls Protected Resource Using Post Parameter">
-                    <t>The protected resource MAY allow clients to make authenticated requests by including the access token as a parameter in the body of a HTTP "POST" request. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI.</t>
+                <section title="Client Calls Protected Resource Using Body Parameter">
+                    <t>The protected resource MAY allow clients to make authenticated requests by including the access token as a parameter in the body of a HTTP request. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI.</t>
 
-                    <t>The client constructs an HTTP "POST" request to the API request endpoint and includes the following REQUIRED parameter:</t>
+                    <t>The client constructs an HTTP "POST", "PUT", or "DELETE" request to the API request endpoint and includes the following REQUIRED parameter:</t>
                     <t><list style="hanging">
                         <t hangText="oauth_access_token">The access token.</t>
                     </list></t>
