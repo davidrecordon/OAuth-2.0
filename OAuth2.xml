@@ -83,7 +83,7 @@
 
             <t>Unlike the others, <xref target="client_profile">Client Identifier and Secret flow</xref> is intended for a client acting on behalf of itself and not a separate resource owner. For example, when a client is accessing non-private data or modifying data about itself.</t>
 
-            <section title="OAuth 1.0a-style Flow" anchor="web_profile">
+            <section title="Web Server Flow" anchor="web_profile">
                 <t>This flow is suitable when the client is a web application calling the protected resource on behalf of a resource owner. It enables clients to act on behalf of resource owners without acquiring an end-user's credentials.</t>
 
                 <t>Prior to making a request using this flow, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server MAY require the client to pre-register their callback URI.</t>
@@ -196,8 +196,8 @@
                 ]]></artwork></figure>
             </section>
 
-            <section title="Client-side Application Flow">
-                <t>The Client-side Flow is similar to the <xref target="web_profile">Web App Flow</xref>, but it has different security characteristics. Client-side applications are those that live entirely in JavaScript, on the desktop, a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This flow allows for authorization while taking those security considerations into account.</t>
+            <section title="Web Client Flow">
+                <t>The Web Client Flow is similar to the <xref target="web_profile">Web Server Flow</xref>, but it has different security characteristics. Client-side applications are those that live entirely in JavaScript, on the desktop, a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This flow allows for authorization while taking those security considerations into account.</t>
 
                 <t>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this flow. Specifically, as the access token flows directly to the user-agent, it should only be used when it is acceptable for the end-user to have direct access to the access token. Additionally, care should be taken to choose a good callback URL, as described below.</t>
 
@@ -232,7 +232,8 @@
 
                 <t>TODO: Marcel to write/make sense here.The server SHOULD also verify that the callback URI provided in the "oauth_callback" parameter is the callback URI the client has pre-registered.</t>
 
-                <t>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding the following REQUIRED parameter to the callback URI query component:</t>
+                <t>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI. The authorization server constructs the request URI by adding the following REQUIRED parameter to the callback URI query component:</t>
+
                 <t><list style="hanging">
                     <t hangText="oauth_access_token">The access token.</t>
                 </list></t>
@@ -243,7 +244,7 @@
                     <t hangText="oauth_refresh_token">The refresh token.</t>
                 </list></t>
 
-                <t>If the callback URI already includes a query component as defined by <xref target="RFC3986" /> section 3, the server MUST append the OAuth parameters to the end of the existing query. The callback URI's query component MUST NOT contain any parameters beginning with the "oauth_" prefix.</t>
+                <t>If the callback URI already includes a query component as defined by <xref target="RFC3986" /> section 3, the server MUST append the OAuth parameters to the end of the existing query. If the callback URI includes a fragment (#), then the OAuth parameters MUST be appended to the end of the query, after the fragment. The callback URI's query component MUST NOT contain any parameters beginning with the "oauth_" prefix.</t>
 
                 <t>For example, the server redirects the resource owner's user-agent:</t>
                 <figure><artwork><![CDATA[
