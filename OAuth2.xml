@@ -576,6 +576,8 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
         <section title="Accessing a Protected Resource" anchor="access_resource">
             <t>OAuth 2.0 supports the ability for clients to make protected resource requests by using TLS/SSL (<xref target="using_ssl" />) and/or by signing their HTTP request with shared secrets (<xref target="using_signatures" />). Protected resources MUST support clients making authenticated requests via TLS/SSL (<xref target="using_ssl" />) and MAY choose to also support signatures (<xref target="using_signatures" />). It is RECOMMENDED that clients make authenticated requests via TLS/SSL.</t>
 
+            <t>If a client includes more than one access token within the request, the protected resource MUST respond with a HTTP 400 "Bad Request" error code.</t>
+
             <section title="Using TLS/SSL" anchor="using_ssl">
                 <t>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <xref target="RFC2617" /> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to ensure that access tokens are not inadvertently logged or captured.</t>
 
