@@ -201,9 +201,9 @@ Notational Conventions<br />
 <a href="#get_token">2.</a>&nbsp;
 Getting an Access Token<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#web_profile">2.1.</a>&nbsp;
-OAuth 1.0a-style Flow<br />
+Web Server Flow<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor6">2.2.</a>&nbsp;
-Client-side Application Flow<br />
+Web Client Flow<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor7">2.3.</a>&nbsp;
 Device Flow<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor8">2.4.</a>&nbsp;
@@ -221,7 +221,7 @@ Client Calls Protected Resource Using HTTP Header<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor10">4.1.2.</a>&nbsp;
 Client Calls Protected Resource Using URL Query Parameter<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor11">4.1.3.</a>&nbsp;
-Client Calls Protected Resource Using Post Parameter<br />
+Client Calls Protected Resource Using Body Parameter<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#using_signatures">4.2.</a>&nbsp;
 Using Signatures<br />
 <a href="#anchor12">5.</a>&nbsp;
@@ -335,7 +335,7 @@ Getting an Access Token</h3>
 <a name="web_profile"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.1"></a><h3>2.1.&nbsp;
-OAuth 1.0a-style Flow</h3>
+Web Server Flow</h3>
 
 <p>This flow is suitable when the client is a web application calling the protected resource on behalf of a resource owner. It enables clients to act on behalf of resource owners without acquiring an end-user's credentials.
 </p>
@@ -346,7 +346,7 @@ OAuth 1.0a-style Flow</h3>
 <p></p>
 <blockquote class="text"><dl>
 <dt>oauth_mode</dt>
-<dd>The parameter value MUST be set to "flow_web_app" (case sensitive).
+<dd>The parameter value MUST be set to "flow_web_server" (case sensitive).
 </dd>
 <dt>oauth_client_identifier</dt>
 <dd>The client identifier.
@@ -372,7 +372,7 @@ OAuth 1.0a-style Flow</h3>
 </p>
 <p>For example, the client directs the resource owner's user-agent to make the following HTTPS requests:
 </p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
-    GET /user_authorization?oauth_mode=flow_web_app&amp;oauth_client_identifier=s6BhdRkqt3&amp;oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_web_server&amp;oauth_client_identifier=s6BhdRkqt3&amp;oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
     Host: server.example.com
 </pre></div>
 <p>The way in which the server handles the user authorization request (such as via cookies), including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner. If the resource owner approves the authorization request, the authorization server MUST generate a verification code and associate it with the client identifier and callback URI.
@@ -440,7 +440,7 @@ OAuth 1.0a-style Flow</h3>
 </p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
     POST /access_token HTTP/1.1
     Host: server.example.com
-   oauth_client_identifier=s6BhdRkqt3&amp;oauth_client_secret=gX1fBat3bV&amp;oauth_verification_code=i1WsRn1uB1&amp;oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
+    oauth_client_identifier=s6BhdRkqt3&amp;oauth_client_secret=gX1fBat3bV&amp;oauth_verification_code=i1WsRn1uB1&amp;oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
 </pre></div>
 <p>If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <a class='info' href='#W3C.REC-html40-19980424'>[W3C.REC&#8209;html40&#8209;19980424]<span> (</span><span class='info'>Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;HTML 4.0 Specification,&rdquo; .</span><span>)</span></a> with a 200 status code (OK). The response contains the following REQUIRED parameter:
 </p>
@@ -493,9 +493,9 @@ OAuth 1.0a-style Flow</h3>
 <a name="anchor6"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.2"></a><h3>2.2.&nbsp;
-Client-side Application Flow</h3>
+Web Client Flow</h3>
 
-<p>The Client-side Flow is similar to the <a class='info' href='#web_profile'>Web App Flow<span> (</span><span class='info'>OAuth 1.0a-style Flow</span><span>)</span></a>, but it has different security characteristics. Client-side applications are those that live entirely in JavaScript, on the desktop, a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This flow allows for authorization while taking those security considerations into account.
+<p>The Web Client Flow is similar to the <a class='info' href='#web_profile'>Web Server Flow<span> (</span><span class='info'>Web Server Flow</span><span>)</span></a>, but it has different security characteristics. Client-side applications are those that live entirely in JavaScript, on the desktop, a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This flow allows for authorization while taking those security considerations into account.
 </p>
 <p>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this flow. Specifically, as the access token flows directly to the user-agent, it should only be used when it is acceptable for the end-user to have direct access to the access token. Additionally, care should be taken to choose a good callback URL, as described below.
 </p>
@@ -506,13 +506,13 @@ Client-side Application Flow</h3>
 <p></p>
 <blockquote class="text"><dl>
 <dt>oauth_mode</dt>
-<dd>The parameter value MUST be set to "flow_pure_client" (case sensitive).
+<dd>The parameter value MUST be set to "flow_web_client" (case sensitive).
 </dd>
 <dt>oauth_client_identifier</dt>
 <dd>The client identifier.
 </dd>
 <dt>oauth_callback_url</dt>
-<dd>An absolute URI to which the authorization server will redirect the resource owner back when the resource owner authorization step is completed. The client MUST either make use of a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URI or include a fragment identifier ("#") as defined by <a class='info' href='#RFC3986'>[RFC3986]<span> (</span><span class='info'>Berners-Lee, T., Fielding, R., and L. Masinter, &ldquo;Uniform Resource Identifier (URI): Generic Syntax,&rdquo; .</span><span>)</span></a> section 3.5 in the URI to prevent transmission of plain text credentials. TODO: better wording of what if I do both SSL and fragement?!?
+<dd>An absolute URI to which the authorization server will redirect the resource owner back when the authorization step is completed. The client MUST make use of at least one of either a transport-layer mechanism such as TLS or SSL (or a secure channel with equivalent protections) for the callback URI or including a fragment identifier ("#") as defined by <a class='info' href='#RFC3986'>[RFC3986]<span> (</span><span class='info'>Berners-Lee, T., Fielding, R., and L. Masinter, &ldquo;Uniform Resource Identifier (URI): Generic Syntax,&rdquo; .</span><span>)</span></a> section 3.5 in the URI to prevent transmission of plain text credentials.
 </dd>
 </dl></blockquote>
 
@@ -532,17 +532,17 @@ Client-side Application Flow</h3>
 </p>
 <p>For example, the client directs the resource owner's user-agent to make one of the following HTTPS requests:
 </p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
-    GET /user_authorization?oauth_mode=flow_pure_client&amp;oauth_client_identifier=s6BhdRkqt3&amp;oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_web_client&amp;oauth_client_identifier=s6BhdRkqt3&amp;oauth_callback_url=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
     Host: server.example.com
 </pre></div><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
-    GET /user_authorization?oauth_mode=flow_pure_client&amp;oauth_client_identifier=s6BhdRkqt3&amp;oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
+    GET /user_authorization?oauth_mode=flow_web_client&amp;oauth_client_identifier=s6BhdRkqt3&amp;oauth_callback_url=http%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb# HTTP/1.1
     Host: server.example.com
 </pre></div>
 <p>The way in which the server handles the user authorization request (such as via cookies), including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner.
 </p>
-<p>TODO: Marcel to write/make sense here.The server SHOULD also verify that the callback URI provided in the "oauth_callback" parameter is the callback URI the client has pre-registered.
+<p>If the Client has previously registered a callback URI with the authorization server, it SHOULD verify that the callback URI provided in the "oauth_callback" parameter is valid given the pre-registered URI.
 </p>
-<p>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI if one was provided in the "oauth_callback" parameter or pre-registered by other means. The authorization server constructs the request URI by adding the following REQUIRED parameter to the callback URI query component:
+<p>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI. The authorization server constructs the request URI by adding the following REQUIRED parameter to the callback URI query component:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -563,7 +563,7 @@ Client-side Application Flow</h3>
 </dd>
 </dl></blockquote>
 
-<p>If the callback URI already includes a query component as defined by <a class='info' href='#RFC3986'>[RFC3986]<span> (</span><span class='info'>Berners-Lee, T., Fielding, R., and L. Masinter, &ldquo;Uniform Resource Identifier (URI): Generic Syntax,&rdquo; .</span><span>)</span></a> section 3, the server MUST append the OAuth parameters to the end of the existing query. The callback URI's query component MUST NOT contain any parameters beginning with the "oauth_" prefix.
+<p>If the callback URI already includes a query component as defined by <a class='info' href='#RFC3986'>[RFC3986]<span> (</span><span class='info'>Berners-Lee, T., Fielding, R., and L. Masinter, &ldquo;Uniform Resource Identifier (URI): Generic Syntax,&rdquo; .</span><span>)</span></a> section 3, the server MUST append the OAuth parameters to the end of the existing query. If the callback URI includes a fragment (#), then the OAuth parameters MUST be appended to the end of the query, after the fragment. The callback URI's query component MUST NOT contain any parameters beginning with the "oauth_" prefix.
 </p>
 <p>For example, the server redirects the resource owner's user-agent:
 </p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
@@ -613,7 +613,7 @@ Device Flow</h3>
 </dd>
 </dl></blockquote>
 
-<p>The client MAY also include the following OPTIONAL parameters:
+<p>The client MAY also include the following OPTIONAL parameters as well as any additional parameters as defined by the authorization server:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -1006,12 +1006,14 @@ Accessing a Protected Resource</h3>
 
 <p>OAuth 2.0 supports the ability for clients to make protected resource requests by using TLS/SSL (<a class='info' href='#using_ssl'>Section&nbsp;4.1<span> (</span><span class='info'>Using TLS/SSL</span><span>)</span></a>) and/or by signing their HTTP request with shared secrets (<a class='info' href='#using_signatures'>Section&nbsp;4.2<span> (</span><span class='info'>Using Signatures</span><span>)</span></a>). Protected resources MUST support clients making authenticated requests via TLS/SSL (<a class='info' href='#using_ssl'>Section&nbsp;4.1<span> (</span><span class='info'>Using TLS/SSL</span><span>)</span></a>) and MAY choose to also support signatures (<a class='info' href='#using_signatures'>Section&nbsp;4.2<span> (</span><span class='info'>Using Signatures</span><span>)</span></a>). It is RECOMMENDED that clients make authenticated requests via TLS/SSL.
 </p>
+<p>If a client includes more than one access token within the request, the protected resource MUST respond with a HTTP 400 "Bad Request" error code.
+</p>
 <a name="using_ssl"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.4.1"></a><h3>4.1.&nbsp;
 Using TLS/SSL</h3>
 
-<p>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <a class='info' href='#RFC2617'>[RFC2617]<span> (</span><span class='info'>Franks, J., Hallam-Baker, P., Hostetler, J., Lawrence, S., Leach, P., Luotonen, A., and L. Stewart, &ldquo;HTTP Authentication: Basic and Digest Access Authentication,&rdquo; .</span><span>)</span></a> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to insure that access tokens are not inadvertently logged or captured.
+<p>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <a class='info' href='#RFC2617'>[RFC2617]<span> (</span><span class='info'>Franks, J., Hallam-Baker, P., Hostetler, J., Lawrence, S., Leach, P., Luotonen, A., and L. Stewart, &ldquo;HTTP Authentication: Basic and Digest Access Authentication,&rdquo; .</span><span>)</span></a> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to ensure that access tokens are not inadvertently logged or captured.
 </p>
 <a name="anchor9"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
@@ -1076,11 +1078,11 @@ Client Calls Protected Resource Using URL Query Parameter</h3>
 <a name="anchor11"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.4.1.3"></a><h3>4.1.3.&nbsp;
-Client Calls Protected Resource Using Post Parameter</h3>
+Client Calls Protected Resource Using Body Parameter</h3>
 
-<p>The protected resource MAY allow clients to make authenticated requests by including the access token as a parameter in the body of a HTTP "POST" request. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI.
+<p>The protected resource MAY allow clients to make authenticated requests by including the access token as a parameter in the body of a HTTP request. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI.
 </p>
-<p>The client constructs an HTTP "POST" request to the API request endpoint and includes the following REQUIRED parameter:
+<p>The client constructs an HTTP "POST", "PUT", or "DELETE" request to the API request endpoint and includes the following REQUIRED parameter:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -1116,7 +1118,7 @@ Using Signatures</h3>
 <a name="rfc.section.5"></a><h3>5.&nbsp;
 Security Considerations</h3>
 
-<p>TODO: I'm the wrong person to write this section.
+<p>TODO: David is the wrong person to write this section. Should definitely cover why device profiles don't have client secrets (hard to trust them to keep secrets and will probabally use custom ways to auth based on the device and if it has TPM.)
 </p>
 <a name="rfc.references"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
