@@ -142,9 +142,17 @@
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <table summary="layout" width="66%" border="0" cellpadding="0" cellspacing="0"><tr><td><table summary="layout" width="100%" border="0" cellpadding="2" cellspacing="1">
 <tr><td class="header">Network Working Group</td><td class="header">D. Recordon, Ed.</td></tr>
-<tr><td class="header">Internet-Draft</td><td class="header">Facebook, Inc</td></tr>
-<tr><td class="header">Intended status: Informational</td><td class="header">Mar 2010</td></tr>
+<tr><td class="header">Internet-Draft</td><td class="header">Facebook</td></tr>
+<tr><td class="header">Intended status: Informational</td><td class="header">E. Hammer-Lahav, Ed.</td></tr>
 <tr><td class="header">Expires: September 2, 2010</td><td class="header">&nbsp;</td></tr>
+<tr><td class="header">&nbsp;</td><td class="header">A. Tom</td></tr>
+<tr><td class="header">&nbsp;</td><td class="header">Yahoo!</td></tr>
+<tr><td class="header">&nbsp;</td><td class="header">B. Goldman</td></tr>
+<tr><td class="header">&nbsp;</td><td class="header">L. Shepard</td></tr>
+<tr><td class="header">&nbsp;</td><td class="header">Facebook</td></tr>
+<tr><td class="header">&nbsp;</td><td class="header">R. Krikorian</td></tr>
+<tr><td class="header">&nbsp;</td><td class="header">Twitter</td></tr>
+<tr><td class="header">&nbsp;</td><td class="header">Mar 2010</td></tr>
 </table></td></tr></table>
 <h1><br />OAuth 2.0 DRAFT<br />draft-recordon-oauth2-01</h1>
 
@@ -193,20 +201,22 @@ Introduction<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor2">1.1.</a>&nbsp;
 Acknowledgements<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor3">1.2.</a>&nbsp;
+Changes from WRAP<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor4">1.3.</a>&nbsp;
 Terminology<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor4">1.2.1.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor5">1.3.1.</a>&nbsp;
 Endpoints<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor5">1.3.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor6">1.4.</a>&nbsp;
 Notational Conventions<br />
 <a href="#get_token">2.</a>&nbsp;
 Getting an Access Token<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#web_profile">2.1.</a>&nbsp;
 Web Server Flow<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor6">2.2.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor7">2.2.</a>&nbsp;
 Web Client Flow<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor7">2.3.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor8">2.3.</a>&nbsp;
 Device Flow<br />
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor8">2.4.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor9">2.4.</a>&nbsp;
 Username and Password Flow<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#client_profile">2.5.</a>&nbsp;
 Client Identifier and Secret Flow<br />
@@ -215,16 +225,24 @@ Refreshing an Access Token<br />
 <a href="#access_resource">4.</a>&nbsp;
 Accessing a Protected Resource<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#using_ssl">4.1.</a>&nbsp;
-Using TLS/SSL<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor9">4.1.1.</a>&nbsp;
+Using TLS/SSL solely with an access token<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor10">4.1.1.</a>&nbsp;
 Client Calls Protected Resource Using HTTP Header<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor10">4.1.2.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor11">4.1.2.</a>&nbsp;
 Client Calls Protected Resource Using URL Query Parameter<br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor11">4.1.3.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#anchor12">4.1.3.</a>&nbsp;
 Client Calls Protected Resource Using Body Parameter<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#using_signatures">4.2.</a>&nbsp;
 Using Signatures<br />
-<a href="#anchor12">5.</a>&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#compute_sig">4.2.1.</a>&nbsp;
+Computing the signature<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#sig_headers">4.2.2.</a>&nbsp;
+Client Calls Protected Resource Using HTTP Headers<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#sig_query">4.2.3.</a>&nbsp;
+Client Calls Protected Resource Using URL Query Parameters<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#sig_body">4.2.4.</a>&nbsp;
+Client Calls Protected Resource Using Body Parameters<br />
+<a href="#anchor14">5.</a>&nbsp;
 Security Considerations<br />
 <a href="#rfc.references1">6.</a>&nbsp;
 References<br />
@@ -233,7 +251,7 @@ Normative References<br />
 &nbsp;&nbsp;&nbsp;&nbsp;<a href="#rfc.references2">6.2.</a>&nbsp;
 Informative References<br />
 <a href="#rfc.authors">&#167;</a>&nbsp;
-Author's Address<br />
+Authors' Addresses<br />
 </p>
 <br clear="all" />
 
@@ -260,12 +278,38 @@ Acknowledgements</h3>
 <a name="anchor3"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.1.2"></a><h3>1.2.&nbsp;
+Changes from WRAP</h3>
+
+<p>The following are highlighted changes from <a class='info' href='#draft-hardt-oauth-01'>[draft&#8209;hardt&#8209;oauth&#8209;01]<span> (</span><span class='info'>Eaton, B., Goland, Y., Hardt, D., Ed., and A. Tom, &ldquo;OAuth Web Resource Authorization Profiles,&rdquo; .</span><span>)</span></a>:
+</p>
+<p></p>
+<ol class="text">
+<li>A Web Client flow designed for use within JavaScript. It also supports the use cases of the rich app profile so that they're not two separate flows.
+</li>
+<li>A new device flows which is based on the Netflix/Tivo flow (TV shows you a code that you type in on your computer). http://www.ietf.org/mail-archive/web/oauth/current/msg01346.html
+</li>
+<li>Remove captchas from the username/password flow.  They haven't been successfully implemented within this context and create complexity especially when we use other signals to detect compromised accounts. http://www.ietf.org/mail-archive/web/oauth/current/msg01293.html
+</li>
+<li>Don't allow bearer tokens without either SSL and/or signatures. While some providers may offer this ability, they should be out of spec for doing so though technically it won't break the flows.
+</li>
+<li>Abstract the refresh token flow out of each profile into its own section. Support the ability to request access token secrets when refreshing.
+</li>
+<li>Support signatures for making API requests but not for getting access tokens.  If you want to use signatures, you'll get an access token and then make a refresh call where you ask for a token secret. This causes the auth server to mark the token as no longer being valid as a bearer token via SSL.  This performance tradeoff seems realistic given many use cases focus on high-volume API transactions and thus the one additional request at the onset should be noise. The signature mechanism is currently from OAuth 1.0.
+</li>
+</ol>
+
+<a name="anchor4"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.1.3"></a><h3>1.3.&nbsp;
 Terminology</h3>
 
 <p></p>
 <blockquote class="text"><dl>
 <dt>access token</dt>
 <dd>An unique identifier issued by the authorization server and used by the client to make authenticated requests on behalf of the user whose authorization has been obtained by the client.  When making protected resource requests, the access token is either a bearer token presented over SSL/TLS and/or accompanied by an additional secret when using a signature mechanism.
+</dd>
+<dt>access token secret</dt>
+<dd>A string issued by the authorization server and used by the client to establish ownership of the access token when using a signature mechanism to access a protected resource.
 </dd>
 <dt>authorization server</dt>
 <dd>A HTTP server (per <a class='info' href='#RFC2616'>[RFC2616]<span> (</span><span class='info'>Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;Hypertext Transfer Protocol -- HTTP/1.1,&rdquo; .</span><span>)</span></a>) that issues access tokens to clients after successful authorization. May be the same entity as the server hosting protected resources.
@@ -290,9 +334,9 @@ Terminology</h3>
 </dd>
 </dl></blockquote>
 
-<a name="anchor4"></a><br /><hr />
+<a name="anchor5"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
-<a name="rfc.section.1.2.1"></a><h3>1.2.1.&nbsp;
+<a name="rfc.section.1.3.1"></a><h3>1.3.1.&nbsp;
 Endpoints</h3>
 
 <p>The authorization server advertises (such as via documentation) the URIs of the following three endpoints:
@@ -314,9 +358,9 @@ Endpoints</h3>
 </p>
 <p>The methods in which the servers advertise and document its three endpoints are beyond the scope of this specification. Clients should avoid making assumptions about the size of tokens and other server-generated values, which are left undefined by this specification. However it is strongly RECOMMENDED that authorization servers make their identifiers, secrets, and tokens not over 255 characters in length in order to ease client implementations. In addition, protocol parameters MAY include values which require encoding when transmitted.  All identifiers, secrets, tokens, and codes MUST use URL safe characters and not require further encoding.  Clients and servers should not make other assumptions about the possible range of their values.
 </p>
-<a name="anchor5"></a><br /><hr />
+<a name="anchor6"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
-<a name="rfc.section.1.3"></a><h3>1.3.&nbsp;
+<a name="rfc.section.1.4"></a><h3>1.4.&nbsp;
 Notational Conventions</h3>
 
 <p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <a class='info' href='#RFC2119'>[RFC2119]<span> (</span><span class='info'>Bradner, B., &ldquo;Key words for use in RFCs to Indicate Requirement Levels,&rdquo; .</span><span>)</span></a>.
@@ -490,7 +534,7 @@ Web Server Flow</h3>
 
     oauth_error_reason=expired_verification_code
 </pre></div>
-<a name="anchor6"></a><br /><hr />
+<a name="anchor7"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.2"></a><h3>2.2.&nbsp;
 Web Client Flow</h3>
@@ -592,7 +636,7 @@ Web Client Flow</h3>
     HTTP/1.1 401 Authorization Required
     WWW-Authenticate: OAuth realm="example"
 </pre></div>
-<a name="anchor7"></a><br /><hr />
+<a name="anchor8"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.3"></a><h3>2.3.&nbsp;
 Device Flow</h3>
@@ -741,7 +785,7 @@ Device Flow</h3>
 
     oauth_error_reason=authorization_pending
 </pre></div>
-<a name="anchor8"></a><br /><hr />
+<a name="anchor9"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.2.4"></a><h3>2.4.&nbsp;
 Username and Password Flow</h3>
@@ -913,7 +957,7 @@ Client Identifier and Secret Flow</h3>
 <a name="rfc.section.3"></a><h3>3.&nbsp;
 Refreshing an Access Token</h3>
 
-<p>Authorization servers MAY issue access tokens that expire and thus require clients to refresh them. A client determines that an access token needs refreshing either by using the access token's expiration information or upon receiving the HTTP 401 Unauthorized response when accessing protected resources per <a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>. A client will also refresh a token if they wish to obtain a corresponding access token secret for use when accessing protected resources via signatures (<a class='info' href='#using_signatures'>Section&nbsp;4.2<span> (</span><span class='info'>Using Signatures</span><span>)</span></a>).
+<p>Authorization servers MAY issue access tokens that expire and thus require clients to refresh them. A client determines that an access token needs refreshing either by using the access token's expiration information or upon receiving the HTTP 401 Unauthorized response when accessing protected resources per <a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>. A client will also refresh a token if it wishes to obtain a corresponding access token secret for use when accessing protected resources via signatures (<a class='info' href='#using_signatures'>Section&nbsp;4.2<span> (</span><span class='info'>Using Signatures</span><span>)</span></a>).
 </p>
 <p>Prior to making a request using this flow, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server.
 </p>
@@ -954,7 +998,7 @@ oauth_client_identifier=s6BhdRkqt3&amp;oauth_client_secret=8eSEIpnqmM&amp;oauth_
 </pre></div>
 <p>The authorization server MUST verify that the resource owner has still authorized the provisioning of an access token to the client and that the refresh token is valid. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <a class='info' href='#W3C.REC-html40-19980424'>[W3C.REC&#8209;html40&#8209;19980424]<span> (</span><span class='info'>Ragget, D., Ed., Le Hors, A., Ed., and I. Jacobs, Ed., &ldquo;HTML 4.0 Specification,&rdquo; .</span><span>)</span></a> with a 200 status code (OK).
 </p>
-<p>If an access token secret is included in the response, the protected resource MUST NOT allow the use of the corresponding access token without its secret (<a class='info' href='#using_ssl'>Section&nbsp;4.1<span> (</span><span class='info'>Using TLS/SSL</span><span>)</span></a>).
+<p>If an access token secret is included in the response, the protected resource MUST NOT allow the use of the corresponding access token without its secret (<a class='info' href='#using_ssl'>Section&nbsp;4.1<span> (</span><span class='info'>Using TLS/SSL solely with an access token</span><span>)</span></a>).
 </p>
 <p>The response contains the following REQUIRED parameters:
 </p>
@@ -1004,18 +1048,18 @@ oauth_client_identifier=s6BhdRkqt3&amp;oauth_client_secret=8eSEIpnqmM&amp;oauth_
 <a name="rfc.section.4"></a><h3>4.&nbsp;
 Accessing a Protected Resource</h3>
 
-<p>OAuth 2.0 supports the ability for clients to make protected resource requests by using TLS/SSL (<a class='info' href='#using_ssl'>Section&nbsp;4.1<span> (</span><span class='info'>Using TLS/SSL</span><span>)</span></a>) and/or by signing their HTTP request with shared secrets (<a class='info' href='#using_signatures'>Section&nbsp;4.2<span> (</span><span class='info'>Using Signatures</span><span>)</span></a>). Protected resources MUST support clients making authenticated requests via TLS/SSL (<a class='info' href='#using_ssl'>Section&nbsp;4.1<span> (</span><span class='info'>Using TLS/SSL</span><span>)</span></a>) and MAY choose to also support signatures (<a class='info' href='#using_signatures'>Section&nbsp;4.2<span> (</span><span class='info'>Using Signatures</span><span>)</span></a>). It is RECOMMENDED that clients make authenticated requests via TLS/SSL.
+<p>OAuth 2.0 supports the ability for clients to make protected resource requests by using TLS/SSL (<a class='info' href='#using_ssl'>Section&nbsp;4.1<span> (</span><span class='info'>Using TLS/SSL solely with an access token</span><span>)</span></a>) and/or by signing their HTTP request with shared secrets (<a class='info' href='#using_signatures'>Section&nbsp;4.2<span> (</span><span class='info'>Using Signatures</span><span>)</span></a>). Protected resources MUST support clients making authenticated requests via TLS/SSL (<a class='info' href='#using_ssl'>Section&nbsp;4.1<span> (</span><span class='info'>Using TLS/SSL solely with an access token</span><span>)</span></a>) and MAY choose to also support signatures (<a class='info' href='#using_signatures'>Section&nbsp;4.2<span> (</span><span class='info'>Using Signatures</span><span>)</span></a>). It is RECOMMENDED that clients make authenticated requests via TLS/SSL.
 </p>
 <p>If a client includes more than one access token within the request, the protected resource MUST respond with a HTTP 400 "Bad Request" error code.
 </p>
 <a name="using_ssl"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.4.1"></a><h3>4.1.&nbsp;
-Using TLS/SSL</h3>
+Using TLS/SSL solely with an access token</h3>
 
-<p>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <a class='info' href='#RFC2617'>[RFC2617]<span> (</span><span class='info'>Franks, J., Hallam-Baker, P., Hostetler, J., Lawrence, S., Leach, P., Luotonen, A., and L. Stewart, &ldquo;HTTP Authentication: Basic and Digest Access Authentication,&rdquo; .</span><span>)</span></a> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to ensure that access tokens are not inadvertently logged or captured.
+<p>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <a class='info' href='#RFC2617'>[RFC2617]<span> (</span><span class='info'>Franks, J., Hallam-Baker, P., Hostetler, J., Lawrence, S., Leach, P., Luotonen, A., and L. Stewart, &ldquo;HTTP Authentication: Basic and Digest Access Authentication,&rdquo; .</span><span>)</span></a> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to ensure that access tokens are not inadvertently logged or captured. It is RECOMMENDED that clients verify the authenticity of the certificate provided when establishing a TLS/SSL connection to the protected resource.
 </p>
-<a name="anchor9"></a><br /><hr />
+<a name="anchor10"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.4.1.1"></a><h3>4.1.1.&nbsp;
 Client Calls Protected Resource Using HTTP Header</h3>
@@ -1038,14 +1082,14 @@ Client Calls Protected Resource Using HTTP Header</h3>
     Host: api.example.com
     Authorization:  OAuth  oauth_access_token = vF9dft4qmT
 </pre></div>
-<p>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code. The protected resource MAY include further details about why the request was rejected in the response body.
+<p>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code. The protected resource MAY include further details about why the request was rejected in the response body or headers.
 </p>
 <p>For example:
 </p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
     HTTP/1.1 401 Authorization Required
     WWW-Authenticate: OAuth realm="https://api.example.com/"
 </pre></div>
-<a name="anchor10"></a><br /><hr />
+<a name="anchor11"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.4.1.2"></a><h3>4.1.2.&nbsp;
 Client Calls Protected Resource Using URL Query Parameter</h3>
@@ -1075,7 +1119,7 @@ Client Calls Protected Resource Using URL Query Parameter</h3>
     HTTP/1.1 401 Authorization Required
     WWW-Authenticate: OAuth realm="https://api.example.com/"
 </pre></div>
-<a name="anchor11"></a><br /><hr />
+<a name="anchor12"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.4.1.3"></a><h3>4.1.3.&nbsp;
 Client Calls Protected Resource Using Body Parameter</h3>
@@ -1111,14 +1155,180 @@ Client Calls Protected Resource Using Body Parameter</h3>
 <a name="rfc.section.4.2"></a><h3>4.2.&nbsp;
 Using Signatures</h3>
 
-<p>TODO: We need to agree on the signature method though there is a lot of normative text in the OAuth 1.0 spec to draw from.   OAuth 1.0 is about three pages of text assuming people are happy with the mechanism; it would be good to simplify as much as possible. We could modify WRAP's refresh token request to let the client specify that they'd also like an access token secret for that request. This seems like the right way of doing it.
+<p>When using signatures, clients MAY use TLS/SSL as the transport to authenticate to a protected resource.  Use of the "Authorization" header field is RECOMMENDED, as HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs.
 </p>
-<a name="anchor12"></a><br /><hr />
+<p>Editor's note: This draft bases it's signature mechanism off of the <a class='info' href='#draft-hammer-oauth-10'>OAuth 1.0 Protocol<span> (</span><span class='info'>Hammer-Lahav, E., Ed., &ldquo;The OAuth 1.0 Protocol,&rdquo; .</span><span>)</span></a> [draft&#8209;hammer&#8209;oauth&#8209;10] and it's possible that parts of the mechanism will change in future drafts.
+</p>
+<p>The following parameters are obtained (or computed) by clients in order to make protected resource requests:
+</p>
+<blockquote class="text"><dl>
+<dt>oauth_access_token</dt>
+<dd>The access token obtained through a refresh token call with the "oauth_want_secret" parameter included (<a class='info' href='#refresh_token'>Section&nbsp;3<span> (</span><span class='info'>Refreshing an Access Token</span><span>)</span></a>).
+</dd>
+<dt>oauth_signature_method</dt>
+<dd>The signature method used by the client to sign the request.  The method MUST be one of those listed in the "oauth_signature_methods" parameter returned with the access token secret (<a class='info' href='#refresh_token'>Section&nbsp;3<span> (</span><span class='info'>Refreshing an Access Token</span><span>)</span></a>).
+</dd>
+<dt>oauth_timestamp</dt>
+<dd>Unless otherwise specified by the server's documentation, the timestamp is expressed in the number of seconds since January 1, 1970 00:00:00 GMT. It MUST be a positive integer.
+</dd>
+<dt>oauth_nonce</dt>
+<dd>A nonce is a random string, uniquely generated by the client to allow the server to verify that a request has never been made before and helps prevent replay attacks when requests are made over a non-secure channel.  The nonce value MUST be unique across all requests with the same timestamp and token combinations.
+</dd>
+<dt>oauth_signature</dt>
+<dd>The computed signature value ensuring the integrity of this request (<a class='info' href='#compute_sig'>Section&nbsp;4.2.1<span> (</span><span class='info'>Computing the signature</span><span>)</span></a>).
+</dd>
+</dl></blockquote>
+<p>The protocol parameters are added to the request using one of the three transmission methods: <a class='info' href='#sig_headers'>HTTP Headers<span> (</span><span class='info'>Client Calls Protected Resource Using HTTP Headers</span><span>)</span></a>, <a class='info' href='#sig_query'>HTTP query parameters<span> (</span><span class='info'>Client Calls Protected Resource Using URL Query Parameters</span><span>)</span></a>, or <a class='info' href='#sig_body'>HTTP body parameters<span> (</span><span class='info'>Client Calls Protected Resource Using Body Parameters</span><span>)</span></a>.
+</p>
+<p>Construction of the signature base string follows the process detailed in section 3.4.1 of <a class='info' href='#draft-hammer-oauth-10'>[draft&#8209;hammer&#8209;oauth&#8209;10]<span> (</span><span class='info'>Hammer-Lahav, E., Ed., &ldquo;The OAuth 1.0 Protocol,&rdquo; .</span><span>)</span></a>.
+</p>
+<p>For example the request:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    GET /user/daveman692.json?b5=%3D%25%3D&amp;a3=a&amp;c%40=&amp;a2=r%20b HTTP/1.1
+    Host: api.example.com
+    Content-Type: application/x-www-form-urlencoded
+    Authorization: OAuth
+                   oauth_access_token="vF9dft4qmT",
+                   oauth_signature_method="HMAC-SHA1",
+                   oauth_timestamp="1268998408",
+                   oauth_nonce="7d8f3e4a",
+
+                c2&amp;a3=2+q
+</pre></div>
+<p>Is represented by the following signature base string:
+</p>
+<p></p>
+<blockquote class="text">
+<p>GET&http%3A%2F%2Fapi.example.com%2Fuser%2Fdaveman692.json&a2%3Dr%2520b%26a3%3D2%252Bq%26a3%3Da%26b5%3D%253D%2525%253D%26c%2540%3D%26c2%3D%26oauth_nonce%3D7d8f3e4a%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1268998408%26oauth_access_token%3DvF9dft4qmT%26oauth_version%3D2.0
+</p>
+</blockquote>
+
+<a name="compute_sig"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.4.2.1"></a><h3>4.2.1.&nbsp;
+Computing the signature</h3>
+
+<p>The authorization server declares which signature methods it accepts via the "oauth_signature_methods" returned as part of obtaining an access token secret (<a class='info' href='#refresh_token'>Section&nbsp;3<span> (</span><span class='info'>Refreshing an Access Token</span><span>)</span></a>).  The client declares which signature method is used for this request via the "oauth_signature_method" parameter.  It then generates a signature, and includes it in the "oauth_signature" parameter.  The server verifies the signature as specified for each method.
+</p>
+<p>There is no mandate for a particular signature method as each implementation can have its own unique requirements.  Authorization servers are free to implement and document their own custom methods.
+</p>
+<a name="anchor13"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.4.2.1.1"></a><h3>4.2.1.1.&nbsp;
+HMAC-SHA1</h3>
+
+<p>The "HMAC-SHA1" signature method uses the HMAC-SHA1 signature algorithm as defined in <a class='info' href='#RFC2104'>[RFC2104]<span> (</span><span class='info'>Krawczyk, H., Bellare, M., and R. Canetti, &ldquo;HMAC: Keyed-Hashing for Message Authentication,&rdquo; .</span><span>)</span></a>:
+</p>
+<p></p>
+<blockquote class="text">
+<p>digest = HMAC-SHA1 (key, text)
+</p>
+</blockquote>
+
+<p>The HMAC-SHA1 function variables are used in following way:
+</p>
+<p></p>
+<blockquote class="text"><dl>
+<dt>text</dt>
+<dd>is set to the value of the signature base string.
+</dd>
+<dt>key</dt>
+<dd>is set to the concatenated values of:
+                                
+<ol class="text">
+<li>The client secret, after being encoded (TODO: ref)
+</li>
+<li>An "&" character (ASCII code 38), which MUST be included even when either secret is empty.
+</li>
+<li>The access token secret, after being encoded (TODO: ref).
+</li>
+</ol>
+                            
+</dd>
+<dt>digest</dt>
+<dd>is used to set the value of the "oauth_signature" protocol parameter, after the result octet string is base64-encoded per section 6.8 of <a class='info' href='#RFC2045'>[RFC2045]<span> (</span><span class='info'>Freed, N. and N. Borenstein, &ldquo;Multipurpose Internet Mail Extensions (MIME) Part One: Format of Internet Message Bodies,&rdquo; .</span><span>)</span></a>.
+</dd>
+</dl></blockquote>
+
+<a name="sig_headers"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.4.2.2"></a><h3>4.2.2.&nbsp;
+Client Calls Protected Resource Using HTTP Headers</h3>
+
+<p>The protected resource MAY allow clients to make authenticated requests by including the access token in the HTTP "Authorization" header.  Prior to making a request, the client MUST have obtained a valid access token, a valid access token secret, and the API request endpoint URI.  It MUST have also constructed the signature base string and <a class='info' href='#compute_sig'>computed the signature<span> (</span><span class='info'>Computing the signature</span><span>)</span></a>.
+</p>
+<p>The client constructs a HTTP request to the API request endpoint URI and includes the HTTP "Authorization" header field with the auth-scheme name set to "OAuth" (case-insensitive).  The protocol parameters and the signature computed in <a class='info' href='#compute_sig'>Section&nbsp;4.2.1<span> (</span><span class='info'>Computing the signature</span><span>)</span></a> are included in the Authorization header.
+</p>
+<p>For example, a valid request follows the form of:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    GET /user/daveman692.json?b5=%3D%25%3D&amp;a3=a&amp;c%40=&amp;a2=r%20b HTTP/1.1
+    Host: api.example.com
+    Content-Type: application/x-www-form-urlencoded
+    Authorization: OAuth
+                   oauth_access_token="vF9dft4qmT",
+                   oauth_signature_method="HMAC-SHA1",
+                   oauth_timestamp="1268998408",
+                   oauth_nonce="7d8f3e4a",
+                   oauth_signature="hfVFpKvoKp5S6YaNIJ6ljuNYR6s%3D"
+
+    c2&amp;a3=2+q
+</pre></div>
+<p>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code.  The protected resource MAY include further details about why the request was rejected in the response body or headers.
+</p>
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="http://api.example.com/"
+</pre></div>
+<a name="sig_query"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.4.2.3"></a><h3>4.2.3.&nbsp;
+Client Calls Protected Resource Using URL Query Parameters</h3>
+
+<p>The protected resource MAY allow clients to make authenticated requests by including the access token as a URL query parameter. Prior to making a request, the client MUST have obtained a valid access token, a valid access token secret, and the API request endpoint URI.  It MUST have also constructed the signature base string and <a class='info' href='#compute_sig'>computed the signature<span> (</span><span class='info'>Computing the signature</span><span>)</span></a>.  While the following examples use the HTTP "GET" method, there's nothing limiting a client to use query parameters with other HTTP methods.
+</p>
+<p>The client constructs the request URI by adding the protocol parameters and the signature computed in <a class='info' href='#compute_sig'>Section&nbsp;4.2.1<span> (</span><span class='info'>Computing the signature</span><span>)</span></a>.
+</p>
+<p>For example, the client makes the following HTTP request:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    GET /user/daveman692.json?oauth_access_token=vF9dft4qmT&amp;oauth_signature_method=HMAC-SHA1&amp;oauth_timestamp=1268998408&amp;oauth_nonce=7d8f3e4a&amp;oauth_signature=hfVFpKvoKp5S6YaNIJ6ljuNYR6s%3D
+    Host: api.example.com
+</pre></div>
+<p>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code.  The protected resource MAY include further details about why the request was rejected in the response body or headers.
+</p>
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="http://api.example.com/"
+</pre></div>
+<a name="sig_body"></a><br /><hr />
+<table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
+<a name="rfc.section.4.2.4"></a><h3>4.2.4.&nbsp;
+Client Calls Protected Resource Using Body Parameters</h3>
+
+<p>The protected resource MAY allow clients to make authenticated requests by including the access token as a parameter in the body of a HTTP "POST" request. Prior to making a request, the client MUST have obtained a valid access token, a valid access token secret, and the API request endpoint URI.  It MUST have also constructed the signature base string and <a class='info' href='#compute_sig'>computed the signature<span> (</span><span class='info'>Computing the signature</span><span>)</span></a>.
+</p>
+<p>The client constructs a HTTP "POST" request to the API request endpoint and includes the protocol parameters and the signature computed in <a class='info' href='#compute_sig'>Section&nbsp;4.2.1<span> (</span><span class='info'>Computing the signature</span><span>)</span></a>.
+</p>
+<p>For example, the client makes the following HTTP request:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    GET /user/daveman692.json
+    Host: api.example.com
+    oauth_access_token=vF9dft4qmT&amp;oauth_signature_method=HMAC-SHA1&amp;oauth_timestamp=1268998408&amp;oauth_nonce=7d8f3e4a&amp;oauth_signature=hfVFpKvoKp5S6YaNIJ6ljuNYR6s%3D
+</pre></div>
+<p>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code.  The protected resource MAY include further details about why the request was rejected in the response body or headers.
+</p>
+<p>For example:
+</p><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="http://api.example.com/"
+</pre></div>
+<a name="anchor14"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <a name="rfc.section.5"></a><h3>5.&nbsp;
 Security Considerations</h3>
 
-<p>TODO: David is the wrong person to write this section. Should definitely cover why device profiles don't have client secrets (hard to trust them to keep secrets and will probabally use custom ways to auth based on the device and if it has TPM.)
+<p>TODO: David is the wrong person to write this section. Should definitely cover why device profiles don't have client secrets (hard to trust them to keep secrets and will probably use custom ways to auth based on the device and if it has TPM.)
 </p>
 <a name="rfc.references"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
@@ -1129,6 +1339,10 @@ References</h3>
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
 <h3>6.1.&nbsp;Normative References</h3>
 <table width="99%" border="0">
+<tr><td class="author-text" valign="top"><a name="RFC2045">[RFC2045]</a></td>
+<td class="author-text">Freed, N. and N. Borenstein, &ldquo;<a href="http://tools.ietf.org/html/rfc2045">Multipurpose Internet Mail Extensions (MIME) Part One: Format of Internet Message Bodies</a>,&rdquo; RFC&nbsp;2045 (<a href="ftp://ftp.isi.edu/in-notes/rfc2045.txt">TXT</a>).</td></tr>
+<tr><td class="author-text" valign="top"><a name="RFC2104">[RFC2104]</a></td>
+<td class="author-text">Krawczyk, H., Bellare, M., and R. Canetti, &ldquo;<a href="http://tools.ietf.org/html/rfc2104">HMAC: Keyed-Hashing for Message Authentication</a>,&rdquo; RFC&nbsp;2104 (<a href="ftp://ftp.isi.edu/in-notes/rfc2104.txt">TXT</a>).</td></tr>
 <tr><td class="author-text" valign="top"><a name="RFC2119">[RFC2119]</a></td>
 <td class="author-text">Bradner, B., &ldquo;<a href="http://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>,&rdquo; BCP&nbsp;14, RFC&nbsp;2119 (<a href="ftp://ftp.isi.edu/in-notes/rfc2119.txt">TXT</a>, <a href="http://xml.resource.org/public/rfc/html/rfc2119.html">HTML</a>).</td></tr>
 <tr><td class="author-text" valign="top"><a name="RFC2616">[RFC2616]</a></td>
@@ -1153,14 +1367,47 @@ References</h3>
 
 <a name="rfc.authors"></a><br /><hr />
 <table summary="layout" cellpadding="0" cellspacing="2" class="TOCbug" align="right"><tr><td class="TOCbug"><a href="#toc">&nbsp;TOC&nbsp;</a></td></tr></table>
-<h3>Author's Address</h3>
+<h3>Authors' Addresses</h3>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
 <tr><td class="author-text">&nbsp;</td>
 <td class="author-text">David Recordon (editor)</td></tr>
 <tr><td class="author-text">&nbsp;</td>
-<td class="author-text">Facebook, Inc</td></tr>
+<td class="author-text">Facebook</td></tr>
 <tr><td class="author" align="right">Email:&nbsp;</td>
 <td class="author-text"><a href="mailto:davidrecordon@facebook.com">davidrecordon@facebook.com</a></td></tr>
+<tr cellpadding="3"><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">Eran Hammer-Lahav (editor)</td></tr>
+<tr><td class="author" align="right">Email:&nbsp;</td>
+<td class="author-text"><a href="mailto:eran@hueniverse.com">eran@hueniverse.com</a></td></tr>
+<tr cellpadding="3"><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">Allen Tom</td></tr>
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">Yahoo!</td></tr>
+<tr><td class="author" align="right">Email:&nbsp;</td>
+<td class="author-text"><a href="mailto:atom@yahoo-inc.com">atom@yahoo-inc.com</a></td></tr>
+<tr cellpadding="3"><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">Brent Goldman</td></tr>
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">Facebook</td></tr>
+<tr><td class="author" align="right">Email:&nbsp;</td>
+<td class="author-text"><a href="mailto:lshepard@facebook.com">lshepard@facebook.com</a></td></tr>
+<tr cellpadding="3"><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">Luke Shepard</td></tr>
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">Facebook</td></tr>
+<tr><td class="author" align="right">Email:&nbsp;</td>
+<td class="author-text"><a href="mailto:lshepard@facebook.com">lshepard@facebook.com</a></td></tr>
+<tr cellpadding="3"><td>&nbsp;</td><td>&nbsp;</td></tr>
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">Raffi Krikorian</td></tr>
+<tr><td class="author-text">&nbsp;</td>
+<td class="author-text">Twitter</td></tr>
+<tr><td class="author" align="right">Email:&nbsp;</td>
+<td class="author-text"><a href="mailto:raffi@twitter.com">raffi@twitter.com</a></td></tr>
 </table>
 </body></html>
 
