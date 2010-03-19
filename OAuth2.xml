@@ -40,6 +40,8 @@
                 <t><list style="hanging">
                     <t hangText="access token">An unique identifier issued by the authorization server and used by the client to make authenticated requests on behalf of the user whose authorization has been obtained by the client.  When making protected resource requests, the access token is either a bearer token presented over SSL/TLS and/or accompanied by an additional secret when using a signature mechanism.</t>
 
+                    <t hangText="access token secret">A string issued by the authorization server and used by the client to establish ownership of the access token when using a signature mechanism to access a protected resource.</t>
+
                     <t hangText="authorization server">A HTTP server (per <xref target='RFC2616' />) that issues access tokens to clients after successful authorization. May be the same entity as the server hosting protected resources.</t>
 
                     <t hangText="client">An HTTP client (per <xref target='RFC2616' />) capable of making OAuth-authenticated requests for protected resources.</t>
@@ -507,7 +509,7 @@
         </section>
 
         <section title="Refreshing an Access Token" anchor="refresh_token">
-            <t>Authorization servers MAY issue access tokens that expire and thus require clients to refresh them. A client determines that an access token needs refreshing either by using the access token's expiration information or upon receiving the HTTP 401 Unauthorized response when accessing protected resources per <xref target="access_resource" />. A client will also refresh a token if they wish to obtain a corresponding access token secret for use when accessing protected resources via signatures (<xref target="using_signatures"/>).</t>
+            <t>Authorization servers MAY issue access tokens that expire and thus require clients to refresh them. A client determines that an access token needs refreshing either by using the access token's expiration information or upon receiving the HTTP 401 Unauthorized response when accessing protected resources per <xref target="access_resource" />. A client will also refresh a token if it wishes to obtain a corresponding access token secret for use when accessing protected resources via signatures (<xref target="using_signatures"/>).</t>
 
             <t>Prior to making a request using this flow, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server.</t>
 
@@ -578,8 +580,8 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
 
             <t>If a client includes more than one access token within the request, the protected resource MUST respond with a HTTP 400 "Bad Request" error code.</t>
 
-            <section title="Using TLS/SSL" anchor="using_ssl">
-                <t>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <xref target="RFC2617" /> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to ensure that access tokens are not inadvertently logged or captured.</t>
+            <section title="Using TLS/SSL solely with an access token" anchor="using_ssl">
+                <t>When using TLS/SSL, clients MUST present an access token to authenticate to a protected resource. Use of the HTTP "Authorization" header field as defined by <xref target="RFC2617" /> is RECOMMENDED, since HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs. Protected resources SHOULD take precautions to ensure that access tokens are not inadvertently logged or captured. It is RECOMMENDED that clients verify the authenticity of the certificate provided when establishing a TLS/SSL connection to the protected resource.</t>
 
                 <section title="Client Calls Protected Resource Using HTTP Header">
                     <t>The protected resource SHOULD allow clients to make authenticated requests by including the access token in the HTTP "Authorization" header. Prior to making a request, the client MUST have obtained a valid access token and the API request endpoint URI.</t>
@@ -602,7 +604,7 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
     Authorization:  OAuth  oauth_access_token = vF9dft4qmT
                     ]]></artwork></figure>
 
-                    <t>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code. The protected resource MAY include further details about why the request was rejected in the response body.</t>
+                    <t>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code. The protected resource MAY include further details about why the request was rejected in the response body or headers.</t>
 
                     <t>For example:</t>
                     <figure><artwork><![CDATA[
@@ -664,17 +666,168 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
             </section>
 
             <section title="Using Signatures" anchor="using_signatures">
-                <t>TODO: We need to agree on the signature method though there is a lot of normative text in the OAuth 1.0 spec to draw from.   OAuth 1.0 is about three pages of text assuming people are happy with the mechanism; it would be good to simplify as much as possible. We could modify WRAP's refresh token request to let the client specify that they'd also like an access token secret for that request. This seems like the right way of doing it.</t>
+                <t>When using signatures, clients MAY use TLS/SSL as the transport to authenticate to a protected resource.  Use of the "Authorization" header field is RECOMMENDED, as HTTP implementations are aware that this header has special security properties and may require special treatment in caches and logs.</t>
+                <t>Editor's note: This draft bases it's signature mechanism off of the <xref target="draft-hammer-oauth-10">OAuth 1.0 Protocol</xref> and it's possible that parts of the mechanism will change in future drafts.</t>
+
+                <t>The following parameters are obtained (or computed) by clients in order to make protected resource requests:</t>
+                <list style="hanging">
+                    <t hangText="oauth_access_token">The access token obtained through a refresh token call with the "oauth_want_secret" parameter included (<xref target="refresh_token"/>).</t>
+                    <t hangText="oauth_signature_method">The signature method used by the client to sign the request.  The method MUST be one of those listed in the "oauth_signature_methods" parameter returned with the access token secret (<xref target="refresh_token" />).</t>
+                    <t hangText="oauth_timestamp">Unless otherwise specified by the server's documentation, the timestamp is expressed in the number of seconds since January 1, 1970 00:00:00 GMT. It MUST be a positive integer.</t>
+                    <t hangText="oauth_nonce">A nonce is a random string, uniquely generated by the client to allow the server to verify that a request has never been made before and helps prevent replay attacks when requests are made over a non-secure channel.  The nonce value MUST be unique across all requests with the same timestamp and token combinations.</t>
+                    <t hangText="oauth_signature">The computed signature value ensuring the integrity of this request (<xref target="compute_sig" />).</t>
+                </list>
+
+                <t>The protocol parameters are added to the request using one of the three transmission methods: <xref target="sig_headers">HTTP Headers</xref>, <xref target="sig_query">HTTP query parameters</xref>, or <xref target="sig_body">HTTP body parameters</xref>.</t>
+
+                <t>Construction of the signature base string follows the process detailed in section 3.4.1 of <xref target="draft-hammer-oauth-10" />.</t>
+
+                <t>For example the request:</t>
+                <figure><artwork><![CDATA[
+    GET /user/daveman692.json?b5=%3D%25%3D&a3=a&c%40=&a2=r%20b HTTP/1.1
+    Host: api.example.com
+    Content-Type: application/x-www-form-urlencoded
+    Authorization: OAuth
+                   oauth_access_token="vF9dft4qmT",
+                   oauth_signature_method="HMAC-SHA1",
+                   oauth_timestamp="1268998408",
+                   oauth_nonce="7d8f3e4a",
+
+                c2&a3=2+q
+                ]]></artwork></figure>
+
+                <t>Is represented by the following signature base string:</t>
+                <t><list>
+                    <t>GET&http%3A%2F%2Fapi.example.com%2Fuser%2Fdaveman692.json&a2%3Dr%2520b%26a3%3D2%252Bq%26a3%3Da%26b5%3D%253D%2525%253D%26c%2540%3D%26c2%3D%26oauth_nonce%3D7d8f3e4a%26oauth_signature_method%3DHMAC-SHA1%26oauth_timestamp%3D1268998408%26oauth_access_token%3DvF9dft4qmT%26oauth_version%3D2.0</t>
+                </list></t>
+
+
+                <section title="Computing the signature" anchor="compute_sig">
+                    <t>The authorization server declares which signature methods it accepts via the "oauth_signature_methods" returned as part of obtaining an access token secret (<xref target="refresh_token" />).  The client declares which signature method is used for this request via the "oauth_signature_method" parameter.  It then generates a signature, and includes it in the "oauth_signature" parameter.  The server verifies the signature as specified for each method.</t>
+
+                    <t>There is no mandate for a particular signature method as each implementation can have its own unique requirements.  Authorization servers are free to implement and document their own custom methods.</t>
+
+                    <section title="HMAC-SHA1">
+                        <t>The "HMAC-SHA1" signature method uses the HMAC-SHA1 signature algorithm as defined in <xref target="RFC2104" />:</t>
+                        <t><list>
+                            <t>digest = HMAC-SHA1 (key, text)</t>
+                        </list></t>
+
+                        <t>The HMAC-SHA1 function variables are used in following way:</t>
+                        <t><list style="hanging">
+                            <t hangText="text">is set to the value of the signature base string.</t>
+                            <t hangText="key">is set to the concatenated values of:
+                                <list style="numbers">
+                                    <t>The client secret, after being encoded (TODO: ref)</t>
+                                    <t>An "&" character (ASCII code 38), which MUST be included even when either secret is empty.</t>
+                                    <t>The access token secret, after being encoded (TODO: ref).</t>
+                                </list>
+                            </t>
+                            <t hangText="digest">is used to set the value of the "oauth_signature" protocol parameter, after the result octet string is base64-encoded per section 6.8 of <xref target="RFC2045" />.</t>
+                        </list></t>
+                    </section>
+                </section>
+
+                <section title="Client Calls Protected Resource Using HTTP Headers" anchor="sig_headers">
+                    <t>The protected resource MAY allow clients to make authenticated requests by including the access token in the HTTP "Authorization" header.  Prior to making a request, the client MUST have obtained a valid access token, a valid access token secret, and the API request endpoint URI.  It MUST have also constructed the signature base string and <xref target="compute_sig">computed the signature</xref>.</t>
+
+                    <t>The client constructs a HTTP request to the API request endpoint URI and includes the HTTP "Authorization" header field with the auth-scheme name set to "OAuth" (case-insensitive).  The protocol parameters and the signature computed in <xref target="compute_sig" /> are included in the Authorization header.</t>
+
+                    <t>For example, a valid request follows the form of:</t>
+                    <figure><artwork><![CDATA[
+    GET /user/daveman692.json?b5=%3D%25%3D&a3=a&c%40=&a2=r%20b HTTP/1.1
+    Host: api.example.com
+    Content-Type: application/x-www-form-urlencoded
+    Authorization: OAuth
+                   oauth_access_token="vF9dft4qmT",
+                   oauth_signature_method="HMAC-SHA1",
+                   oauth_timestamp="1268998408",
+                   oauth_nonce="7d8f3e4a",
+                   oauth_signature="hfVFpKvoKp5S6YaNIJ6ljuNYR6s%3D"
+
+    c2&a3=2+q
+                    ]]></artwork></figure>
+
+                    <t>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code.  The protected resource MAY include further details about why the request was rejected in the response body or headers.</t>
+
+                    <t>For example:</t>
+                    <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="http://api.example.com/"
+                    ]]></artwork></figure>
+                </section>
+
+                <section title="Client Calls Protected Resource Using URL Query Parameters" anchor="sig_query">
+                    <t>The protected resource MAY allow clients to make authenticated requests by including the access token as a URL query parameter. Prior to making a request, the client MUST have obtained a valid access token, a valid access token secret, and the API request endpoint URI.  It MUST have also constructed the signature base string and <xref target="compute_sig">computed the signature</xref>.  While the following examples use the HTTP "GET" method, there's nothing limiting a client to use query parameters with other HTTP methods.</t>
+
+                    <t>The client constructs the request URI by adding the protocol parameters and the signature computed in <xref target="compute_sig" />.</t>
+
+                    <t>For example, the client makes the following HTTP request:</t>
+                    <figure><artwork><![CDATA[
+    GET /user/daveman692.json?oauth_access_token=vF9dft4qmT&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1268998408&oauth_nonce=7d8f3e4a&oauth_signature=hfVFpKvoKp5S6YaNIJ6ljuNYR6s%3D
+    Host: api.example.com
+                    ]]></artwork></figure>
+
+                    <t>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code.  The protected resource MAY include further details about why the request was rejected in the response body or headers.</t>
+
+                    <t>For example:</t>
+                    <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="http://api.example.com/"
+                    ]]></artwork></figure>
+                </section>
+
+                <section title="Client Calls Protected Resource Using Body Parameters" anchor="sig_body">
+                    <t>The protected resource MAY allow clients to make authenticated requests by including the access token as a parameter in the body of a HTTP "POST" request. Prior to making a request, the client MUST have obtained a valid access token, a valid access token secret, and the API request endpoint URI.  It MUST have also constructed the signature base string and <xref target="compute_sig">computed the signature</xref>.</t>
+
+                    <t>The client constructs a HTTP "POST" request to the API request endpoint and includes the protocol parameters and the signature computed in <xref target="compute_sig" />.</t>
+
+                    <t>For example, the client makes the following HTTP request:</t>
+                    <figure><artwork><![CDATA[
+    GET /user/daveman692.json
+    Host: api.example.com
+    oauth_access_token=vF9dft4qmT&oauth_signature_method=HMAC-SHA1&oauth_timestamp=1268998408&oauth_nonce=7d8f3e4a&oauth_signature=hfVFpKvoKp5S6YaNIJ6ljuNYR6s%3D
+                    ]]></artwork></figure>
+
+                    <t>If the request fails verification, the protected resource SHOULD respond with the appropriate HTTP response status code.  The protected resource MAY include further details about why the request was rejected in the response body or headers.</t>
+
+                    <t>For example:</t>
+                    <figure><artwork><![CDATA[
+    HTTP/1.1 401 Authorization Required
+    WWW-Authenticate: OAuth realm="http://api.example.com/"
+                    ]]></artwork></figure>
+                </section>
             </section>
         </section>
 
         <section title="Security Considerations">
-            <t>TODO: David is the wrong person to write this section. Should definitely cover why device profiles don't have client secrets (hard to trust them to keep secrets and will probabally use custom ways to auth based on the device and if it has TPM.)</t>
+            <t>TODO: David is the wrong person to write this section. Should definitely cover why device profiles don't have client secrets (hard to trust them to keep secrets and will probably use custom ways to auth based on the device and if it has TPM.)</t>
         </section>
     </middle>
 
     <back>
         <references title="Normative References">
+            <reference anchor='RFC2045'>
+                <front>
+                    <title abbrev='Internet Message Bodies'>Multipurpose Internet Mail Extensions (MIME) Part One: Format of Internet Message Bodies</title>
+                    <author initials='N.' surname='Freed' fullname='Ned Freed' />
+                    <author initials='N.S.' surname='Borenstein' fullname='Nathaniel S. Borenstein' />
+                </front>
+                <seriesInfo name='RFC' value='2045' />
+                <format type='TXT' octets='72932' target='ftp://ftp.isi.edu/in-notes/rfc2045.txt' />
+            </reference>
+
+            <reference anchor="RFC2104">
+                <front> 
+                    <title abbrev='HMAC'>HMAC: Keyed-Hashing for Message Authentication</title>
+                    <author initials='H.' surname='Krawczyk' fullname='Hugo Krawczyk' />
+                    <author initials='M.' surname='Bellare' fullname='Mihir Bellare' />
+                    <author initials='R.' surname='Canetti' fullname='Ran Canetti' />
+                </front>
+                <seriesInfo name='RFC' value='2104' /> 
+                <format type='TXT' target='ftp://ftp.isi.edu/in-notes/rfc2104.txt' /> 
+            </reference>
+
             <reference anchor="RFC2119">
                 <front>
                     <title abbrev='RFC Key Words'>Key words for use in RFCs to Indicate Requirement Levels</title>
