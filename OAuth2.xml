@@ -667,7 +667,7 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
         </section>
 
         <section title="Security Considerations">
-            <t>TODO: I'm the wrong person to write this section.</t>
+            <t>TODO: David is the wrong person to write this section. Should definitely cover why device profiles don't have client secrets (hard to trust them to keep secrets and will probabally use custom ways to auth based on the device and if it has TPM.)</t>
         </section>
     </middle>
 
