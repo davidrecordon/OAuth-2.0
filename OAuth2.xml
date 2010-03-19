@@ -11,11 +11,41 @@
     <front>
         <title>OAuth 2.0 DRAFT</title>
         <author fullname='David Recordon' surname='Recordon' initials='D.' role='editor'>
-            <organization>Facebook, Inc</organization>
+            <organization>Facebook</organization>
             <address>
                 <email>davidrecordon@facebook.com</email>
             </address>
         </author>
+        <author fullname='Eran Hammer-Lahav' surname='Hammer-Lahav' initials='E.' role='editor'>
+            <address>
+                <email>eran@hueniverse.com</email>
+            </address>
+        </author>
+        <author fullname='Allen Tom' surname='Tom' initials='A.'>
+            <organization>Yahoo!</organization>
+            <address>
+                <email>atom@yahoo-inc.com</email>
+            </address>
+        </author>
+        <author fullname='Brent Goldman' surname='Goldman' initials='B.'>
+            <organization>Facebook</organization>
+            <address>
+                <email>lshepard@facebook.com</email>
+            </address>
+        </author>
+        <author fullname='Luke Shepard' surname='Shepard' initials='L.'>
+            <organization>Facebook</organization>
+            <address>
+                <email>lshepard@facebook.com</email>
+            </address>
+        </author>
+        <author fullname='Raffi Krikorian' surname='Krikorian' initials='R.'>
+            <organization>Twitter</organization>
+            <address>
+                <email>raffi@twitter.com</email>
+            </address>
+        </author>
+
         <date year="2010" month="Mar"/>
 
         <abstract>
