@@ -70,12 +70,22 @@
                 <t>The following are highlighted changes from <xref target="draft-hardt-oauth-01" />:</t>
                 <t><list style="numbers">
                     <t>A Web Client flow designed for use within JavaScript. It also supports the use cases of the rich app profile so that they're not two separate flows.</t>
-                    <t>A new device flows which is based on the Netflix/Tivo flow (TV shows you a code that you type in on your computer). http://www.ietf.org/mail-archive/web/oauth/current/msg01346.html</t>
+                    <t>A new device flows which is based on the Netflix/Tivo/Twitter desktop flow (display a code that a user types into his or her computer). http://www.ietf.org/mail-archive/web/oauth/current/msg01346.html</t>
                     <t>Remove captchas from the username/password flow.  They haven't been successfully implemented within this context and create complexity especially when we use other signals to detect compromised accounts. http://www.ietf.org/mail-archive/web/oauth/current/msg01293.html</t>
                     <t>Don't allow bearer tokens without either SSL and/or signatures. While some providers may offer this ability, they should be out of spec for doing so though technically it won't break the flows.</t>
                     <t>Abstract the refresh token flow out of each profile into its own section. Support the ability to request access token secrets when refreshing.</t>
-                    <t>Support signatures for making API requests but not for getting access tokens.  If you want to use signatures, you'll get an access token and then make a refresh call where you ask for a token secret. This causes the auth server to mark the token as no longer being valid as a bearer token via SSL.  This performance tradeoff seems realistic given many use cases focus on high-volume API transactions and thus the one additional request at the onset should be noise. The signature mechanism is currently from OAuth 1.0.</t>
+                    <t>Support signatures for making API requests but not for getting access tokens.:</t>
+                    <t><list style="numbers">
+                        <t>If you want to use signatures, you'll get an access token and then make a refresh call where you ask for a token secret. This causes the auth server to mark the token as no longer being valid as a bearer token via SSL.</t>
+                        <t>This performance tradeoff seems realistic given many use cases focus on high-volume API transactions and thus the one additional request at the onset should be noise.</t>
+                        <t>The use of signatures enables the pass-through of secure requests through untrusted third-parties.</t>
+                        <t>The signature mechanism is currently from OAuth 1.0.</t>
+                    </list></t>
                 </list></t>
+            </section>
+
+            <section title="Notational Conventions">
+                <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119" />.</t>
             </section>
 
             <section title="Terminology">
@@ -114,10 +124,6 @@
                     <t>The methods in which the servers advertise and document its three endpoints are beyond the scope of this specification. Clients should avoid making assumptions about the size of tokens and other server-generated values, which are left undefined by this specification. However it is strongly RECOMMENDED that authorization servers make their identifiers, secrets, and tokens not over 255 characters in length in order to ease client implementations. In addition, protocol parameters MAY include values which require encoding when transmitted.  All identifiers, secrets, tokens, and codes MUST use URL safe characters and not require further encoding.  Clients and servers should not make other assumptions about the possible range of their values.</t>
                 </section>
             </section>
-
-            <section title="Notational Conventions">
-                <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119" />.</t>
-            </section>
         </section>
 
         <section title="Getting an Access Token" anchor="get_token">
@@ -132,7 +138,7 @@
 
                 <t>Prior to making a request using this flow, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server MAY require the client to pre-register their callback URI.</t>
 
-                <t>The client MUST first send the resource owners's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:</t>
+                <t>The client MUST first send the resource owners's user-agent (commonly his or her web browser) to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:</t>
                 <t><list style="hanging">
                     <t hangText="oauth_mode">The parameter value MUST be set to "flow_web_server" (case sensitive).</t>
                     <t hangText="oauth_client_identifier">The client identifier.</t>
@@ -224,7 +230,7 @@
 
                 <t>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.</t>
 
-                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
+                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.  Alternatively, it can refresh the access token and request an access secret to use in the signature flow (<xref target="refresh_token" />).</t>
 
                 <t>If the authorization server is unable to issue an access token to the client, the HTTP response body uses the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 401 status code (Unauthorized). The response contains the following OPTIONAL parameter:</t>
                 <t><list style="hanging">
@@ -312,7 +318,7 @@
 
                 <t>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.</t>
 
-                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
+                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.  Alternatively, it can refresh the access token and request an access secret to use in the signature flow (<xref target="refresh_token" />).</t>
 
                 <t>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.</t>
 
@@ -412,7 +418,7 @@
 
                 <t>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.</t>
 
-                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
+                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.  Alternatively, it can refresh the access token and request an access secret to use in the signature flow (<xref target="refresh_token" />).</t>
 
                 <t>If the authorization server is unable to issue an access token to the client, the HTTP response body uses the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 401 status code (Unauthorized). The response contains the following REQUIRED parameter:</t>
                 <t><list style="hanging">
@@ -429,9 +435,11 @@
             </section>
 
             <section title="Username and Password Flow">
-                <t>This flow is used when the authorization server generally trusts the client to temporarily collect the end-user's username and password and it is impossible to use one of the other authorization flows. This flow enables a client to act on behalf of the resource owner without having to permanently store their username and password.</t>
+                <t>This flow is used when the authorization server generally trusts the client to temporarily collect the end-user's username and password and it is impossible to use one of the other authorization flows. This flow enables a client to act on behalf of the resource owner without having to permanently store their username and password.  This flow also enables clients who previously used username and password to perform a conversion to token based credentials.</t>
 
                 <t>Prior to making a request using this flow, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server. How the client prompts the resource owner for their username and password is beyond the scope of this specification. The client MUST discard the resource owner's username and password once an access token has been obtained.</t>
+
+                <t>Because the end-user's username and password flows through the client, it is RECOMMENDED that authorization servers only allow "trusted" clients to have access to this flow; it is RECOMMENDED that, by default, a client does not have access to this flow, and it must have its abilities elevated somehow.  In the case of allowing a client to convert usernames and passwords to tokens, it is RECOMMENDED that a client only be given access to this flow for a set time duration.  The method by which to elevate permissions is out of scope for this document.</t>
 
                 <t>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:</t>
                 <t><list style="hanging">
@@ -478,7 +486,7 @@
 
                 <t>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.</t>
 
-                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
+                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.  Alternatively, it can refresh the access token and request an access secret to use in the signature flow (<xref target="refresh_token" />).</t>
 
                 <t>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.</t>
 
@@ -538,7 +546,7 @@
 
                 <t>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.</t>
 
-                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.</t>
+                <t>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<xref target='access_resource' />) using the access token received.  Alternatively, it can refresh the access token and request an access secret to use in the signature flow (<xref target="refresh_token" />).</t>
 
                 <t>If the request fails verification, the authorization server SHOULD respond with the appropriate HTTP response status code. The authorization server MAY include further details about why the request was rejected in the response body.</t>
 
@@ -618,7 +626,7 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
         </section>
 
         <section title="Accessing a Protected Resource" anchor="access_resource">
-            <t>OAuth 2.0 supports the ability for clients to make protected resource requests by using TLS/SSL (<xref target="using_ssl" />) and/or by signing their HTTP request with shared secrets (<xref target="using_signatures" />). Protected resources MUST support clients making authenticated requests via TLS/SSL (<xref target="using_ssl" />) and MAY choose to also support signatures (<xref target="using_signatures" />). It is RECOMMENDED that clients make authenticated requests via TLS/SSL.</t>
+            <t>OAuth 2.0 supports the ability for clients to make protected resource requests by using TLS/SSL (<xref target="using_ssl" />) and/or by signing their HTTP request with shared secrets (<xref target="using_signatures" />). Protected resources MUST support clients making authenticated requests via TLS/SSL (<xref target="using_ssl" />).  Protected resources MAY also choose to also support signatures (<xref target="using_signatures" />), and it is RECOMMENDED that clients make signature-based authenticated requests via TLS/SSL.</t>
 
             <t>If a client includes more than one access token within the request, the protected resource MUST respond with a HTTP 400 "Bad Request" error code.</t>
 
@@ -860,14 +868,14 @@ oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_refresh_
             </reference>
 
             <reference anchor="RFC2104">
-                <front> 
+                <front>
                     <title abbrev='HMAC'>HMAC: Keyed-Hashing for Message Authentication</title>
                     <author initials='H.' surname='Krawczyk' fullname='Hugo Krawczyk' />
                     <author initials='M.' surname='Bellare' fullname='Mihir Bellare' />
                     <author initials='R.' surname='Canetti' fullname='Ran Canetti' />
                 </front>
-                <seriesInfo name='RFC' value='2104' /> 
-                <format type='TXT' target='ftp://ftp.isi.edu/in-notes/rfc2104.txt' /> 
+                <seriesInfo name='RFC' value='2104' />
+                <format type='TXT' target='ftp://ftp.isi.edu/in-notes/rfc2104.txt' />
             </reference>
 
             <reference anchor="RFC2119">
