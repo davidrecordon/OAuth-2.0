@@ -158,7 +158,7 @@
 
 <h3>Abstract</h3>
 
-<p>OAuth 2.0 provides a method for an application (client) to access the Protected Resource hosted on a server on behalf of a resource owner (such as a different client or an end-user).  It provides a process for users to authorize third-party access to their protected resources via a variety of authorization flows. These flows generally do not include having to share their credentials (typically, a username and password pair).  A server can additionally delegate authorization to one or more authorities (authorization server) which issue access tokens to clients.
+<p>OAuth 2.0 provides a method for an application (client) to access the protected resource hosted on a server on behalf of a resource owner (such as a different client or an end-user).  It provides a process for users to authorize third-party access to their protected resources via a variety of authorization flows. These flows generally do not include having to share their credentials (typically, a username and password pair).  A server hosting protected resources may or may not be the same entity as the authorization server which issue access tokens to clients.
 </p>
 <h3>Status of this Memo</h3>
 <p>
@@ -260,7 +260,7 @@ Authors' Addresses<br />
 <a name="rfc.section.1"></a><h3>1.&nbsp;
 Introduction</h3>
 
-<p>This specification consists of two major parts: <a class='info' href='#get_token'>Getting an Access Token<span> (</span><span class='info'>Getting an Access Token</span><span>)</span></a> and <a class='info' href='#access_resource'>Accessing a Protected Resource<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>.  The first part defines multiple authorization flows describing how a client may obtain an access token when acting autonomously or on behalf of an end-user.  They involve resource owners authorizing client access to their resources, by authenticating directly with the server and provisioning tokens to the client for use with the authentication method.  The second part defines a method for making authenticated HTTP requests using access tokens either protected via TLS/SSL or by using an access token combined with an access token secret. The access token both identifies the client making the request as well as the resource owner on whose behalf the request is being made.
+<p>This specification consists of two major parts: <a class='info' href='#get_token'>Getting an Access Token<span> (</span><span class='info'>Getting an Access Token</span><span>)</span></a> and <a class='info' href='#access_resource'>Accessing a Protected Resource<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>.  The first part defines multiple authorization flows describing how a client may obtain an access token either on behalf of an end-user or acting in an autonomous fashion.  They involve resource owners authorizing client access to their resources, which results in an authorization server issuing the client an access token on behalf of the resource owner.  The second part defines a method for making authenticated HTTP requests using access tokens either protected via TLS/SSL or by using an access token combined with an access token secret. The access token both identifies the client making the request as well as the resource owner on whose behalf the request is being made.
 </p>
 <p>The use of OAuth with any other transport protocol than <a class='info' href='#RFC2616'>HTTP<span> (</span><span class='info'>Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;Hypertext Transfer Protocol -- HTTP/1.1,&rdquo; .</span><span>)</span></a> [RFC2616] is undefined.
 </p>
@@ -306,31 +306,34 @@ Terminology</h3>
 <p></p>
 <blockquote class="text"><dl>
 <dt>access token</dt>
-<dd>An unique identifier issued by the authorization server and used by the client to make authenticated requests on behalf of the user whose authorization has been obtained by the client.  When making protected resource requests, the access token is either a bearer token presented over SSL/TLS and/or accompanied by an additional secret when using a signature mechanism.
+<dd>An unique identifier issued by the authorization server and used by the client to make authenticated requests on behalf of the resource owner (generally a user) whose authorization has been obtained by the client.  When making protected resource requests, the access token is either a bearer token presented over SSL/TLS and/or accompanied by an additional secret when using a signature mechanism.
 </dd>
 <dt>access token secret</dt>
 <dd>A string issued by the authorization server and used by the client to establish ownership of the access token when using a signature mechanism to access a protected resource.
 </dd>
 <dt>authorization server</dt>
-<dd>A HTTP server (per <a class='info' href='#RFC2616'>[RFC2616]<span> (</span><span class='info'>Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;Hypertext Transfer Protocol -- HTTP/1.1,&rdquo; .</span><span>)</span></a>) that issues access tokens to clients after successful authorization. May be the same entity as the server hosting protected resources.
+<dd>A server that issues access tokens to clients after successful authorization. May be the same entity as the server hosting protected resources.
 </dd>
 <dt>client</dt>
 <dd>An HTTP client (per <a class='info' href='#RFC2616'>[RFC2616]<span> (</span><span class='info'>Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;Hypertext Transfer Protocol -- HTTP/1.1,&rdquo; .</span><span>)</span></a>) capable of making OAuth-authenticated requests for protected resources.
 </dd>
 <dt>client identifier</dt>
-<dd>An unique identifier issued by the authorization server and used used by the client to identify itself to the authorization server.
+<dd>An unique identifier issued by the authorization server and used by the client to identify itself to the authorization server.
 </dd>
 <dt>client secret</dt>
 <dd>A string issued by the authorization server and used by the client to establish ownership of the client identifier.
 </dd>
 <dt>protected resource</dt>
-<dd>An access-restricted resource which can be obtained from a HTTP server (per <a class='info' href='#RFC2616'>[RFC2616]<span> (</span><span class='info'>Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;Hypertext Transfer Protocol -- HTTP/1.1,&rdquo; .</span><span>)</span></a>) using an OAuth-authenticated request. May be the same entity as the authorization server.
+<dd>An access-restricted resource which can be obtained from a server using an OAuth-authenticated request. May be the same entity as the authorization server.
 </dd>
 <dt>refresh token</dt>
 <dd>An unique long lived bearer token used by a client to acquire access tokens from an authorization server.
 </dd>
 <dt>resource owner</dt>
-<dd>An entity (generally an end-user) who can authenticate to the authorization server such that it issues the client an access token.
+<dd>An entity (generally an end-user) who can authenticate to the authorization server to approve the issuing of an access token to a client.
+</dd>
+<dt>server</dt>
+<dd>An HTTP server (per <a class='info' href='#RFC2616'>[RFC2616]<span> (</span><span class='info'>Fielding, R., Gettys, J., Mogul, J., Frystyk, H., Masinter, L., Leach, P., and T. Berners-Lee, &ldquo;Hypertext Transfer Protocol -- HTTP/1.1,&rdquo; .</span><span>)</span></a>) capable of accepting OAuth-authenticated requests.
 </dd>
 </dl></blockquote>
 
@@ -339,7 +342,7 @@ Terminology</h3>
 <a name="rfc.section.1.3.1"></a><h3>1.3.1.&nbsp;
 Endpoints</h3>
 
-<p>The authorization server advertises (such as via documentation) the URIs of the following three endpoints:
+<p>The client discovers the following three URI endpoints from the server (such as via reading documentation):
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -347,10 +350,10 @@ Endpoints</h3>
 <dd>The authorization server endpoint used by the client to obtain an access token via a HTTP "POST" request using one of the authorization flows (<a class='info' href='#get_token'>Section&nbsp;2<span> (</span><span class='info'>Getting an Access Token</span><span>)</span></a>) or by refreshing an access token (<a class='info' href='#refresh_token'>Section&nbsp;3<span> (</span><span class='info'>Refreshing an Access Token</span><span>)</span></a>).
 </dd>
 <dt>API request</dt>
-<dd>The protected resource endpoint used by the client to make OAuth-authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>).
+<dd>The protected resource endpoint(s) used by the client to make OAuth-authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>).
 </dd>
 <dt>user authorization request</dt>
-<dd>The authorization server endpoint where the client sends the resource owners's user-agent via a HTTP "GET" request to make an authorization decision using one of the authorization flows (<a class='info' href='#get_token'>Section&nbsp;2<span> (</span><span class='info'>Getting an Access Token</span><span>)</span></a>).
+<dd>The authorization server endpoint where the client sends the resource owner's user-agent via a HTTP "GET" request to make an authorization decision using one of the authorization flows (<a class='info' href='#get_token'>Section&nbsp;2<span> (</span><span class='info'>Getting an Access Token</span><span>)</span></a>).
 </dd>
 </dl></blockquote>
 
@@ -381,11 +384,11 @@ Getting an Access Token</h3>
 <a name="rfc.section.2.1"></a><h3>2.1.&nbsp;
 Web Server Flow</h3>
 
-<p>This flow is suitable when the client is a web application calling the protected resource on behalf of a resource owner. It enables clients to act on behalf of resource owners without acquiring an end-user's credentials.
+<p>This flow is suitable when the client is a web application calling the protected resource on behalf of a resource owner. It enables clients to act on behalf of resource owners without acquiring their credentials (often known as the 'password anti-pattern').
 </p>
 <p>Prior to making a request using this flow, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server MAY require the client to pre-register their callback URI.
 </p>
-<p>The client MUST first send the resource owners's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:
+<p>The client MUST first send the resource owner's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -429,7 +432,7 @@ Web Server Flow</h3>
 <dd>The verification code.
 </dd>
 <dt>oauth_error_reason</dt>
-<dd>The parameter value MUST be set to "user_denied" (case sensitive).
+<dd>The parameter value MUST be set to "owner_denied" (case sensitive).
 </dd>
 </dl></blockquote>
 
@@ -454,7 +457,7 @@ Web Server Flow</h3>
     GET /cb?oauth_verification_code=i1WsRn1uB1 HTTP/1.1
     Host: client.example.com
 </pre></div><div style='display: table; width: 0; margin-left: 3em; margin-right: auto'><pre>
-    GET /cb?oauth_error_reason=user_denied HTTP/1.1
+    GET /cb?oauth_error_reason=owner_denied HTTP/1.1
     Host: client.example.com
 </pre></div>
 <p>If the client receives a verification code, it constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:
@@ -514,7 +517,7 @@ Web Server Flow</h3>
 
     oauth_access_token=SlAV32hkKG&amp;oauth_refresh_token=8xLOxBtZp8
 </pre></div>
-<p>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
+<p>The authorization server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
 </p>
 <p>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>) using the access token received.
 </p>
@@ -539,13 +542,13 @@ Web Server Flow</h3>
 <a name="rfc.section.2.2"></a><h3>2.2.&nbsp;
 Web Client Flow</h3>
 
-<p>The Web Client Flow is similar to the <a class='info' href='#web_profile'>Web Server Flow<span> (</span><span class='info'>Web Server Flow</span><span>)</span></a>, but it has different security characteristics. Client-side applications are those that live entirely in JavaScript, on the desktop, a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This flow allows for authorization while taking those security considerations into account.
+<p>The Web Client Flow is similar to the <a class='info' href='#web_profile'>Web Server Flow<span> (</span><span class='info'>Web Server Flow</span><span>)</span></a>, but it has different security characteristics. Client-side applications are those that live entirely in JavaScript, on the desktop, on a mobile device, or in other environments where the code does not have easy access to a server. These applications have the ability to display a web page to the user, but cannot receive the response on a server. Because the entirety of the client is downloaded to the resource owner's user-agent, it is not possible to completely protect the client secret. This flow allows for authorization while taking those security considerations into account.
 </p>
 <p>Because there is no client secret to ensure authenticity, both the client and authorization server should take some extra precautions when using this flow. Specifically, as the access token flows directly to the user-agent, it should only be used when it is acceptable for the end-user to have direct access to the access token. Additionally, care should be taken to choose a good callback URL, as described below.
 </p>
 <p>Prior to making a request using this flow, the client MUST have obtained a client identifier and user authorization request endpoint URI from the authorization server. The authorization server SHOULD require the client to pre-register their callback URI.
 </p>
-<p>The client MUST first send the resource owners's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:
+<p>The client MUST first send the resource owner's user-agent to the authorization server's user authorization request endpoint. The client constructs the request URI by adding the following REQUIRED query parameters to the user authorization endpoint URI:
 </p>
 <p></p>
 <blockquote class="text"><dl>
@@ -584,7 +587,7 @@ Web Client Flow</h3>
 </pre></div>
 <p>The way in which the server handles the user authorization request (such as via cookies), including whether it uses a secure channel such as TLS/SSL is beyond the scope of this specification.  However, the server MUST first verify the identity of the resource owner.
 </p>
-<p>If the Client has previously registered a callback URI with the authorization server, it SHOULD verify that the callback URI provided in the "oauth_callback" parameter is valid given the pre-registered URI.
+<p>If the Client has previously registered a callback URI with the authorization server, it MUST verify that the callback URI provided in the "oauth_callback" parameter is valid given the pre-registered URI.
 </p>
 <p>After receiving an authorization decision from the resource owner, the server redirects the resource owner to the callback URI. The authorization server constructs the request URI by adding the following REQUIRED parameter to the callback URI query component:
 </p>
@@ -625,7 +628,7 @@ Web Client Flow</h3>
     GET /cb#?oauth_access_token=FJQbwq9OD8&amp;oauth_expires=10800 HTTP/1.1
     Host: client.example.com
 </pre></div>
-<p>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
+<p>The authorization server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
 </p>
 <p>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>) using the access token received.
 </p>
@@ -713,7 +716,7 @@ Device Flow</h3>
 </p>
 <p>The authorization server MUST verify that the user verification code is valid and MAY verify that the client is authorized to use this flow.  If the request is authorized, the authorization server directs the end-user to go back to the client device and follow its instructions.
 </p>
-<p>The client MAY have an interface element (such as a button) that the end-user interacts with to communicate that they have finished the authorization process. The client MAY initiate the following request at an arbitrary but reasonable interval in order to create a more responsive user experience though MUST NOT exceed the verification rate limit if one is specified. The Client MAY both poll and have an interface element, but MUST NOT have neither.
+<p>The client MAY have an interface element (such as a button) that the end-user interacts with to communicate that they have finished the authorization process. The client MAY initiate the following request at an arbitrary but reasonable interval in order to create a more responsive user experience though MUST NOT exceed the verification rate limit if one is specified. The client MUST either poll or have an interface element, or both.
 </p>
 <p>The client constructs an HTTP "GET" request to the access token request endpoint and includes the following REQUIRED parameters:
 </p>
@@ -765,7 +768,7 @@ Device Flow</h3>
 
     oauth_access_token=FJQbwq9OD8&amp;oauth_expires=600
 </pre></div>
-<p>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
+<p>The authorization server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
 </p>
 <p>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>) using the access token received.
 </p>
@@ -792,7 +795,7 @@ Username and Password Flow</h3>
 
 <p>This flow is used when the authorization server generally trusts the client to temporarily collect the end-user's username and password and it is impossible to use one of the other authorization flows. This flow enables a client to act on behalf of the resource owner without having to permanently store their username and password.
 </p>
-<p>Prior to making a request using this flow, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server. How the client prompts the resource owner for their username and password is beyond the scope of this specification. The client MUST discard the resource owner's username and password once an access token has been obtained.
+<p>Prior to making a request using this flow, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server. How the client prompts the resource owner for their username and password is beyond the scope of this specification. The client must discard the resource owner's username and password once an access token has been obtained.
 </p>
 <p>The client constructs an HTTP "POST" request to the access token request endpoint and includes the following REQUIRED parameters:
 </p>
@@ -859,7 +862,7 @@ Username and Password Flow</h3>
 
     oauth_access_token=FJQbwq9OD8&amp;oauth_refresh_token=gO3CHNqpH8
 </pre></div>
-<p>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
+<p>The authorization server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
 </p>
 <p>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>) using the access token received.
 </p>
@@ -941,7 +944,7 @@ Client Identifier and Secret Flow</h3>
 
     oauth_access_token=FJQbwq9OD8&amp;oauth_refresh_token=gO3CHNqpH8
 </pre></div>
-<p>The server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
+<p>The authorization server must retain the scope, duration, and other attributes approved by the resource owner, and enforce these restrictions when receiving a client request made with the tokens issued.
 </p>
 <p>Once the client receives and stores the token credentials, it can proceed to access protected resources on behalf of the resource owner by making authenticated requests (<a class='info' href='#access_resource'>Section&nbsp;4<span> (</span><span class='info'>Accessing a Protected Resource</span><span>)</span></a>) using the access token received.
 </p>
@@ -1020,7 +1023,7 @@ oauth_client_identifier=s6BhdRkqt3&amp;oauth_client_secret=8eSEIpnqmM&amp;oauth_
 <dd>A corresponding access token secret if the client requested one.
 </dd>
 <dt>oauth_signature_methods</dt>
-<dd>A comma-separated list of signature methods supported by the protected resource. REQUIRED if an access token secret is being returned. Possible values include "HMAC-SHA1" and "HMAC-SHA256" (case-sensitive) as well as any other values defined by extensions to this protocol.
+<dd>A comma-separated list of signature methods supported by the protected resource, ordered by preference. REQUIRED if an access token secret is being returned. Possible values include "HMAC-SHA1" and "HMAC-SHA256" (case-sensitive) as well as any other values defined by extensions to this protocol.
 </dd>
 </dl></blockquote>
 
