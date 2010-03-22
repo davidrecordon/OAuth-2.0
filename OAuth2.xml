@@ -439,7 +439,7 @@
             <section title="Username and Password Flow">
                 <t>This flow is used when the authorization server generally trusts the client to temporarily collect the end-user's username and password and it is impossible to use one of the other authorization flows. This flow enables a client to act on behalf of the resource owner without having to permanently store their username and password.  This flow also enables clients who previously used username and password to perform a conversion to token based credentials.</t>
 
-                <t>Prior to making a request using this flow, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server. How the client prompts the resource owner for their username and password is beyond the scope of this specification. The client must discard the resource owner's username and password once an access token has been obtained.</t>
+                <t>Prior to making a request using this flow, the client MUST have obtained a client identifier and access token request endpoint URI from the authorization server. How the client prompts the resource owner for their username and password is beyond the scope of this specification. The client must discard the resource owner's username and password once an access token has been obtained.</t>
 
                 <t>Because the end-user's username and password flows through the client, it is RECOMMENDED that authorization servers only allow "trusted" clients to have access to this flow; it is RECOMMENDED that, by default, a client does not have access to this flow, and it must have its abilities elevated somehow.  In the case of allowing a client to convert usernames and passwords to tokens, it is RECOMMENDED that a client only be given access to this flow for a set time duration.  The method by which to elevate permissions is out of scope for this document.</t>
 
@@ -462,7 +462,7 @@
                 <figure><artwork><![CDATA[
     POST /access_token HTTP/1.1
     Host: server.example.com
-    oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_username=daveman692&oauth_password=1password
+    oauth_client_identifier=s6BhdRkqt3&oauth_username=daveman692&oauth_password=1password
                 ]]></artwork></figure>
 
                 <t>The authorization server MUST verify that the resource owner's credentials are accurate and MAY verify that the client is authorized to use this flow. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
