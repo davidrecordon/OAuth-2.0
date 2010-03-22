@@ -500,7 +500,7 @@
             </section>
 
             <section title="Client Identifier and Secret Flow" anchor="client_profile">
-                <t>This flow is suitable when the client is also the resource owner and thus not accessing protected resources within the context of a given end-user. For example, when a client is accessing non-private data or modifying data about itself. This flow SHOULD NOT be used when the client is acting on behalf of an end-user.</t>
+                <t>This flow is suitable when the client acts autonomously in seeking access and is thus not accessing protected resources within the context of a given end-user. For example, when a client is accessing non-private data or modifying data about itself. This flow SHOULD NOT be used when the client is acting on behalf of an end-user.</t>
 
                 <t>Prior to making a request using this flow, the client MUST have obtained a client identifier, client secret, and access token request endpoint URI from the authorization server.</t>
 
