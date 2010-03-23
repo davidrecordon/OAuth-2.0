@@ -462,7 +462,7 @@
                 <figure><artwork><![CDATA[
     POST /access_token HTTP/1.1
     Host: server.example.com
-    oauth_client_identifier=s6BhdRkqt3&oauth_username=daveman692&oauth_password=1password
+    oauth_client_identifier=s6BhdRkqt3&oauth_username=daveman692&oauth_password=1password&oauth_mode=flow_username_password
                 ]]></artwork></figure>
 
                 <t>The authorization server MUST verify that the resource owner's credentials are accurate and MAY verify that the client is authorized to use this flow. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
@@ -522,7 +522,7 @@
                 <figure><artwork><![CDATA[
     POST /access_token HTTP/1.1
     Host: server.example.com
-    oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM
+    oauth_client_identifier=s6BhdRkqt3&oauth_client_secret=8eSEIpnqmM&oauth_mode=flow_client
                 ]]></artwork></figure>
 
                 <t>The authorization server MUST verify that the resource owner has authorized the provisioning of an access token to the client. If the request is authorized, the access token is included in the HTTP response body using the "application/x-www-form-urlencoded" content type as defined by <xref target="W3C.REC-html40-19980424" /> with a 200 status code (OK).</t>
