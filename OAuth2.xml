@@ -112,7 +112,7 @@
                   </list></t>
 
                 <section title="Endpoints">
-                    <t>The client discovers the following three URI endpoints from the server (such as via reading documentation):</t>
+                    <t>The client discovers the following three URI endpoints from the server (such as via reading documentation or a discovery process beyond the scope of this document):</t>
                     <t><list style="hanging">
                         <t hangText="access token request">The authorization server endpoint used by the client to obtain an access token via a HTTP "POST" request using one of the authorization flows (<xref target="get_token" />) or by refreshing an access token (<xref target="refresh_token" />).</t>
 
