@@ -569,8 +569,12 @@
             <t><list style="hanging">
                 <t hangText="oauth_mode">The parameter value MUST be set to "refresh_token" (case sensitive).</t>
                 <t hangText="oauth_client_identifier">The client identifier.</t>
-                <t hangText="oauth_client_secret">The client secret.</t>
                 <t hangText="oauth_refresh_token">The refresh token associated with the access token to be refreshed.</t>
+            </list></t>
+
+            <t>If the client has access to the client secret, the following parameter SHOULD also be added to the request:</t>
+            <t><list style="hanging">
+                <t hangText="oauth_client_secret">The client secret.</t>
             </list></t>
 
             <t>If the client wishes to obtain an access token for use when accessing protected resources via signatures, the following parameters MUST also be added to the request:</t>
