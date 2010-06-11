@@ -3,7 +3,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
-<rfc category="info" docName="draft-recordon-oauth-v2-ux-00" ipr="trust200902">
+<rfc category="info" docName="draft-recordon-oauth-v2-ux-01" ipr="trust200902">
     <front>
         <title>OAuth 2.0 User Experience Extension</title>
         <author fullname='David Recordon' surname='Recordon' initials='D.' role='editor'>
@@ -69,6 +69,16 @@
                         <t hangText="wap"><vspace />An extremely compact dialog optimized for older mobile web browsers.</t>
                     </list></t>
             </list></t>
+        </section>
+
+        <section title="Immediate Mode">
+            <t>When not using refresh tokens, clients may wish to obtain a new access token without prompting the end-user assuming the original authorization is still valid.</t>
+
+            <t><list style="hanging">
+                <t hangText='immediate'><vspace />OPTIONAL. The parameter value must be set to <spanx style='verb'>true</spanx> or <spanx style='verb'>false</spanx>. If set to <spanx style='verb'>true</spanx>, the authorization server MUST NOT prompt the end-user to authenticate or approve access. Instead, the authorization server attempts to establish the end-user's identity via other means (e.g. browser cookies) and checks if the end-user has previously approved an identical access request by the same client and if that access grant is still active.</t>
+            </list></t>
+
+            <t>If the authorization server does not support an immediate check or if it is unable to establish the end-user's identity or approval status, it MUST deny the request without prompting the end-user. Defaults to <spanx style='verb'>false</spanx> if omitted.</t>
         </section>
 
         <section title="Security Considerations">
