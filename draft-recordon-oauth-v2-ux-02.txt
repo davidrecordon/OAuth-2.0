@@ -1,0 +1,281 @@
+
+
+
+Network Working Group                                   D. Recordon, Ed.
+Internet-Draft                                                  Facebook
+Intended status: Informational                                    A. Tom
+Expires: January 2, 2011                                          Yahoo!
+                                                          B. de Medeiros
+                                                                  Google
+                                                              L. Shepard
+                                                                Facebook
+                                                                Jul 2010
+
+
+                  OAuth 2.0 User Experience Extension
+                     draft-recordon-oauth-v2-ux-01
+
+Abstract
+
+   This specification defines two user experience oriented extension
+   parameters for OAuth 2.0 user authorization requests.
+
+Status of this Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on January 2, 2011.
+
+Copyright Notice
+
+   Copyright (c) 2010 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+
+
+
+Recordon, et al.         Expires January 2, 2011                [Page 1]
+
+Internet-Draft     OAuth 2.0 User Experience Extension          Jul 2010
+
+
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 3
+     1.1.  Notational Conventions  . . . . . . . . . . . . . . . . . . 3
+   2.  Language Preference . . . . . . . . . . . . . . . . . . . . . . 3
+   3.  Display . . . . . . . . . . . . . . . . . . . . . . . . . . . . 3
+   4.  Security Considerations . . . . . . . . . . . . . . . . . . . . 4
+   5.  Normative References  . . . . . . . . . . . . . . . . . . . . . 4
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . . . 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Recordon, et al.         Expires January 2, 2011                [Page 2]
+
+Internet-Draft     OAuth 2.0 User Experience Extension          Jul 2010
+
+
+1.  Introduction
+
+   This extension defines additional parameters for the client to
+   include in OAuth 2.0 requests to the authorization server.  While
+   there are not restrictions around which flows this extension can be
+   used with, it will generally be used with user delegation flows.
+
+1.1.  Notational Conventions
+
+   The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL NOT',
+   'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'MAY', and 'OPTIONAL' in this
+   document are to be interpreted as described in [RFC2119].
+
+
+2.  Language Preference
+
+   A client MAY provide the authorization server with information about
+   an end-user's language preference.  The client includes the following
+   URI query parameter when constructing its request to the end-user
+   endpoint URI:
+
+   language
+      OPTIONAL.  The user's preferred languages represented as a comma-
+      separated list of [RFC5646] basic language ranges in descending
+      priority order.  For example, the value "fr-CA,fr-FR,en-CA"
+      represents the preference for French spoken in Canada, French
+      spoken in France, followed by English spoken in Canada.
+
+   This parameter SHOULD take precedence over both the HTTP Accept-
+   Language header sent by the end-user's browser and any language
+   preference inferred via IP address geolocation.
+
+
+3.  Display
+
+   OAuth 2.0 user delegation flows are designed to work across a wide
+   variety of screen sizes, device types, and contexts.  The client MAY
+   request a specific form factor of dialog from the authorization
+   server based on what they feel is most appropriate.  The client
+   includes the following URI query parameter when constructing its
+   request to the end-user endpoint URI:
+
+   display
+      OPTIONAL.  The most appropriate form factor for the authorization
+      dialog.  If the parameter is included in the request, the value
+      MUST be set to one of the following:
+
+
+
+
+
+Recordon, et al.         Expires January 2, 2011                [Page 3]
+
+Internet-Draft     OAuth 2.0 User Experience Extension          Jul 2010
+
+
+
+
+      page
+         A full-page authorization screen (the default).
+
+      popup
+         A compact dialog optimized for modern web browser popup
+         windows.
+
+      touch
+         A mobile-optimized dialog designed for modern smartphones such
+         as Android and iPhone.
+
+      wap
+         An extremely compact dialog optimized for older mobile web
+         browsers.
+
+
+4.  Security Considerations
+
+   No additional considerations beyond those described within the OAuth
+   2.0 Protocol.
+
+
+5.  Normative References
+
+   [I-D.ietf.oauth-v2]
+              Hammer-Lahav, E., Ed., Recordon, D., and D. Hardt, "The
+              OAuth 2.0 Protocol", Jun 2010.
+
+   [RFC2119]  Bradner, B., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119.
+
+   [RFC5646]  Phillips, A., Ed. and M. Davis, Ed., "Tags for Identifying
+              Languages", BCP 47, RFC 5646.
+
+
+Authors' Addresses
+
+   David Recordon (editor)
+   Facebook
+
+   Email: davidrecordon@facebook.com
+
+
+
+
+
+
+
+
+Recordon, et al.         Expires January 2, 2011                [Page 4]
+
+Internet-Draft     OAuth 2.0 User Experience Extension          Jul 2010
+
+
+   Allen Tom
+   Yahoo!
+
+   Email: atom@yahoo-inc.com
+
+
+   Breno de Medeiros
+   Google
+
+   Email: breno@google.com
+
+
+   Luke Shepard
+   Facebook
+
+   Email: lshepard@facebook.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Recordon, et al.         Expires January 2, 2011                [Page 5]
+
+
