@@ -13,7 +13,7 @@ Expires: January 2, 2011                                          Yahoo!
 
 
                   OAuth 2.0 User Experience Extension
-                     draft-recordon-oauth-v2-ux-01
+                     draft-recordon-oauth-v2-ux-02
 
 Abstract
 
@@ -132,7 +132,7 @@ Internet-Draft     OAuth 2.0 User Experience Extension          Jul 2010
    A client MAY provide the authorization server with information about
    an end-user's language preference.  The client includes the following
    URI query parameter when constructing its request to the end-user
-   endpoint URI:
+   authorization endpoint URI:
 
    language
       OPTIONAL.  The user's preferred languages represented as a comma-
@@ -153,7 +153,7 @@ Internet-Draft     OAuth 2.0 User Experience Extension          Jul 2010
    request a specific form factor of dialog from the authorization
    server based on what they feel is most appropriate.  The client
    includes the following URI query parameter when constructing its
-   request to the end-user endpoint URI:
+   request to the end-user authorization endpoint URI:
 
    display
       OPTIONAL.  The most appropriate form factor for the authorization
