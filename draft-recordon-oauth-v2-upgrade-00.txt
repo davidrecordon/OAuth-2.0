@@ -1,0 +1,225 @@
+
+
+
+Network Working Group                                   D. Recordon, Ed.
+Internet-Draft                                                  Facebook
+Intended status: Informational                                  Jul 2010
+Expires: January 2, 2011
+
+
+                   OAuth 2.0 Token Upgrade Extension
+                   draft-recordon-oauth-v2-upgrade-00
+
+Abstract
+
+   This specification defines an OAuth 2.0 assertion request format for
+   upgrading OAuth 1.0 token and secret pairs to OAuth 2.0 access
+   tokens.
+
+Status of this Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at http://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on January 2, 2011.
+
+Copyright Notice
+
+   Copyright (c) 2010 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents
+   (http://trustee.ietf.org/license-info) in effect on the date of
+   publication of this document.  Please review these documents
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
+   include Simplified BSD License text as described in Section 4.e of
+   the Trust Legal Provisions and are provided without warranty as
+   described in the Simplified BSD License.
+
+
+
+
+
+Recordon                 Expires January 2, 2011                [Page 1]
+
+Internet-Draft      OAuth 2.0 Token Upgrade Extension           Jul 2010
+
+
+Table of Contents
+
+   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . . . 3
+     1.1.  Notational Conventions  . . . . . . . . . . . . . . . . . . 3
+   2.  Assertion Request . . . . . . . . . . . . . . . . . . . . . . . 3
+   3.  Assertion Response  . . . . . . . . . . . . . . . . . . . . . . 4
+   4.  Security Considerations . . . . . . . . . . . . . . . . . . . . 4
+   5.  Normative References  . . . . . . . . . . . . . . . . . . . . . 4
+   Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Recordon                 Expires January 2, 2011                [Page 2]
+
+Internet-Draft      OAuth 2.0 Token Upgrade Extension           Jul 2010
+
+
+1.  Introduction
+
+   This extension defines an assertion format as described in section
+   4.1.3 of [I-D.ietf.oauth-v2].
+
+1.1.  Notational Conventions
+
+   The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL NOT',
+   'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'MAY', and 'OPTIONAL' in this
+   document are to be interpreted as described in [RFC2119].
+
+
+2.  Assertion Request
+
+   The client will make a request to the authorization server as
+   described in section 4.1.3 of [I-D.ietf.oauth-v2] with the following
+   parameters:
+
+   assertion_type
+      REQUIRED. "http://oauth.net/token/1.0"
+
+   assertion
+      REQUIRED.  The OAuth 1.0 token and token secret to be upgraded as
+      a JSON object with the keys `token` and `token_secret`.
+
+   client_id
+      REQUIRED.  The client identifier as described in Section 2 of
+      [I-D.ietf.oauth-v2].
+
+   client_secret
+      REQUIRED.  The client secret as described in Section 2 of
+      [I-D.ietf.oauth-v2].
+
+   For example, the client makes the following HTTP request using
+   transport-layer security:
+
+POST /token HTTP/1.1
+Host: server.example.com
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=assertion&
+assertion_type=http%3A%2F%2Foauth.net%2Ftoken%2F1.0&
+assertion=%7B'token'%3A'rjmaGaw48XT9ATWfofaz'%2C'token_secret'%3A'OgFcfN9J2EMojBR'%7D&
+client_id=8eSEIpnqmM&
+client_secret=s6BhdRkqt3
+
+
+
+
+
+
+Recordon                 Expires January 2, 2011                [Page 3]
+
+Internet-Draft      OAuth 2.0 Token Upgrade Extension           Jul 2010
+
+
+3.  Assertion Response
+
+   The authorization server MUST validate the client credentials, token,
+   and token secret.  If they are all valid, the authorization server
+   issues an access token response as described in Section 4.2 of
+   [I-D.ietf.oauth-v2].  The new access token SHOULD have the same
+   expiration and scope as the OAuth 1.0 token which the client is
+   upgrading.
+
+
+4.  Security Considerations
+
+   No additional considerations beyond those described within the OAuth
+   2.0 Protocol.
+
+
+5.  Normative References
+
+   [I-D.ietf.oauth-v2]
+              Hammer-Lahav, E., Ed., Recordon, D., and D. Hardt, "The
+              OAuth 2.0 Protocol", Jun 2010.
+
+   [RFC2119]  Bradner, B., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119.
+
+
+Author's Address
+
+   David Recordon (editor)
+   Facebook
+
+   Email: davidrecordon@facebook.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Recordon                 Expires January 2, 2011                [Page 4]
+
+

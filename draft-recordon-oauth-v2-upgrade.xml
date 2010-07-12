@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?rfc toc="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="info" docName="draft-recordon-oauth-v2-upgrade-00" ipr="trust200902">
+    <front>
+        <title>OAuth 2.0 Token Upgrade Extension</title>
+        <author fullname='David Recordon' surname='Recordon' initials='D.' role='editor'>
+            <organization>Facebook</organization>
+            <address>
+                <email>davidrecordon@facebook.com</email>
+            </address>
+        </author>
+
+        <date year="2010" month="Jul"/>
+
+        <abstract>
+            <t>This specification defines an OAuth 2.0 assertion request format for upgrading OAuth 1.0 token and secret pairs to OAuth 2.0 access tokens.</t>
+        </abstract>
+    </front>
+
+    <middle>        
+        <section title="Introduction">
+            <t>This extension defines an assertion format as described in section 4.1.3 of <xref target="I-D.ietf.oauth-v2" />.</t>
+
+            <section title="Notational Conventions">
+                <t>The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'MAY', and 'OPTIONAL' in this document are to be interpreted as described in <xref target='RFC2119' />.</t>
+            </section>
+        </section>
+
+        <section title="Assertion Request">
+            <t>The client will make a request to the authorization server as described in section 4.1.3 of <xref target="I-D.ietf.oauth-v2" /> with the following parameters:</t>
+
+            <t><list style="hanging">
+                <t hangText="assertion_type"><vspace />REQUIRED. "http://oauth.net/token/1.0"</t>
+                <t hangText="assertion"><vspace />REQUIRED. The OAuth 1.0 token and token secret to be upgraded as a JSON object with the keys `token` and `token_secret`.</t>
+                <t hangText="client_id"><vspace />REQUIRED. The client identifier as described in Section 2 of <xref target="I-D.ietf.oauth-v2" />.</t>
+                <t hangText="client_secret"><vspace />REQUIRED. The client secret as described in Section 2 of <xref target="I-D.ietf.oauth-v2" />.</t>
+            </list></t>
+
+            <t>For example, the client makes the following HTTP request using transport-layer security:</t>
+            <figure><artwork><![CDATA[
+POST /token HTTP/1.1
+Host: server.example.com
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=assertion&
+assertion_type=http%3A%2F%2Foauth.net%2Ftoken%2F1.0&
+assertion=%7B'token'%3A'rjmaGaw48XT9ATWfofaz'%2C'token_secret'%3A'OgFcfN9J2EMojBR'%7D&
+client_id=8eSEIpnqmM&
+client_secret=s6BhdRkqt3
+            ]]></artwork></figure>
+        </section>
+
+        <section title="Assertion Response">
+          <t>The authorization server MUST validate the client credentials, token, and token secret. If they are all valid, the authorization server issues an access token response as described in Section 4.2 of <xref target="I-D.ietf.oauth-v2" />. The new access token SHOULD have the same expiration and scope as the OAuth 1.0 token which the client is upgrading.</t>
+        </section>
+
+        <section title="Security Considerations">
+            <t>No additional considerations beyond those described within the OAuth 2.0 Protocol.</t>
+        </section>
+    </middle>
+
+    <back>
+        <references title="Normative References">
+            <reference anchor="I-D.ietf.oauth-v2">
+                <front>
+                    <title abbrev='OAuth 2.0'>The OAuth 2.0 Protocol</title>
+                    <author initials='E.' surname='Hammer-Lahav' fullname='Eran Hammer-Lahav' role='editor'></author>
+                    <author initials='D.' surname='Recordon' fullname='David Recordon'></author>
+                    <author initials='D.' surname='Hardt' fullname='Dick Hardt'></author>
+                    <date year="2010" month="Jun"/>
+                </front>
+                <format type='TXT' target='http://tools.ietf.org/id/draft-ietf-oauth-v2-10.txt' />
+                <format type='HTML' target='http://tools.ietf.org/id/draft-ietf-oauth-v2-10.html' />
+            </reference>
+
+            <reference anchor="RFC2119">
+                <front>
+                    <title abbrev='RFC Key Words'>Key words for use in RFCs to Indicate Requirement Levels</title>
+                    <author initials='B.' surname='Bradner' fullname='Scott Bradner'></author>
+                </front>
+                <seriesInfo name='BCP' value='14' />
+                <seriesInfo name='RFC' value='2119' />
+                <format type='TXT' target='ftp://ftp.isi.edu/in-notes/rfc2119.txt' />
+                <format type='HTML' target='http://xml.resource.org/public/rfc/html/rfc2119.html' />
+            </reference>
+        </references>
+    </back>
+</rfc>
