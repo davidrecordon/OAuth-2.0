@@ -3,7 +3,7 @@
 <?rfc sortrefs="yes"?>
 <?rfc compact="yes"?>
 <?rfc subcompact="no"?>
-<rfc category="info" docName="draft-recordon-oauth-v2-device-00" ipr="trust200902">
+<rfc category="info" docName="draft-recordon-oauth-v2-device-01" ipr="trust200902">
   <front>
     <title>OAuth 2.0 Device Profile</title>
     <author fullname='David Recordon' surname='Recordon' initials='D.' role='editor'>
@@ -265,8 +265,9 @@ Cache-Control: no-store
         <t>
           The client requests an access token by making an HTTP <spanx style='verb'>POST</spanx>
           request to the token endpoint as described in Section 4.1.1 of
-          <xref target="I-D.ietf.oauth-v2" />. The <spanx style="verb">redirect_uri</spanx>
-          parameter is NOT REQUIRED as part of this request.
+          <xref target="I-D.ietf.oauth-v2" />. The <spanx style="verb">redirect_uri</spanx> and
+          <spanx style="verb">client_secret</spanx> parameters are NOT REQUIRED as part of this
+          request.
         </t>
       </section>
 
@@ -290,7 +291,18 @@ Cache-Control: no-store
     </section>
 
     <section title="Security Considerations">
-      <t>Length of codes (Google has done some research here).</t>
+      <section title='Length of user verification codes'>
+        <t>You want the codes to be sufficiently long that they can't be brute forced, but short enough to be easy to type. (Google has done some research here).</t>
+      </section>
+
+      <section title='Client secrets'>
+        <t>This profile doesn't include the client secret when requesting an access token. This is due to the fact that it's impossible to guarantee that all devices can securely store secrets. There are basically two thoughts in terms of how to solve (or mitigate) it:
+          <list style='numbers'>
+            <t>Devices which have TPM can use it to sign requests and thus securely authenticate themselves to authorization servers.</t>
+            <t>An authorization server can issue a second client secret which is only for the device profile. If it is compromised then the client secret used by the application's web servers would still be secure.</t>
+          </list>
+        </t>
+      </section>
     </section>
   </middle>
 
