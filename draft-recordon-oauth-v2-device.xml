@@ -212,7 +212,7 @@ response_type=device_code&client_id=s6BhdRkqt3
             </t>
             <t hangText='interval'>
               <vspace />
-              OPTIONAL. The minimum amount of time in seconds that the client SHOULD wait
+              OPTIONAL. The minimum amount of time in seconds that the client MUST wait
               between polling requests to the token endpoint.
             </t>
           </list>
@@ -257,9 +257,9 @@ Cache-Control: no-store
         </t>
         <t>
           The client makes the following request at an arbitrary but reasonable interval which
-          MUST NOT exceed the minimum interval rate provided by the authorization server (if
-          present via the <spanx style='verb'>interval</spanx> parameter). Alternatively, the
-          client MAY provide a user interface for the end-user to manually inform it when
+          MUST NOT be less than the minimum interval rate provided by the authorization server
+          (if present via the <spanx style='verb'>interval</spanx> parameter). Alternatively,
+          the client MAY provide a user interface for the end-user to manually inform it when
           authorization was granted.
         </t>
         <t>
