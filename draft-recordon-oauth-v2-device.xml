@@ -256,11 +256,11 @@ Cache-Control: no-store
           denies the request, or the verification code expires.
         </t>
         <t>
-          The client makes the following request at an arbitrary but reasonable interval which
-          MUST NOT be less than the minimum interval rate provided by the authorization server
-          (if present via the <spanx style='verb'>interval</spanx> parameter). Alternatively,
-          the client MAY provide a user interface for the end-user to manually inform it when
-          authorization was granted.
+          The client makes the next request after an arbitrary but reasonable length of time,
+          which MUST be longer than or equal to the minimum length of time provided by the
+          authorization server in the <spanx style='verb'>interval</spanx> parameter if present.
+          Alternatively, the client MAY provide a user interface for the end-user to manually
+          inform it when authorization was granted.
         </t>
         <t>
           The client requests an access token by making an HTTP <spanx style='verb'>POST</spanx>
