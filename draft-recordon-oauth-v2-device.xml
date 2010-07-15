@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?rfc toc="yes"?>
+<?rfc sortrefs="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="info" docName="draft-recordon-oauth-v2-device-00" ipr="trust200902">
+  <front>
+    <title>OAuth 2.0 Device Profile</title>
+    <author fullname='David Recordon' surname='Recordon' initials='D.' role='editor'>
+      <organization>Facebook</organization>
+      <address>
+        <email>davidrecordon@facebook.com</email>
+      </address>
+    </author>
+    <author fullname='Brent Goldman' surname='Goldman' initials='B.'>
+      <organization>Facebook</organization>
+      <address>
+        <email>bgoldman@facebook.com</email>
+      </address>
+    </author>
+
+    <date year="2010" month="Jul"/>
+
+    <abstract>
+      <t>
+        The device profile is suitable for OAuth 2.0 clients executing on devices which do not
+        have an easy data-entry method (e.g. game consoles or media hubs), but where the
+        end-user has separate access to a user-agent on another computer or device (e.g. home
+        computer, a laptop, or a smart phone).
+      </t>
+    </abstract>
+  </front>
+
+  <middle>        
+    <section title="Introduction">
+      <section title="Notational Conventions">
+        <t>The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'MAY', and 'OPTIONAL' in this document are to be interpreted as described in <xref target='RFC2119' />.</t>
+      </section>
+
+      <section title="Terminology">
+        <t>
+          <list style="hanging" hangIndent="6">
+            <t hangText="device endpoint">
+              <vspace />
+              The authorization server's HTTP endpoint capable of issuing verification codes, user codes, and verification URLs.
+            </t>
+            <t hangText="device verification code">
+              <vspace />
+              A short-lived token representing an authorization session.
+            </t>
+            <t hangText="end-user verificition code">
+              <vspace />
+              A short-lived token which the device displays to the end user, is entered by the end-user on the authorization sever, and is thus used to bind the device to the end-user.
+            </t> 
+          </list>
+        </t>
+      </section>
+
+      <section title="Overview">
+        <t>
+          The device profile is suitable for clients executing on devices which do not have an easy
+          data-entry method (e.g. game consoles or media hubs), but where the end-user has separate
+          access to a user-agent on another computer or device (e.g. home computer, a laptop, or a
+          smart phone). The client is incapable of receiving incoming requests from the authorization
+          server (incapable of acting as an HTTP server).
+        </t>
+        <t>
+          Instead of interacting with the end-user's user-agent, the client instructs the end-user
+          to use another computer or device and connect to the authorization server to approve the
+          access request. Since the client cannot receive incoming requests, it polls the
+          authorization server repeatedly until the end-user completes the approval process.
+        </t>
+        <t>
+          This device flow does not utilize the client secret since the client executables
+          reside on a local device which makes the client secret accessible and exploitable.
+        </t>
+        <figure title='Device Flow' anchor='Figure 1'>
+          <artwork>
+<![CDATA[
++----------+                                +----------------+
+|          |>---(A)-- Client Identifier --->|                |
+|          |                                |                |
+|          |<---(B)-- Verification Code, --<|                |
+|          |              User Code,        |                |
+|          |         & Verification URI     |                |
+|  Device  |                                |                |
+|  Client  |         Client Identifier &    |                |
+|          |>---(E)-- Verification Code --->|                |
+|          |    ...                         |                |
+|          |>---(E)--->                     |                |
+|          |                                |  Authorization |
+|          |<---(F)-- Access Token --------<|     Server     |
++----------+  (w/ Optional Refresh Token)   |                |
+      v                                     |                |
+      :                                     |                |
+     (C) User Code & Verification URI       |                |
+      :                                     |                |
+      v                                     |                |
++----------+                                |                |
+| End-user |                                |                |
+|    at    |<---(D)-- User authenticates -->|                |
+|  Browser |                                |                |
++----------+                                +----------------+
+]]>
+          </artwork>
+        </figure>
+        <t>
+          The device flow illustrated in <xref target='Figure 1' /> includes the following
+          steps:
+
+          <list style='format (%C)'>
+            <t>
+              The client requests access from the authorization server and includes its client
+              identifier in the request.
+            </t>
+            <t>
+              The authorization server issues a verification code, an end-user code, and provides the
+              end-user verification URI.
+            </t>
+            <t>
+              The client instructs the end-user to use its user-agent (elsewhere) and visit the
+              provided end-user verification URI. The client provides the end-user with the
+              end-user code to enter in order to grant access.
+            </t>
+            <t>
+              The authorization server authenticates the end-user (via the user-agent) and
+              prompts the end-user to grant the client's access request. If the end-user agrees to
+              the client's access request, the end-user enters the end-user code provided by the
+              client. The authorization server validates the end-user code provided by the
+              end-user.
+            </t>
+            <t>
+              While the end-user authorizes (or denies) the client's request (D), the client
+              repeatedly polls the authorization server to find out if the end-user completed the
+              end-user authorization step. The client includes the verification code and its client
+              identifier.
+            </t>
+            <t>
+              Assuming the end-user granted access, the authorization server validates the
+              verification code provided by the client and responds back with the access token.
+            </t>
+          </list>
+        </t>
+      </section>
+
+      <section title='Client Requests Authorization'>
+        <t>
+          The client initiates the flow by requesting a set of verification codes from the
+          authorization server by making an HTTP <spanx style='verb'>POST</spanx> request to the
+          device endpoint. The client constructs a request URI by adding the following
+          parameters to the request:
+
+          <list style='hanging' hangIndent='6'>
+            <t hangText='response_type'>
+              <vspace />
+              REQUIRED. The parameter value MUST be set to
+              <spanx style='verb'>device_code</spanx>.
+            </t>
+            <t hangText='client_id'>
+              <vspace />
+              REQUIRED. The client identifier as described in Section 2 of <xref target='I-D.ietf.oauth-v2' />.
+            </t>
+            <t hangText='scope'>
+              <vspace />
+              OPTIONAL. The scope of the access request expressed as a list of space-delimited
+              strings. The value of the <spanx style='verb'>scope</spanx> parameter is defined
+              by the authorization server. If the value contains multiple space-delimited
+              strings, their order does not matter, and each string adds an additional access
+              range to the requested scope.
+            </t>
+          </list>
+        </t>
+        <figure>
+          <preamble>
+            For example, the client makes the following HTTPS request (line breaks are for
+            display purposes only):
+          </preamble>
+          <artwork>
+<![CDATA[
+POST /token HTTP/1.1
+Host: server.example.com
+Content-Type: application/x-www-form-urlencoded
+
+response_type=device_code&client_id=s6BhdRkqt3
+]]>
+          </artwork>
+        </figure>
+        <t>
+          In response, the authorization server generates a verification code and an end-user
+          code and includes them in the HTTP response body using the
+          <spanx style='verb'>application/json</spanx> format with a 200 status code (OK).
+          The response contains the following parameters:
+
+          <list style='hanging' hangIndent='6'>
+            <t hangText='device_code'>
+              <vspace />
+              REQUIRED. The verification code.
+            </t>
+            <t hangText='user_code'>
+              <vspace />
+              REQUIRED. The end-user verification code.
+            </t>
+            <t hangText='verification_uri'>
+              <vspace />
+              REQUIRED. The end-user verification URI on the authorization server. The URI should be
+              short and easy to remember as end-users will be asked to manually type it into
+              their user-agent.
+            </t>
+            <t hangText='expires_in'>
+              <vspace />
+              OPTIONAL. The duration in seconds of the verification code lifetime.
+            </t>
+            <t hangText='interval'>
+              <vspace />
+              OPTIONAL. The minimum amount of time in seconds that the client SHOULD wait
+              between polling requests to the token endpoint.
+            </t>
+          </list>
+        </t>
+        <figure>
+          <preamble>
+            For example:
+          </preamble>
+          <artwork>
+<![CDATA[
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-store
+
+{
+  "device_code":"74tq5miHKB",
+  "user_code":"94248",
+  "verification_uri":"http://www.example.com/device",
+  "interval"=5
+}
+]]>
+          </artwork>
+        </figure>
+        <t>
+          The client displays the end-user code and the end-user verification URI to the end-user, and
+          instructs the end-user to visit the URI using a user-agent and enter the end-user code.
+        </t>
+        <t>
+          The end-user manually types the provided verification URI and authenticates with the
+          authorization server. The authorization server prompts the end-user to authorize the
+          client's request by entering the end-user code provided by the client. Once the
+          end-user approves or denies the request, the authorization server informs the end-user
+          to return to the device for further instructions.
+        </t>
+      </section>
+
+      <section title='Client Requests Access Token'>
+        <t>
+          Since the client is unable to receive incoming requests from the authorization
+          server, it polls the authorization server repeatedly until the end-user grants or
+          denies the request, or the verification code expires.
+        </t>
+        <t>
+          The client makes the following request at an arbitrary but reasonable interval which
+          MUST NOT exceed the minimum interval rate provided by the authorization server (if
+          present via the <spanx style='verb'>interval</spanx> parameter). Alternatively, the
+          client MAY provide a user interface for the end-user to manually inform it when
+          authorization was granted.
+        </t>
+        <t>
+          The client requests an access token by making an HTTP <spanx style='verb'>POST</spanx>
+          request to the token endpoint as described in Section 4.1.1 of
+          <xref target="I-D.ietf.oauth-v2" />. The <spanx style="verb">redirect_uri</spanx>
+          parameter is NOT REQUIRED as part of this request.
+        </t>
+      </section>
+
+      <section title="Additional Error Responses">
+        <t>
+          The following error responses are defined in addition to those within Section 4.3.1
+          of <xref target="I-D.ietf.oauth-v2" />.
+
+          <list style='hanging' hangIndent='6'>
+            <t hangText='authorization_pending'>
+              <vspace />
+              The authorization request is still pending as the end-user hasn't yet visited the authorization server and entered their verification code.
+            </t>
+            <t hangText='slow_down'>
+              <vspace />
+              The client is polling too quickly and should back off at a reasonable rate.
+            </t>
+          </list>
+        </t>
+      </section>
+    </section>
+
+    <section title="Security Considerations">
+      <t>Length of codes (Google has done some research here).</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <reference anchor="I-D.ietf.oauth-v2">
+        <front>
+          <title abbrev='OAuth 2.0'>The OAuth 2.0 Protocol</title>
+          <author initials='E.' surname='Hammer-Lahav' fullname='Eran Hammer-Lahav' role='editor'></author>
+          <author initials='D.' surname='Recordon' fullname='David Recordon'></author>
+          <author initials='D.' surname='Hardt' fullname='Dick Hardt'></author>
+          <date year="2010" month="Jun"/>
+        </front>
+        <format type='TXT' target='http://tools.ietf.org/id/draft-ietf-oauth-v2-10.txt' />
+        <format type='HTML' target='http://tools.ietf.org/id/draft-ietf-oauth-v2-10.html' />
+      </reference>
+
+      <reference anchor="RFC2119">
+        <front>
+          <title abbrev='RFC Key Words'>Key words for use in RFCs to Indicate Requirement Levels</title>
+          <author initials='B.' surname='Bradner' fullname='Scott Bradner'></author>
+        </front>
+        <seriesInfo name='BCP' value='14' />
+        <seriesInfo name='RFC' value='2119' />
+        <format type='TXT' target='ftp://ftp.isi.edu/in-notes/rfc2119.txt' />
+        <format type='HTML' target='http://xml.resource.org/public/rfc/html/rfc2119.html' />
+      </reference>
+    </references>
+  </back>
+</rfc>
