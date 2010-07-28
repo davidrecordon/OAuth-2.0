@@ -3,7 +3,7 @@
 
 Network Working Group                                   D. Recordon, Ed.
 Internet-Draft                                                  Facebook
-Intended status: Informational                                    A. Tom
+Intended status: Standards Track                                  A. Tom
 Expires: January 2, 2011                                          Yahoo!
                                                           B. de Medeiros
                                                                   Google

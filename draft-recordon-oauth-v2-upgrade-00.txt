@@ -3,7 +3,7 @@
 
 Network Working Group                                   D. Recordon, Ed.
 Internet-Draft                                                  Facebook
-Intended status: Informational                                  Jul 2010
+Intended status: Standards Track                                Jul 2010
 Expires: January 2, 2011
 
 
@@ -64,10 +64,10 @@ Table of Contents
    2.  Assertion Request . . . . . . . . . . . . . . . . . . . . . . . 3
    3.  Assertion Response  . . . . . . . . . . . . . . . . . . . . . . 4
    4.  Security Considerations . . . . . . . . . . . . . . . . . . . . 4
-   5.  Normative References  . . . . . . . . . . . . . . . . . . . . . 4
+   5.  References  . . . . . . . . . . . . . . . . . . . . . . . . . . 4
+     5.1.  Normative References  . . . . . . . . . . . . . . . . . . . 4
+     5.2.  Informative References  . . . . . . . . . . . . . . . . . . 4
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . . . 4
-
-
 
 
 
@@ -149,15 +149,15 @@ Internet-Draft      OAuth 2.0 Token Upgrade Extension           Jul 2010
    For example, the client makes the following HTTP request using
    transport-layer security:
 
-POST /token HTTP/1.1
-Host: server.example.com
-Content-Type: application/x-www-form-urlencoded
+ POST /token HTTP/1.1
+ Host: server.example.com
+ Content-Type: application/x-www-form-urlencoded
 
-grant_type=assertion&
-assertion_type=http%3A%2F%2Foauth.net%2Ftoken%2F1.0&
-assertion=%7B'token'%3A'rjmaGaw48XT9ATWfofaz'%2C'token_secret'%3A'OgFcfN9J2EMojBR'%7D&
-client_id=8eSEIpnqmM&
-client_secret=s6BhdRkqt3
+ grant_type=assertion&
+ assertion_type=http%3A%2F%2Foauth.net%2Ftoken%2F1.0&
+ assertion=%7B'token'%3A'rjmaGaw9ATW'%2C'token_secret'%3A'OgFcfEjBR'%7D&
+ client_id=8eSEIpnqmM&
+ client_secret=s6BhdRkqt3
 
 
 
@@ -185,14 +185,18 @@ Internet-Draft      OAuth 2.0 Token Upgrade Extension           Jul 2010
    2.0 Protocol.
 
 
-5.  Normative References
+5.  References
+
+5.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+5.2.  Informative References
 
    [I-D.ietf.oauth-v2]
               Hammer-Lahav, E., Ed., Recordon, D., and D. Hardt, "The
               OAuth 2.0 Protocol", Jun 2010.
-
-   [RFC2119]  Bradner, B., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119.
 
 
 Author's Address
@@ -201,10 +205,6 @@ Author's Address
    Facebook
 
    Email: davidrecordon@facebook.com
-
-
-
-
 
 
 

@@ -3,7 +3,7 @@
 
 Network Working Group                                   D. Recordon, Ed.
 Internet-Draft                                                B. Goldman
-Intended status: Informational                                  Facebook
+Intended status: Standards Track                                Facebook
 Expires: January 2, 2011                                        Jul 2010
 
 

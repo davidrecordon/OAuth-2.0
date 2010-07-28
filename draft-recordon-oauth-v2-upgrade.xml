@@ -1,9 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?rfc toc="yes"?>
-<?rfc sortrefs="yes"?>
-<?rfc compact="yes"?>
-<?rfc subcompact="no"?>
-<rfc category="info" docName="draft-recordon-oauth-v2-upgrade-00" ipr="trust200902">
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE rfc SYSTEM 'rfc2629.dtd'>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+
+<rfc category="std" docName="draft-recordon-oauth-v2-upgrade-00" ipr="trust200902">
+    <?rfc strict='yes' ?>
+    <?rfc toc='yes' ?>
+    <?rfc tocdepth='3' ?>
+    <?rfc symrefs='yes' ?>
+    <?rfc sortrefs='yes' ?>
+    <?rfc compact='yes' ?>
+    <?rfc subcompact='no' ?>
+
     <front>
         <title>OAuth 2.0 Token Upgrade Extension</title>
         <author fullname='David Recordon' surname='Recordon' initials='D.' role='editor'>
@@ -13,7 +20,7 @@
             </address>
         </author>
 
-        <date year="2010" month="Jul"/>
+        <date year="2010" month="Aug"/>
 
         <abstract>
             <t>This specification defines an OAuth 2.0 assertion request format for upgrading OAuth 1.0 token and secret pairs to OAuth 2.0 access tokens.</t>
@@ -47,7 +54,7 @@ Content-Type: application/x-www-form-urlencoded
 
 grant_type=assertion&
 assertion_type=http%3A%2F%2Foauth.net%2Ftoken%2F1.0&
-assertion=%7B'token'%3A'rjmaGaw48XT9ATWfofaz'%2C'token_secret'%3A'OgFcfN9J2EMojBR'%7D&
+assertion=%7B'token'%3A'rjmaGaw9ATW'%2C'token_secret'%3A'OgFcfEjBR'%7D&
 client_id=8eSEIpnqmM&
 client_secret=s6BhdRkqt3
             ]]></artwork></figure>
@@ -64,6 +71,10 @@ client_secret=s6BhdRkqt3
 
     <back>
         <references title="Normative References">
+            <?rfc include='http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml' ?>
+        </references>
+
+        <references title="Informative References">
             <reference anchor="I-D.ietf.oauth-v2">
                 <front>
                     <title abbrev='OAuth 2.0'>The OAuth 2.0 Protocol</title>
@@ -74,17 +85,6 @@ client_secret=s6BhdRkqt3
                 </front>
                 <format type='TXT' target='http://tools.ietf.org/id/draft-ietf-oauth-v2-10.txt' />
                 <format type='HTML' target='http://tools.ietf.org/id/draft-ietf-oauth-v2-10.html' />
-            </reference>
-
-            <reference anchor="RFC2119">
-                <front>
-                    <title abbrev='RFC Key Words'>Key words for use in RFCs to Indicate Requirement Levels</title>
-                    <author initials='B.' surname='Bradner' fullname='Scott Bradner'></author>
-                </front>
-                <seriesInfo name='BCP' value='14' />
-                <seriesInfo name='RFC' value='2119' />
-                <format type='TXT' target='ftp://ftp.isi.edu/in-notes/rfc2119.txt' />
-                <format type='HTML' target='http://xml.resource.org/public/rfc/html/rfc2119.html' />
             </reference>
         </references>
     </back>
